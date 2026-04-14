@@ -55,6 +55,7 @@ jobs:
         run: |
           chmod +x scripts/run-e2e.sh
           scripts/run-e2e.sh quick
+        # Quick scope: node-bun base + node-bun-claude agent + solo-claude compose
 
   # Full e2e on main push or manual dispatch
   e2e-full:

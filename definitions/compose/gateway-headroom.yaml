@@ -45,9 +45,9 @@ env_file: .env
 volumes:
   - name: workspace
     description: Shared project workspace
-  - name: openclaw-state
-    description: OpenClaw runtime state
-  - name: claude-state
-    description: Claude runtime state
+  - name: openclaw-config
+    description: OpenClaw config persistence
+  - name: claude-config
+    description: Claude configuration persistence
   - name: headroom-data
     description: Headroom proxy data

@@ -95,6 +95,6 @@ networks:
 
 volumes:
   workspace:
-  claude-state:
-  codex-state:
+  claude-config:
+  codex-config:
   headroom-data:

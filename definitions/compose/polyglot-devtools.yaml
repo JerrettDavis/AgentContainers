@@ -48,9 +48,9 @@ env_file: .env
 volumes:
   - name: workspace
     description: Shared project workspace
-  - name: claude-state
-    description: Claude runtime state
-  - name: codex-state
-    description: Codex runtime state
+  - name: claude-config
+    description: Claude configuration persistence
+  - name: codex-config
+    description: Codex configuration persistence
   - name: headroom-data
     description: Headroom proxy data

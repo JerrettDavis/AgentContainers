@@ -1,5 +1,5 @@
 {
-  "manifest_hash": "16df29260fa9f617a06f2e66e156773dbdfca19dde73b7c39d12c1b6e88f95e9",
+  "manifest_hash": "663438a998887e632e5d7627c0d00bd203e7d0026e38907bcec311bccc322ed2",
   "generator_version": "0.1.0",
   "artifacts": [
     {
@@ -111,6 +111,42 @@
       "content_hash": "674bb1da3d085a51fba7a346453abb03fc10c440997e97dd76a8fe1830980919"
     },
     {
+      "type": "dockerfile",
+      "id": "tool-pack-node-bun-devtools",
+      "path": "docker/tool-packs/node-bun-devtools/Dockerfile",
+      "content_hash": "63c85d706cf363c6872b7addce2ec3855b8a135ca6673c39a5d07d1fe0fb530f"
+    },
+    {
+      "type": "dockerfile",
+      "id": "tool-pack-python-devtools",
+      "path": "docker/tool-packs/python-devtools/Dockerfile",
+      "content_hash": "9bbf002b13d433c823940dc1e241fa8d5b4d22203e544a2f16eee558c2a68a97"
+    },
+    {
+      "type": "dockerfile",
+      "id": "tool-pack-dotnet-devtools",
+      "path": "docker/tool-packs/dotnet-devtools/Dockerfile",
+      "content_hash": "54d489dcb8ca71eb60841352af4e1b5f781a2d7c1937f6ac316d72ac2ec2ecff"
+    },
+    {
+      "type": "dockerfile",
+      "id": "tool-pack-rust-devtools",
+      "path": "docker/tool-packs/rust-devtools/Dockerfile",
+      "content_hash": "e108974b7e028efbb9e23fc16e2166af2d9859f204cc9fde8fa95fda6fdf1ce5"
+    },
+    {
+      "type": "dockerfile",
+      "id": "tool-pack-node-py-dotnet-devtools",
+      "path": "docker/tool-packs/node-py-dotnet-devtools/Dockerfile",
+      "content_hash": "3abc1514c196b9e3443da3569123e1c1e05478bea229c64854cb61ab4bb47ff9"
+    },
+    {
+      "type": "dockerfile",
+      "id": "tool-pack-fullstack-polyglot-devtools",
+      "path": "docker/tool-packs/fullstack-polyglot-devtools/Dockerfile",
+      "content_hash": "b0f2c7acf902dd6278def058c38150faa80740a5e4eff5f9fce0ad811c2d42b9"
+    },
+    {
       "type": "compose-fragment",
       "id": "agent-claude",
       "path": "compose/fragments/claude-service.yaml",
@@ -138,13 +174,13 @@
       "type": "compose-stack",
       "id": "stack-gateway-headroom",
       "path": "compose/stacks/gateway-headroom/docker-compose.yaml",
-      "content_hash": "de52c526ee0ca96068da001fbd63db3309551087bb62b3a3df4328dd78b4aab1"
+      "content_hash": "1898e12ccfc9c99a8d3aaa0e039d69ea7099643f738d08558c0db5aef685a7a9"
     },
     {
       "type": "compose-stack",
       "id": "stack-polyglot-devtools",
       "path": "compose/stacks/polyglot-devtools/docker-compose.yaml",
-      "content_hash": "77635cb55a9ad131e77d9ea3dc574f4f6aa617b21be956cf1dd81ce93dfb5b9a"
+      "content_hash": "370ca9b449934489809e1de019c771428f8dd82e45802a918b3014fa654f2a36"
     },
     {
       "type": "compose-stack",
@@ -168,7 +204,7 @@
       "type": "catalog",
       "id": "image-catalog",
       "path": "image-catalog.json",
-      "content_hash": "b2823ddd6d9633b5c31287d735bf74316ad802e7719955f0fe8c8417bd6f1dd9"
+      "content_hash": "9f213e144d4babd79952b32447315ecbf3a87a18a3c733708b7289fd3ced4e1c"
     }
   ]
 }

@@ -96,5 +96,5 @@ networks:
 volumes:
   workspace:
   openclaw-config:
-  claude-state:
+  claude-config:
   headroom-data:

@@ -70,7 +70,7 @@ try {
     $raw = dotnet run --project $GenProj --configuration Release -- emit-e2e-plan 2>$null
     if (-not $raw) { Write-Error "Failed to emit e2e plan"; exit 1 }
     $plan = $raw | ConvertFrom-Json
-    Log-Info ("Plan: {0} bases, {1} combos, {2} agents, {3} compose" -f $plan.bases.Count, $plan.combos.Count, $plan.agents.Count, $plan.compose_stacks.Count)
+    Log-Info ("Plan: {0} bases, {1} combos, {2} agents, {3} tool-packs, {4} compose" -f $plan.bases.Count, $plan.combos.Count, $plan.agents.Count, $plan.tool_packs.Count, $plan.compose_stacks.Count)
 } finally { Pop-Location }
 
 # --- Test Bases ---
@@ -78,7 +78,7 @@ function Test-Bases {
     Log-Hdr "Testing Base Images"
     foreach ($b in $plan.bases) {
         if (-not (Test-Filter $b.id)) { Log-Skip "Base $($b.id) filtered"; continue }
-        if ($Scope -eq "quick" -and $b.id -ne "python") { Log-Skip "Base $($b.id) quick-skip"; continue }
+        if ($Scope -eq "quick" -and $b.id -ne "node-bun") { Log-Skip "Base $($b.id) quick-skip"; continue }
 
         Write-Host "`n  Base: $($b.display_name) [$($b.size_class)]" -ForegroundColor White
         if (Invoke-Build $b.build_context $b.tag) {
@@ -86,6 +86,37 @@ function Test-Bases {
             foreach ($c in $b.validation_commands) { Invoke-Validate $b.tag $c }
             foreach ($c in $b.common_tool_validations) { Invoke-Validate $b.tag $c }
         } else { Log-Fail "Build: $($b.tag)" }
+    }
+}
+
+# --- Test Combos ---
+function Test-Combos {
+    Log-Hdr "Testing Combo Images"
+    foreach ($c in $plan.combos) {
+        if (-not (Test-Filter $c.id)) { Log-Skip "Combo $($c.id) filtered"; continue }
+
+        Write-Host "`n  Combo: $($c.display_name) [$($c.size_class)]" -ForegroundColor White
+        if (Invoke-Build $c.build_context $c.tag) {
+            Log-Pass "Build: $($c.tag)"
+            foreach ($cmd in $c.validation_commands) { Invoke-Validate $c.tag $cmd }
+        } else { Log-Fail "Build: $($c.tag)" }
+    }
+}
+
+# --- Test Tool Packs ---
+function Test-ToolPacks {
+    Log-Hdr "Testing Tool Pack Overlay Images"
+    foreach ($tp in $plan.tool_packs) {
+        if (-not (Test-Filter $tp.id)) { Log-Skip "ToolPack $($tp.id) filtered"; continue }
+
+        Write-Host "`n  ToolPack: $($tp.display_name) [$($tp.size_class)]" -ForegroundColor White
+        docker image inspect $tp.base_tag 2>&1 | Out-Null
+        if ($LASTEXITCODE -ne 0) { Log-Skip "ToolPack $($tp.id) - base not built"; continue }
+
+        if (Invoke-Build $tp.build_context $tp.tag) {
+            Log-Pass "Build: $($tp.tag)"
+            foreach ($cmd in $tp.validation_commands) { Invoke-Validate $tp.tag $cmd }
+        } else { Log-Fail "Build: $($tp.tag)" }
     }
 }
 
@@ -114,37 +145,79 @@ function Test-Agents {
 # --- Test Compose ---
 function Test-Compose {
     Log-Hdr "Testing Compose Stack Readiness"
+
+    # Phase 1: Validate syntax of all generated compose files
+    foreach ($cs in $plan.compose_stacks) {
+        $fullPath = Join-Path $RepoRoot $cs.compose_path
+        if (-not (Test-Path $fullPath)) { Log-Skip "Compose config: $($cs.id) - file not found"; continue }
+
+        Write-Host "`n  Compose config: $($cs.id)" -ForegroundColor White
+
+        # Create a dummy .env file if needed
+        $composeDir = Split-Path $fullPath -Parent
+        $envFile = Join-Path $composeDir ".env"
+        $createdEnv = $false
+        if (-not (Test-Path $envFile)) {
+            New-Item -ItemType File -Path $envFile -Force | Out-Null
+            $createdEnv = $true
+        }
+
+        $env:ANTHROPIC_API_KEY = "e2e-test"
+        $env:GITHUB_TOKEN = "e2e-test"
+        $env:OPENAI_API_KEY = "e2e-test"
+        $env:OPENCLAW_API_KEY = "e2e-test"
+        $env:CODEX_API_KEY = "e2e-test"
+        docker compose -f $fullPath config 2>&1 | Out-Null
+        Remove-Item Env:\ANTHROPIC_API_KEY -ErrorAction SilentlyContinue
+        Remove-Item Env:\GITHUB_TOKEN -ErrorAction SilentlyContinue
+        Remove-Item Env:\OPENAI_API_KEY -ErrorAction SilentlyContinue
+        Remove-Item Env:\OPENCLAW_API_KEY -ErrorAction SilentlyContinue
+        Remove-Item Env:\CODEX_API_KEY -ErrorAction SilentlyContinue
+        if ($LASTEXITCODE -eq 0) { Log-Pass "Compose config: $($cs.id)" }
+        else { Log-Fail "Compose config: $($cs.id)" }
+
+        if ($createdEnv) { Remove-Item -Force $envFile -ErrorAction SilentlyContinue }
+    }
+
+    # Phase 2: Runtime test using generated solo-claude stack
     $imgTag = "agentcontainers/node-bun-claude:latest"
     docker image inspect $imgTag 2>&1 | Out-Null
-    if ($LASTEXITCODE -ne 0) { Log-Skip "Compose: $imgTag not available"; return }
+    if ($LASTEXITCODE -ne 0) { Log-Skip "Compose runtime: $imgTag not available"; return }
 
-    Write-Host "`n  Compose: e2e-health-validation" -ForegroundColor White
-    $dir = Join-Path $RepoRoot "generated\compose\e2e-validation"
-    New-Item -ItemType Directory -Path $dir -Force | Out-Null
-    $file = Join-Path $dir "docker-compose.yaml"
+    $soloClaude = Join-Path $RepoRoot "generated\compose\stacks\solo-claude\docker-compose.yaml"
+    if (-not (Test-Path $soloClaude)) { Log-Skip "Compose runtime: solo-claude stack not found"; return }
 
-    # Build compose YAML line by line to avoid parse issues
-    $sb = New-Object System.Text.StringBuilder
-    [void]$sb.AppendLine("services:")
-    [void]$sb.AppendLine("  agent-health:")
-    [void]$sb.AppendLine("    image: $imgTag")
-    [void]$sb.AppendLine("    command: [""sleep"", ""infinity""]")
-    [void]$sb.AppendLine("    healthcheck:")
-    [void]$sb.AppendLine("      test: [""CMD"", ""node"", ""--version""]")
-    [void]$sb.AppendLine("      interval: 5s")
-    [void]$sb.AppendLine("      timeout: 3s")
-    [void]$sb.AppendLine("      retries: 10")
-    [void]$sb.AppendLine("      start_period: 3s")
-    [void]$sb.AppendLine("    restart: ""no""")
-    [System.IO.File]::WriteAllText($file, $sb.ToString())
+    Write-Host "`n  Compose runtime: solo-claude (generated stack)" -ForegroundColor White
+
+    # Tag local image to match registry reference
+    docker tag $imgTag "ghcr.io/agentcontainers/node-bun-claude:latest" 2>&1 | Out-Null
+    $script:Tags += "ghcr.io/agentcontainers/node-bun-claude:latest"
+
+    # Create override to keep container alive
+    $overrideDir = Join-Path $RepoRoot "generated\compose\stacks\solo-claude"
+    $overrideFile = Join-Path $overrideDir "docker-compose.e2e.yaml"
+    $overrideSb = New-Object System.Text.StringBuilder
+    [void]$overrideSb.AppendLine("services:")
+    [void]$overrideSb.AppendLine("  claude:")
+    [void]$overrideSb.AppendLine("    command: [""sleep"", ""infinity""]")
+    [void]$overrideSb.AppendLine("    healthcheck:")
+    [void]$overrideSb.AppendLine("      test: [""CMD"", ""node"", ""--version""]")
+    [void]$overrideSb.AppendLine("      interval: 5s")
+    [void]$overrideSb.AppendLine("      timeout: 3s")
+    [void]$overrideSb.AppendLine("      retries: 10")
+    [void]$overrideSb.AppendLine("      start_period: 3s")
+    [void]$overrideSb.AppendLine("    restart: ""no""")
+    [System.IO.File]::WriteAllText($overrideFile, $overrideSb.ToString())
 
     $proj = "e2e-ac-$PID"
+    $env:ANTHROPIC_API_KEY = "e2e-test"
     Log-Info "Starting compose stack..."
-    docker compose -f $file -p $proj up -d 2>&1 | Out-Null
+    docker compose -f $soloClaude -f $overrideFile -p $proj up -d 2>&1 | Out-Null
     if ($LASTEXITCODE -ne 0) {
-        Log-Fail "Compose: stack failed to start"
-        docker compose -f $file -p $proj down -v 2>&1 | Out-Null
-        Remove-Item -Recurse -Force $dir -ErrorAction SilentlyContinue
+        Log-Fail "Compose runtime: stack failed to start"
+        docker compose -f $soloClaude -f $overrideFile -p $proj down -v 2>&1 | Out-Null
+        Remove-Item -Force $overrideFile -ErrorAction SilentlyContinue
+        Remove-Item Env:\ANTHROPIC_API_KEY -ErrorAction SilentlyContinue
         return
     }
 
@@ -152,7 +225,7 @@ function Test-Compose {
     $ok = $false
     for ($i = 1; $i -le 12; $i++) {
         Start-Sleep -Seconds 5
-        $st = docker compose -f $file -p $proj ps --format json 2>$null
+        $st = docker compose -f $soloClaude -f $overrideFile -p $proj ps --format json 2>$null
         if ($st) {
             $parsed = $st | ConvertFrom-Json -ErrorAction SilentlyContinue
             if ($parsed -and $parsed.Health -eq "healthy") { $ok = $true; break }
@@ -161,20 +234,21 @@ function Test-Compose {
     }
 
     if ($ok) {
-        Log-Pass "Compose: service healthy"
-        docker compose -f $file -p $proj exec -T agent-health node --version 2>&1 | Out-Null
-        if ($LASTEXITCODE -eq 0) { Log-Pass "Compose: node --version" }
-        else { Log-Fail "Compose: node --version" }
-        docker compose -f $file -p $proj exec -T agent-health claude --version 2>&1 | Out-Null
-        if ($LASTEXITCODE -eq 0) { Log-Pass "Compose: claude --version" }
-        else { Log-Fail "Compose: claude --version" }
+        Log-Pass "Compose runtime: service healthy"
+        docker compose -f $soloClaude -f $overrideFile -p $proj exec -T claude node --version 2>&1 | Out-Null
+        if ($LASTEXITCODE -eq 0) { Log-Pass "Compose runtime: node --version" }
+        else { Log-Fail "Compose runtime: node --version" }
+        docker compose -f $soloClaude -f $overrideFile -p $proj exec -T claude claude --version 2>&1 | Out-Null
+        if ($LASTEXITCODE -eq 0) { Log-Pass "Compose runtime: claude --version" }
+        else { Log-Fail "Compose runtime: claude --version" }
     } else {
-        Log-Fail "Compose: not healthy within timeout"
+        Log-Fail "Compose runtime: not healthy within timeout"
     }
 
     Log-Info "Tearing down..."
-    docker compose -f $file -p $proj down -v 2>&1 | Out-Null
-    Remove-Item -Recurse -Force $dir -ErrorAction SilentlyContinue
+    docker compose -f $soloClaude -f $overrideFile -p $proj down -v 2>&1 | Out-Null
+    Remove-Item -Force $overrideFile -ErrorAction SilentlyContinue
+    Remove-Item Env:\ANTHROPIC_API_KEY -ErrorAction SilentlyContinue
 }
 
 # === Main ===
@@ -189,7 +263,7 @@ switch ($Scope) {
     "bases"   { Test-Bases }
     "agents"  { Test-Bases; Test-Agents }
     "compose" { Test-Bases; Test-Agents; Test-Compose }
-    "full"    { Test-Bases; Test-Agents; Test-Compose }
+    "full"    { Test-Bases; Test-Combos; Test-Agents; Test-ToolPacks; Test-Compose }
 }
 
 if (-not $NoCleanup -and $script:Tags.Count -gt 0) {
