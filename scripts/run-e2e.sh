@@ -59,9 +59,9 @@ FAIL=0
 SKIP=0
 ERRORS=()
 
-log_pass()  { echo -e "  ${GREEN}✓ PASS${NC}: $1"; ((PASS++)); }
-log_fail()  { echo -e "  ${RED}✗ FAIL${NC}: $1"; ERRORS+=("$1"); ((FAIL++)); }
-log_skip()  { echo -e "  ${YELLOW}→ SKIP${NC}: $1"; ((SKIP++)); }
+log_pass()  { echo -e "  ${GREEN}✓ PASS${NC}: $1"; PASS=$((PASS + 1)); }
+log_fail()  { echo -e "  ${RED}✗ FAIL${NC}: $1"; ERRORS+=("$1"); FAIL=$((FAIL + 1)); }
+log_skip()  { echo -e "  ${YELLOW}→ SKIP${NC}: $1"; SKIP=$((SKIP + 1)); }
 log_info()  { echo -e "  ${BLUE}ℹ${NC} $1"; }
 log_header(){ echo -e "\n${BOLD}=== $1 ===${NC}"; }
 

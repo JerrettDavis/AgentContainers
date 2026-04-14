@@ -33,8 +33,11 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      - name: Restore generator
+        run: dotnet restore src/AgentContainers.Generator --nologo
+
       - name: Build generator
-        run: dotnet build src/AgentContainers.Generator --configuration Release --nologo -q
+        run: dotnet build src/AgentContainers.Generator --configuration Release --no-restore --nologo
 
       - name: Emit build matrix
         id: matrix
