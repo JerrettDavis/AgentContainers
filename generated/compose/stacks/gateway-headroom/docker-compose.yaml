@@ -1,0 +1,74 @@
+# AUTO-GENERATED — do not edit by hand.
+# Stack: gateway-headroom (Gateway Stack with Headroom)
+
+services:
+  openclaw:
+    image: ghcr.io/agentcontainers/node-bun-openclaw:latest
+    environment:
+      - OPENCLAW_API_KEY=${OPENCLAW_API_KEY:?OPENCLAW_API_KEY is required}
+      - OPENCLAW_PORT=3000
+      - OPENCLAW_CONFIG_DIR=/home/dev/.config/openclaw
+    volumes:
+      - workspace:/workspace
+      - openclaw-config:/home/dev/.config/openclaw
+    ports:
+      - "${OPENCLAW_PORT:-3000}:3000"
+    networks:
+      - agent-net
+    depends_on:
+      headroom:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:${OPENCLAW_PORT:-3000}/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+    user: "1000:1000"
+  headroom:
+    image: headroom/headroom:latest
+    ports:
+      - "8080:8080"
+    networks:
+      - agent-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+  claude:
+    image: ghcr.io/agentcontainers/node-bun-claude:latest
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:?ANTHROPIC_API_KEY is required}
+      - CLAUDE_CONFIG_DIR=/home/dev/.config/claude
+      - CLAUDE_WORKSPACE=/workspace
+    volumes:
+      - workspace:/workspace
+      - claude-config:/home/dev/.config/claude
+    networks:
+      - agent-net
+    depends_on:
+      headroom:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "claude --version || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    profiles:
+      - claude
+    restart: unless-stopped
+    user: "1000:1000"
+
+networks:
+  agent-net:
+    driver: bridge
+
+volumes:
+  workspace:
+  openclaw-state:
+  claude-state:
+  headroom-data:

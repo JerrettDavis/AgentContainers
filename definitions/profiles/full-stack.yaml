@@ -1,0 +1,11 @@
+id: full-stack
+display_name: Full Stack Profile
+version: v1
+description: Activates all agents and tool packs
+
+include_services: []
+include_agents:
+  - claude
+  - openclaw
+include_tool_packs:
+  - headroom

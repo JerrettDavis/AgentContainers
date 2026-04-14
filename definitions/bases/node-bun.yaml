@@ -1,0 +1,63 @@
+id: node-bun
+display_name: Node.js + Bun
+version: v1
+description: Node.js 22 LTS with Bun runtime
+family: javascript
+
+from:
+  image: "node:22-bookworm-slim"
+
+common_tools: default
+
+provides:
+  - node
+  - "node>=22"
+  - npm
+  - bun
+  - "bun>=1.0"
+  - javascript
+
+install:
+  steps:
+    - description: "Install Bun"
+      run: |
+        curl -fsSL https://bun.sh/install | bash
+        echo 'export BUN_INSTALL="$HOME/.bun"' >> /etc/profile.d/bun.sh
+        echo 'export PATH="$HOME/.bun/bin:$PATH"' >> /etc/profile.d/bun.sh
+
+env:
+  - name: NODE_ENV
+    default: development
+    description: Node.js environment mode
+    sensitive: false
+  - name: BUN_INSTALL
+    default: /home/dev/.bun
+    description: Bun install path
+    sensitive: false
+
+mounts: []
+
+user:
+  name: dev
+  uid: 1000
+  gid: 1000
+  sudo: true
+
+shell: bash
+
+healthcheck:
+  test: ["CMD", "node", "--version"]
+  interval: 30s
+  timeout: 5s
+  retries: 3
+
+validation:
+  commands:
+    - "node --version"
+    - "npm --version"
+    - "bun --version"
+    - "which git"
+
+resource_hints:
+  image_size_class: medium
+  memory_minimum_mb: 512

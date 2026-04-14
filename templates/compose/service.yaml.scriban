@@ -1,0 +1,36 @@
+# AUTO-GENERATED — do not edit by hand.
+# Source: definitions/agents/{{ agent.id }}.yaml
+
+services:
+  {{ agent.compose_capabilities.service_name_default }}:
+    image: ghcr.io/agentcontainers/node-bun-{{ agent.id }}:latest
+    environment:
+{{~ for env in agent.env ~}}
+{{~ if env.sensitive ~}}
+      - {{ env.name }}=${ {{ env.name }}:?{{ env.name }} is required}
+{{~ else if env.default ~}}
+      - {{ env.name }}={{ env.default }}
+{{~ end ~}}
+{{~ end ~}}
+{{~ if agent.mounts.size > 0 ~}}
+    volumes:
+{{~ for mount in agent.mounts ~}}
+      - {{ mount.name }}:{{ mount.container_path }}
+{{~ end ~}}
+{{~ end ~}}
+    networks:
+{{~ for net in agent.compose_capabilities.networks ~}}
+      - {{ net }}
+{{~ end ~}}
+{{~ if agent.healthcheck.test.size > 0 ~}}
+    healthcheck:
+      test: [{{ agent.healthcheck.test | array.join '", "' | prepend '"' | append '"' }}]
+      interval: {{ agent.healthcheck.interval }}
+      timeout: {{ agent.healthcheck.timeout }}
+      retries: {{ agent.healthcheck.retries }}
+{{~ if agent.healthcheck.start_period ~}}
+      start_period: {{ agent.healthcheck.start_period }}
+{{~ end ~}}
+{{~ end ~}}
+    restart: unless-stopped
+    user: "1000:1000"

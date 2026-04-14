@@ -1,0 +1,89 @@
+{
+  "manifest_hash": "09d14b19f2ce47fce048a145c657ef1178b8b0cf166de4c43960c75490b4cdaa",
+  "generator_version": "0.1.0",
+  "images": [
+    {
+      "type": "base",
+      "id": "dotnet",
+      "display_name": ".NET SDK",
+      "family": "dotnet",
+      "from_image": "mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim",
+      "provides": [
+        "dotnet",
+        "dotnet\u003E=8",
+        "csharp",
+        "fsharp"
+      ]
+    },
+    {
+      "type": "base",
+      "id": "node-bun",
+      "display_name": "Node.js \u002B Bun",
+      "family": "javascript",
+      "from_image": "node:22-bookworm-slim",
+      "provides": [
+        "node",
+        "node\u003E=22",
+        "npm",
+        "bun",
+        "bun\u003E=1.0",
+        "javascript"
+      ]
+    },
+    {
+      "type": "base",
+      "id": "python",
+      "display_name": "Python",
+      "family": "python",
+      "from_image": "python:3.12-slim-bookworm",
+      "provides": [
+        "python",
+        "python\u003E=3.12",
+        "pip",
+        "venv"
+      ]
+    },
+    {
+      "type": "combo",
+      "id": "node-py-dotnet",
+      "display_name": "Node.js \u002B Python \u002B .NET",
+      "bases": [
+        "node-bun",
+        "python",
+        "dotnet"
+      ],
+      "provides": [
+        "node",
+        "node\u003E=22",
+        "npm",
+        "bun",
+        "bun\u003E=1.0",
+        "javascript",
+        "python",
+        "python\u003E=3.12",
+        "pip",
+        "dotnet",
+        "dotnet\u003E=8",
+        "csharp"
+      ]
+    },
+    {
+      "type": "agent",
+      "id": "claude",
+      "display_name": "Claude Code",
+      "requires": [
+        "node\u003E=18"
+      ],
+      "install_method": "npm_global"
+    },
+    {
+      "type": "agent",
+      "id": "openclaw",
+      "display_name": "OpenClaw",
+      "requires": [
+        "node"
+      ],
+      "install_method": "npm_global"
+    }
+  ]
+}

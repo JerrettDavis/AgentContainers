@@ -1,0 +1,43 @@
+id: default
+display_name: Default Common Tools
+version: v1
+description: Universal shell utilities installed on every image
+
+packages:
+  apt:
+    - git
+    - curl
+    - wget
+    - less
+    - sudo
+    - jq
+    - nano
+    - vim
+    - unzip
+    - gnupg2
+    - man-db
+    - ripgrep
+    - fd-find
+    - procps
+    - ca-certificates
+    - bash-completion
+    - zsh
+    - tar
+    - xz-utils
+    - tree
+    - htop
+    - openssh-client
+
+post_install:
+  - command: "ln -sf /usr/bin/fdfind /usr/local/bin/fd"
+    description: "Alias fd-find to fd"
+  - command: "ln -sf /usr/bin/rg /usr/local/bin/rg || true"
+    description: "Ensure ripgrep is on PATH"
+
+validation:
+  commands:
+    - "git --version"
+    - "curl --version"
+    - "jq --version"
+    - "which rg"
+    - "which fd"

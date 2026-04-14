@@ -1,0 +1,73 @@
+id: claude
+display_name: Claude Code
+version: v1
+description: Anthropic Claude Code CLI agent overlay
+
+requires:
+  - "node>=18"
+
+conflicts: []
+
+install:
+  method: npm_global
+  package: "@anthropic-ai/claude-code"
+  version: latest
+  post_install:
+    - command: "claude --version"
+      description: "Verify Claude installation"
+
+env:
+  - name: ANTHROPIC_API_KEY
+    required: true
+    description: Anthropic API key
+    sensitive: true
+    inject_from: environment
+  - name: CLAUDE_CONFIG_DIR
+    required: false
+    default: "/home/dev/.config/claude"
+    description: Configuration directory
+    sensitive: false
+  - name: CLAUDE_WORKSPACE
+    required: false
+    default: "/workspace"
+    description: Default workspace path
+    sensitive: false
+
+mounts:
+  - name: workspace
+    container_path: /workspace
+    description: Project workspace (bind mount from host)
+    required: false
+    suggested_host_path: "."
+  - name: claude-config
+    container_path: /home/dev/.config/claude
+    description: Config and state persistence
+    required: false
+    suggested_host_path: "~/.config/claude"
+
+healthcheck:
+  test: ["CMD-SHELL", "claude --version || exit 1"]
+  interval: 30s
+  timeout: 10s
+  retries: 3
+  start_period: 15s
+
+validation:
+  commands:
+    - "claude --version"
+
+shell_helpers:
+  - name: claude-workspace
+    description: "Sets up Claude workspace with correct permissions"
+
+known_caveats:
+  - "Requires ANTHROPIC_API_KEY at runtime; not set at build time"
+  - "Running as non-root user dev; workspace mount must be owned by UID 1000"
+
+privileged_modes: []
+
+compose_capabilities:
+  service_name_default: claude
+  ports: []
+  networks:
+    - agent-net

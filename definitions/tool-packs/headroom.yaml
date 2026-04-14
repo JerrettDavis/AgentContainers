@@ -1,0 +1,50 @@
+id: headroom
+display_name: Headroom Proxy Pack
+version: v1
+description: Headroom token-optimization proxy client
+
+compatible_with:
+  bases:
+    - node-bun
+    - python
+    - dotnet
+    - node-py-dotnet
+  agents:
+    - claude
+    - openclaw
+
+conflicts: []
+
+install:
+  method: npm_global
+  package: "headroom-cli"
+  version: latest
+  post_install:
+    - command: "headroom --version || true"
+      description: "Verify Headroom CLI installation"
+
+env:
+  - name: HEADROOM_PROXY_URL
+    required: false
+    default: "http://headroom:8080"
+    description: URL of Headroom sidecar
+    sensitive: false
+  - name: HEADROOM_API_KEY
+    required: false
+    description: Optional auth token
+    sensitive: true
+    inject_from: environment
+
+sidecar:
+  enabled: true
+  service_definition: "headroom-service"
+  depends_on_agent: true
+
+validation:
+  commands:
+    - "headroom --version || true"
+
+compose_capabilities:
+  sidecar_service: headroom
+  networks:
+    - agent-net

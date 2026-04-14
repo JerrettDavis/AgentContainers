@@ -1,0 +1,56 @@
+id: dotnet
+display_name: .NET SDK
+version: v1
+description: .NET 8 SDK for C# and F# development
+family: dotnet
+
+from:
+  image: "mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim"
+
+common_tools: default
+
+provides:
+  - dotnet
+  - "dotnet>=8"
+  - csharp
+  - fsharp
+
+install:
+  steps:
+    - description: "Configure dotnet CLI telemetry opt-out"
+      run: |
+        echo 'export DOTNET_CLI_TELEMETRY_OPTOUT=1' >> /etc/profile.d/dotnet.sh
+
+env:
+  - name: DOTNET_CLI_TELEMETRY_OPTOUT
+    default: "1"
+    description: Opt out of .NET telemetry
+    sensitive: false
+  - name: DOTNET_NOLOGO
+    default: "1"
+    description: Suppress .NET welcome message
+    sensitive: false
+
+mounts: []
+
+user:
+  name: dev
+  uid: 1000
+  gid: 1000
+  sudo: true
+
+shell: bash
+
+healthcheck:
+  test: ["CMD", "dotnet", "--version"]
+  interval: 30s
+  timeout: 5s
+  retries: 3
+
+validation:
+  commands:
+    - "dotnet --version"
+
+resource_hints:
+  image_size_class: large
+  memory_minimum_mb: 1024

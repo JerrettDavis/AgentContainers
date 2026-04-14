@@ -1,0 +1,49 @@
+name: CI — Build, Validate & Drift Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test --no-build --configuration Release --verbosity normal
+
+      - name: Validate manifests
+        run: dotnet run --project src/AgentContainers.Generator --configuration Release -- validate
+
+      - name: List compatibility matrix
+        run: dotnet run --project src/AgentContainers.Generator --configuration Release -- list-matrix
+
+      - name: Regenerate artifacts
+        run: dotnet run --project src/AgentContainers.Generator --configuration Release -- generate
+
+      - name: Drift check — generated/ must be up-to-date
+        run: |
+          if [ -n "$(git status --porcelain generated/)" ]; then
+            echo "::error::Drift detected in generated/ directory. Run 'dotnet run --project src/AgentContainers.Generator -- generate' locally and commit the result."
+            git diff --stat generated/
+            git diff generated/
+            exit 1
+          fi
+          echo "No drift detected — generated/ is up-to-date."

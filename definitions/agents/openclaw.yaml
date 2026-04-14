@@ -1,0 +1,71 @@
+id: openclaw
+display_name: OpenClaw
+version: v1
+description: OpenClaw agent overlay
+
+requires:
+  - node
+
+conflicts: []
+
+install:
+  method: npm_global
+  package: "openclaw"
+  version: latest
+  post_install:
+    - command: "openclaw --version || true"
+      description: "Verify OpenClaw installation"
+
+env:
+  - name: OPENCLAW_API_KEY
+    required: true
+    description: OpenClaw API key
+    sensitive: true
+    inject_from: environment
+  - name: OPENCLAW_PORT
+    required: false
+    default: "3000"
+    description: OpenClaw listen port
+    sensitive: false
+  - name: OPENCLAW_CONFIG_DIR
+    required: false
+    default: "/home/dev/.config/openclaw"
+    description: OpenClaw configuration directory
+    sensitive: false
+
+mounts:
+  - name: workspace
+    container_path: /workspace
+    description: Project workspace
+    required: false
+    suggested_host_path: "."
+  - name: openclaw-config
+    container_path: /home/dev/.config/openclaw
+    description: Config persistence
+    required: false
+    suggested_host_path: "~/.config/openclaw"
+
+healthcheck:
+  test: ["CMD-SHELL", "curl -sf http://localhost:${OPENCLAW_PORT:-3000}/health || exit 1"]
+  interval: 15s
+  timeout: 5s
+  retries: 5
+  start_period: 20s
+
+validation:
+  commands:
+    - "openclaw --version || true"
+
+shell_helpers: []
+
+known_caveats:
+  - "Requires OPENCLAW_API_KEY at runtime"
+
+privileged_modes: []
+
+compose_capabilities:
+  service_name_default: openclaw
+  ports:
+    - "${OPENCLAW_PORT:-3000}:3000"
+  networks:
+    - agent-net

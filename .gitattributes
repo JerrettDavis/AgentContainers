@@ -1,0 +1,31 @@
+# Auto-detect text files and normalise line endings
+* text=auto eol=lf
+
+# Explicit text files
+*.cs        text diff=csharp
+*.csproj    text diff=xml
+*.props     text diff=xml
+*.targets   text diff=xml
+*.sln       text eol=crlf
+*.md        text
+*.yaml      text
+*.yml       text
+*.json      text
+*.sh        text eol=lf
+*.ps1       text eol=crlf
+*.editorconfig text
+
+# Templates
+*.scriban   text
+
+# Generated artifacts — mark so reviewers see them as generated
+generated/** linguist-generated=true
+generated/**/*.json linguist-generated=true
+
+# Docker
+Dockerfile* text
+
+# Binary
+*.png       binary
+*.ico       binary
+*.nupkg     binary

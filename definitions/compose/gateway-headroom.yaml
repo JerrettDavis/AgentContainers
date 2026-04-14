@@ -1,0 +1,50 @@
+id: gateway-headroom
+display_name: Gateway Stack with Headroom
+version: v1
+description: OpenClaw with Headroom sidecar and optional Claude
+
+services:
+  - id: openclaw
+    agent: openclaw
+    base: node-bun
+    toolpacks:
+      - headroom
+    depends_on:
+      - id: headroom
+        condition: service_healthy
+
+  - id: headroom
+    type: sidecar
+    toolpack: headroom
+    image: "headroom/headroom:latest"
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  - id: claude
+    agent: claude
+    base: node-bun
+    optional: true
+    profiles:
+      - claude
+    depends_on:
+      - id: headroom
+        condition: service_healthy
+
+networks:
+  - name: agent-net
+    driver: bridge
+
+volumes:
+  - name: workspace
+    description: Shared project workspace
+  - name: openclaw-state
+    description: OpenClaw runtime state
+  - name: claude-state
+    description: Claude runtime state
+  - name: headroom-data
+    description: Headroom proxy data

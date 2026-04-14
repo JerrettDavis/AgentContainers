@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agentcontainers.dev/schemas/base.schema.json",
+  "title": "Base Runtime Manifest",
+  "description": "Schema for AgentContainers base runtime definitions (v1)",
+  "type": "object",
+  "required": ["id", "display_name", "version", "family", "from", "provides"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "Unique kebab-case identifier"
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "enum": ["v1"]
+    },
+    "description": {
+      "type": "string"
+    },
+    "family": {
+      "type": "string",
+      "description": "Runtime family (e.g., javascript, python, dotnet)"
+    },
+    "from": {
+      "type": "object",
+      "required": ["image"],
+      "properties": {
+        "image": { "type": "string" },
+        "digest": { "type": "string" }
+      }
+    },
+    "common_tools": {
+      "type": "string",
+      "default": "default"
+    },
+    "provides": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "Capability tokens this base provides"
+    },
+    "install": {
+      "type": "object",
+      "properties": {
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["description", "run"],
+            "properties": {
+              "description": { "type": "string" },
+              "run": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "env": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string" },
+          "default": { "type": "string" },
+          "description": { "type": "string" },
+          "required": { "type": "boolean" },
+          "sensitive": { "type": "boolean" }
+        }
+      }
+    },
+    "user": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "uid": { "type": "integer" },
+        "gid": { "type": "integer" },
+        "sudo": { "type": "boolean" }
+      }
+    },
+    "shell": {
+      "type": "string",
+      "enum": ["bash", "zsh", "sh"]
+    },
+    "healthcheck": {
+      "type": "object",
+      "properties": {
+        "test": { "type": "array", "items": { "type": "string" } },
+        "interval": { "type": "string" },
+        "timeout": { "type": "string" },
+        "retries": { "type": "integer" }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "commands": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "resource_hints": {
+      "type": "object",
+      "properties": {
+        "image_size_class": { "type": "string", "enum": ["small", "medium", "large"] },
+        "memory_minimum_mb": { "type": "integer" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

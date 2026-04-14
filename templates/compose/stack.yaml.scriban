@@ -1,0 +1,68 @@
+# AUTO-GENERATED — do not edit by hand.
+# Stack: {{ stack.id }} ({{ stack.display_name }})
+
+services:
+{{~ for svc in services ~}}
+  {{ svc.name }}:
+    image: {{ svc.image }}
+{{~ if svc.environment.size > 0 ~}}
+    environment:
+{{~ for env in svc.environment ~}}
+      - {{ env }}
+{{~ end ~}}
+{{~ end ~}}
+{{~ if svc.volumes.size > 0 ~}}
+    volumes:
+{{~ for vol in svc.volumes ~}}
+      - {{ vol }}
+{{~ end ~}}
+{{~ end ~}}
+{{~ if svc.ports.size > 0 ~}}
+    ports:
+{{~ for port in svc.ports ~}}
+      - "{{ port }}"
+{{~ end ~}}
+{{~ end ~}}
+    networks:
+{{~ for net in svc.networks ~}}
+      - {{ net }}
+{{~ end ~}}
+{{~ if svc.depends_on.size > 0 ~}}
+    depends_on:
+{{~ for dep in svc.depends_on ~}}
+      {{ dep.id }}:
+        condition: {{ dep.condition }}
+{{~ end ~}}
+{{~ end ~}}
+{{~ if svc.healthcheck ~}}
+    healthcheck:
+      test: {{ svc.healthcheck.test_formatted }}
+      interval: {{ svc.healthcheck.interval }}
+      timeout: {{ svc.healthcheck.timeout }}
+      retries: {{ svc.healthcheck.retries }}
+{{~ if svc.healthcheck.start_period ~}}
+      start_period: {{ svc.healthcheck.start_period }}
+{{~ end ~}}
+{{~ end ~}}
+{{~ if svc.profiles.size > 0 ~}}
+    profiles:
+{{~ for profile in svc.profiles ~}}
+      - {{ profile }}
+{{~ end ~}}
+{{~ end ~}}
+    restart: unless-stopped
+{{~ if svc.user ~}}
+    user: "{{ svc.user }}"
+{{~ end ~}}
+{{~ end ~}}
+
+networks:
+{{~ for net in networks ~}}
+  {{ net.name }}:
+    driver: {{ net.driver }}
+{{~ end ~}}
+
+volumes:
+{{~ for vol in volumes ~}}
+  {{ vol.name }}:
+{{~ end ~}}

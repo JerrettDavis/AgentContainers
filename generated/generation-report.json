@@ -1,0 +1,60 @@
+{
+  "manifest_hash": "09d14b19f2ce47fce048a145c657ef1178b8b0cf166de4c43960c75490b4cdaa",
+  "generator_version": "0.1.0",
+  "artifacts": [
+    {
+      "type": "dockerfile",
+      "id": "base-dotnet",
+      "path": "docker/bases/dotnet/Dockerfile",
+      "content_hash": "53fae62843a231c871d1a318ac394678a66cc7c765218067b9562dc279cf3dfc"
+    },
+    {
+      "type": "dockerfile",
+      "id": "base-node-bun",
+      "path": "docker/bases/node-bun/Dockerfile",
+      "content_hash": "cc5f8ce43a433f8a318944c273f96c70a508daaed0facc370bfe3c3bd6bfe1fb"
+    },
+    {
+      "type": "dockerfile",
+      "id": "base-python",
+      "path": "docker/bases/python/Dockerfile",
+      "content_hash": "f311a847997f44b472da8e1fe0f4f4cd0b30b80723000629920fb0a69dec5add"
+    },
+    {
+      "type": "dockerfile",
+      "id": "combo-node-py-dotnet",
+      "path": "docker/combos/node-py-dotnet/Dockerfile",
+      "content_hash": "775ea3692fb583789465c17e0213e61f51dffb3357b9b5877b6c713570fb71f3"
+    },
+    {
+      "type": "compose-fragment",
+      "id": "agent-claude",
+      "path": "compose/fragments/claude-service.yaml",
+      "content_hash": "66190a9ff8caa4018e140979ff84bb26ef99f910fd6b94c3177738df7aac39d8"
+    },
+    {
+      "type": "compose-fragment",
+      "id": "agent-openclaw",
+      "path": "compose/fragments/openclaw-service.yaml",
+      "content_hash": "e1f9ea0432572bf81df4f072823bf304232b901858006efcd5a9eda40258d584"
+    },
+    {
+      "type": "compose-stack",
+      "id": "stack-gateway-headroom",
+      "path": "compose/stacks/gateway-headroom/docker-compose.yaml",
+      "content_hash": "232a941b78590d247cbc4ffb6c7648d06417313b3b9aa2515e2af8ccc0a1a17c"
+    },
+    {
+      "type": "compose-stack",
+      "id": "stack-solo-claude",
+      "path": "compose/stacks/solo-claude/docker-compose.yaml",
+      "content_hash": "87edefff21e9791ab85b85fab1c899b7175c9b095d6914a5f704558c31322903"
+    },
+    {
+      "type": "catalog",
+      "id": "image-catalog",
+      "path": "image-catalog.json",
+      "content_hash": "d6f003d751d4becade628f78e5e207c05636106aaa4f82db219b5500ffbd2c10"
+    }
+  ]
+}

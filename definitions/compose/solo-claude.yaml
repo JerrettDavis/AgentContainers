@@ -1,0 +1,21 @@
+id: solo-claude
+display_name: Solo Claude Stack
+version: v1
+description: Single Claude agent on node-bun base
+
+services:
+  - id: claude
+    agent: claude
+    base: node-bun
+    toolpacks: []
+    depends_on: []
+
+networks:
+  - name: agent-net
+    driver: bridge
+
+volumes:
+  - name: workspace
+    description: Shared project workspace
+  - name: claude-config
+    description: Claude configuration persistence

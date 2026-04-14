@@ -1,0 +1,31 @@
+# AUTO-GENERATED — do not edit by hand.
+# Stack: solo-claude (Solo Claude Stack)
+
+services:
+  claude:
+    image: ghcr.io/agentcontainers/node-bun-claude:latest
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:?ANTHROPIC_API_KEY is required}
+      - CLAUDE_CONFIG_DIR=/home/dev/.config/claude
+      - CLAUDE_WORKSPACE=/workspace
+    volumes:
+      - workspace:/workspace
+      - claude-config:/home/dev/.config/claude
+    networks:
+      - agent-net
+    healthcheck:
+      test: ["CMD-SHELL", "claude --version || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    user: "1000:1000"
+
+networks:
+  agent-net:
+    driver: bridge
+
+volumes:
+  workspace:
+  claude-config:

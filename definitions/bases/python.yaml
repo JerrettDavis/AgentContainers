@@ -1,0 +1,58 @@
+id: python
+display_name: Python
+version: v1
+description: Python 3.12 with pip and venv
+family: python
+
+from:
+  image: "python:3.12-slim-bookworm"
+
+common_tools: default
+
+provides:
+  - python
+  - "python>=3.12"
+  - pip
+  - venv
+
+install:
+  steps:
+    - description: "Install pipx for isolated tool installs"
+      run: |
+        pip install --no-cache-dir pipx
+        pipx ensurepath
+
+env:
+  - name: PYTHONDONTWRITEBYTECODE
+    default: "1"
+    description: Prevent .pyc files
+    sensitive: false
+  - name: PYTHONUNBUFFERED
+    default: "1"
+    description: Force unbuffered stdout/stderr
+    sensitive: false
+
+mounts: []
+
+user:
+  name: dev
+  uid: 1000
+  gid: 1000
+  sudo: true
+
+shell: bash
+
+healthcheck:
+  test: ["CMD", "python3", "--version"]
+  interval: 30s
+  timeout: 5s
+  retries: 3
+
+validation:
+  commands:
+    - "python3 --version"
+    - "pip --version"
+
+resource_hints:
+  image_size_class: small
+  memory_minimum_mb: 256

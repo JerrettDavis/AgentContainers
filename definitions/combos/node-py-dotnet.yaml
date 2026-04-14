@@ -1,0 +1,40 @@
+id: node-py-dotnet
+display_name: Node.js + Python + .NET
+version: v1
+description: Full-stack combo with Node.js 22, Python 3.12, and .NET 8
+
+bases:
+  - id: node-bun
+    order: 1
+  - id: python
+    order: 2
+  - id: dotnet
+    order: 3
+
+provides:
+  - node
+  - "node>=22"
+  - npm
+  - bun
+  - "bun>=1.0"
+  - javascript
+  - python
+  - "python>=3.12"
+  - pip
+  - dotnet
+  - "dotnet>=8"
+  - csharp
+
+cross_runtime_utilities:
+  apt:
+    - pipx
+
+validation:
+  commands:
+    - "node --version"
+    - "python3 --version"
+    - "dotnet --version"
+
+resource_hints:
+  image_size_class: large
+  memory_minimum_mb: 1024
