@@ -52,6 +52,19 @@ USER dev
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
   CMD ["CMD", "python3", "--version"]
 
+# OCI Image Labels
+ARG BUILD_DATE=unknown
+ARG VCS_REF=unknown
+ARG IMAGE_VERSION=v1
+
 LABEL org.opencontainers.image.title="Python"
 LABEL org.opencontainers.image.description="Python 3.12 with pip and venv"
+LABEL org.opencontainers.image.source="https://github.com/agentcontainers/AgentContainers"
+LABEL org.opencontainers.image.url="https://github.com/agentcontainers/AgentContainers"
+LABEL org.opencontainers.image.vendor="AgentContainers"
+LABEL org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.version="${IMAGE_VERSION}"
+LABEL org.opencontainers.image.created="${BUILD_DATE}"
+LABEL org.opencontainers.image.revision="${VCS_REF}"
 LABEL dev.agentcontainers.runtime-family="python"
+LABEL dev.agentcontainers.image-type="base"

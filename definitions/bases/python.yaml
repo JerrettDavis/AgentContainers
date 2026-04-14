@@ -15,6 +15,10 @@ provides:
   - pip
   - venv
 
+platforms:
+  - linux/amd64
+  - linux/arm64
+
 install:
   steps:
     - description: "Install pipx for isolated tool installs"

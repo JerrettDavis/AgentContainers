@@ -35,6 +35,9 @@ jobs:
       - name: List compatibility matrix
         run: dotnet run --project src/AgentContainers.Generator --configuration Release -- list-matrix
 
+      - name: Emit build matrix (publishing pre-check)
+        run: dotnet run --project src/AgentContainers.Generator --configuration Release -- build-matrix | head -5
+
       - name: Regenerate artifacts
         run: dotnet run --project src/AgentContainers.Generator --configuration Release -- generate
 

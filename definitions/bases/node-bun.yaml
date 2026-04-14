@@ -17,6 +17,10 @@ provides:
   - "bun>=1.0"
   - javascript
 
+platforms:
+  - linux/amd64
+  - linux/arm64
+
 install:
   steps:
     - description: "Install Bun"

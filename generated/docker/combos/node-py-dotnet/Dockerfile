@@ -22,5 +22,18 @@ RUN pip install --no-cache-dir pipx && \
 # Configure dotnet CLI telemetry opt-out
 RUN echo 'export DOTNET_CLI_TELEMETRY_OPTOUT=1' >> /etc/profile.d/dotnet.sh
 
+# OCI Image Labels
+ARG BUILD_DATE=unknown
+ARG VCS_REF=unknown
+ARG IMAGE_VERSION=v1
+
 LABEL org.opencontainers.image.title="Node.js + Python + .NET"
 LABEL org.opencontainers.image.description="Full-stack combo with Node.js 22, Python 3.12, and .NET 8"
+LABEL org.opencontainers.image.source="https://github.com/agentcontainers/AgentContainers"
+LABEL org.opencontainers.image.url="https://github.com/agentcontainers/AgentContainers"
+LABEL org.opencontainers.image.vendor="AgentContainers"
+LABEL org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.version="${IMAGE_VERSION}"
+LABEL org.opencontainers.image.created="${BUILD_DATE}"
+LABEL org.opencontainers.image.revision="${VCS_REF}"
+LABEL dev.agentcontainers.image-type="combo"

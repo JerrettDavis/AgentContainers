@@ -1,30 +1,30 @@
 {
-  "manifest_hash": "09d14b19f2ce47fce048a145c657ef1178b8b0cf166de4c43960c75490b4cdaa",
+  "manifest_hash": "12b7757b39523c90df6633ed3b3f697338a3f4ce7b7d37136a47e58373069725",
   "generator_version": "0.1.0",
   "artifacts": [
     {
       "type": "dockerfile",
       "id": "base-dotnet",
       "path": "docker/bases/dotnet/Dockerfile",
-      "content_hash": "53fae62843a231c871d1a318ac394678a66cc7c765218067b9562dc279cf3dfc"
+      "content_hash": "9c8c3a8b64e99bedbcfb32bab18ea29d9fac8540234cf019d1233560ee411390"
     },
     {
       "type": "dockerfile",
       "id": "base-node-bun",
       "path": "docker/bases/node-bun/Dockerfile",
-      "content_hash": "cc5f8ce43a433f8a318944c273f96c70a508daaed0facc370bfe3c3bd6bfe1fb"
+      "content_hash": "d07224394b0de83ff3aa97596493dbe9f38163c31e6ae9e66d2e4edf3d2f374a"
     },
     {
       "type": "dockerfile",
       "id": "base-python",
       "path": "docker/bases/python/Dockerfile",
-      "content_hash": "f311a847997f44b472da8e1fe0f4f4cd0b30b80723000629920fb0a69dec5add"
+      "content_hash": "2bfa0b8fc5d3c502a5cbba9831446e6a8af74671940dacff8874d96914ee43a2"
     },
     {
       "type": "dockerfile",
       "id": "combo-node-py-dotnet",
       "path": "docker/combos/node-py-dotnet/Dockerfile",
-      "content_hash": "775ea3692fb583789465c17e0213e61f51dffb3357b9b5877b6c713570fb71f3"
+      "content_hash": "726d46c92b9ce01e6bf6a7429a0da7b5fae623a852f3128dfa22068f8d8d1da3"
     },
     {
       "type": "compose-fragment",
@@ -54,7 +54,7 @@
       "type": "catalog",
       "id": "image-catalog",
       "path": "image-catalog.json",
-      "content_hash": "d6f003d751d4becade628f78e5e207c05636106aaa4f82db219b5500ffbd2c10"
+      "content_hash": "408e555b9f60a130ea4bc52ced537b6ca05f1ebc64f35cead7b5cbe78cb005c4"
     }
   ]
 }

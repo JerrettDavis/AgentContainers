@@ -1,6 +1,7 @@
 {
-  "manifest_hash": "09d14b19f2ce47fce048a145c657ef1178b8b0cf166de4c43960c75490b4cdaa",
+  "manifest_hash": "12b7757b39523c90df6633ed3b3f697338a3f4ce7b7d37136a47e58373069725",
   "generator_version": "0.1.0",
+  "registry": "ghcr.io/agentcontainers",
   "images": [
     {
       "type": "base",
@@ -13,7 +14,12 @@
         "dotnet\u003E=8",
         "csharp",
         "fsharp"
-      ]
+      ],
+      "platforms": [
+        "linux/amd64",
+        "linux/arm64"
+      ],
+      "registry": "ghcr.io/agentcontainers/dotnet"
     },
     {
       "type": "base",
@@ -28,7 +34,12 @@
         "bun",
         "bun\u003E=1.0",
         "javascript"
-      ]
+      ],
+      "platforms": [
+        "linux/amd64",
+        "linux/arm64"
+      ],
+      "registry": "ghcr.io/agentcontainers/node-bun"
     },
     {
       "type": "base",
@@ -41,7 +52,12 @@
         "python\u003E=3.12",
         "pip",
         "venv"
-      ]
+      ],
+      "platforms": [
+        "linux/amd64",
+        "linux/arm64"
+      ],
+      "registry": "ghcr.io/agentcontainers/python"
     },
     {
       "type": "combo",
@@ -65,7 +81,12 @@
         "dotnet",
         "dotnet\u003E=8",
         "csharp"
-      ]
+      ],
+      "platforms": [
+        "linux/amd64",
+        "linux/arm64"
+      ],
+      "registry": "ghcr.io/agentcontainers/node-py-dotnet"
     },
     {
       "type": "agent",

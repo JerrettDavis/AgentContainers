@@ -51,6 +51,19 @@ USER dev
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
   CMD ["CMD", "dotnet", "--version"]
 
+# OCI Image Labels
+ARG BUILD_DATE=unknown
+ARG VCS_REF=unknown
+ARG IMAGE_VERSION=v1
+
 LABEL org.opencontainers.image.title=".NET SDK"
 LABEL org.opencontainers.image.description=".NET 8 SDK for C# and F# development"
+LABEL org.opencontainers.image.source="https://github.com/agentcontainers/AgentContainers"
+LABEL org.opencontainers.image.url="https://github.com/agentcontainers/AgentContainers"
+LABEL org.opencontainers.image.vendor="AgentContainers"
+LABEL org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.version="${IMAGE_VERSION}"
+LABEL org.opencontainers.image.created="${BUILD_DATE}"
+LABEL org.opencontainers.image.revision="${VCS_REF}"
 LABEL dev.agentcontainers.runtime-family="dotnet"
+LABEL dev.agentcontainers.image-type="base"

@@ -10,6 +10,7 @@ public sealed class BaseRuntimeManifest : ManifestBase
     public FromImage From { get; set; } = new();
     public string CommonTools { get; set; } = "default";
     public List<string> Provides { get; set; } = [];
+    public List<string> Platforms { get; set; } = ["linux/amd64"];
     public InstallBlock Install { get; set; } = new();
     public List<EnvVar> Env { get; set; } = [];
     public List<MountDeclaration> Mounts { get; set; } = [];

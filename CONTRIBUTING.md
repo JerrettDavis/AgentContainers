@@ -15,7 +15,7 @@ Thank you for your interest in contributing! This document covers the basics.
 | `schemas/` | JSON Schema files for manifest validation |
 | `templates/` | Scriban templates consumed by the generator |
 | `src/AgentContainers.Core/` | Shared library: models, loading, validation |
-| `src/AgentContainers.Generator/` | CLI tool: validate, generate, list-matrix |
+| `src/AgentContainers.Generator/` | CLI tool: validate, generate, list-matrix, build-matrix |
 | `tests/AgentContainers.Tests/` | Unit & integration tests |
 | `generated/` | **Auto-generated** — do not edit by hand |
 | `scripts/` | Helper scripts for local dev |
@@ -37,6 +37,9 @@ dotnet run --project src/AgentContainers.Generator -- generate
 
 # Print compatibility matrix
 dotnet run --project src/AgentContainers.Generator -- list-matrix
+
+# Emit build matrix for CI/CD publishing
+dotnet run --project src/AgentContainers.Generator -- build-matrix
 ```
 
 ## Making Changes

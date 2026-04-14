@@ -1,0 +1,149 @@
+name: Publish Images to GHCR
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      filter:
+        description: 'Comma-separated image IDs to publish (empty = all)'
+        required: false
+        default: ''
+      dry_run:
+        description: 'Dry run — build but do not push'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write          # OIDC for provenance/attestation
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  # ─── Stage 1: Generate the build matrix from manifests ───
+  generate-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build generator
+        run: dotnet build src/AgentContainers.Generator --configuration Release --nologo -q
+
+      - name: Emit build matrix
+        id: matrix
+        run: |
+          raw=$(dotnet run --project src/AgentContainers.Generator --configuration Release --no-build -- build-matrix 2>/dev/null | grep -v '^AgentContainers')
+          # Apply optional filter
+          filter="${{ github.event.inputs.filter }}"
+          if [ -n "$filter" ]; then
+            raw=$(echo "$raw" | jq --arg ids "$filter" '
+              .include |= [ .[] | select( .id as $id | ($ids | split(",") | map(gsub("^\\s+|\\s+$";"")) | index($id)) ) ]
+            ')
+          fi
+          echo "matrix<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$raw" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Show matrix
+        run: echo '${{ steps.matrix.outputs.matrix }}' | jq .
+
+  # ─── Stage 2: Build + push each image (parallel via matrix) ───
+  build-and-push:
+    needs: generate-matrix
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.generate-matrix.outputs.matrix) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU (multi-arch)
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract image metadata (tags + labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.id }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=branch
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.context }}/${{ matrix.dockerfile }}
+          platforms: ${{ matrix.platforms }}
+          push: ${{ github.event.inputs.dry_run != 'true' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            BUILD_DATE=${{ github.event.repository.updated_at }}
+            VCS_REF=${{ github.sha }}
+            IMAGE_VERSION=${{ steps.meta.outputs.version }}
+          provenance: true
+          sbom: true
+          cache-from: type=gha,scope=${{ matrix.id }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.id }}
+
+      - name: Generate SBOM with Syft
+        if: github.event.inputs.dry_run != 'true'
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.id }}:${{ steps.meta.outputs.version }}
+          artifact-name: sbom-${{ matrix.id }}.spdx.json
+          output-file: sbom-${{ matrix.id }}.spdx.json
+          format: spdx-json
+
+      - name: Upload SBOM artifact
+        if: github.event.inputs.dry_run != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-${{ matrix.id }}
+          path: sbom-${{ matrix.id }}.spdx.json
+          retention-days: 90
+
+  # ─── Stage 3: Post-publish summary ───
+  publish-summary:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Publish summary
+        run: |
+          echo "## 📦 Image Publish Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Field | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-------|-------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Trigger** | \`${{ github.event_name }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Ref** | \`${{ github.ref }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **SHA** | \`${{ github.sha }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Registry** | \`${{ env.REGISTRY }}/${{ github.repository_owner }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Dry Run** | \`${{ github.event.inputs.dry_run || 'false' }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Status** | \`${{ needs.build-and-push.result }}\` |" >> "$GITHUB_STEP_SUMMARY"

@@ -40,6 +40,7 @@ public static class Program
             "generate" => await RunGenerate(repoRoot),
             "validate" => RunValidate(repoRoot),
             "list-matrix" => RunListMatrix(repoRoot, jsonOutput),
+            "build-matrix" => RunBuildMatrix(repoRoot),
             _ => PrintUsage()
         };
     }
@@ -179,6 +180,65 @@ public static class Program
         }
         Console.WriteLine($"\n  Total: {combinations.Count} valid combination(s)");
 
+        return 0;
+    }
+
+    private static int RunBuildMatrix(string repoRoot)
+    {
+        var loader = new ManifestLoader();
+        var catalog = loader.LoadAll(Path.Combine(repoRoot, "definitions"));
+        var manifestHash = ContentHasher.ComputeManifestHash(Path.Combine(repoRoot, "definitions"));
+
+        var include = new List<object>();
+
+        foreach (var (id, b) in catalog.Bases)
+        {
+            var platforms = b.Platforms.Count > 0
+                ? string.Join(",", b.Platforms)
+                : "linux/amd64";
+
+            include.Add(new
+            {
+                id,
+                type = "base",
+                display_name = b.DisplayName,
+                context = $"generated/docker/bases/{id}",
+                dockerfile = "Dockerfile",
+                image_name = $"ghcr.io/${{{{ github.repository_owner }}}}/{id}",
+                platforms,
+                family = b.Family,
+                manifest_hash = manifestHash
+            });
+        }
+
+        foreach (var (id, c) in catalog.Combos)
+        {
+            // Derive platforms from the primary (first-ordered) base
+            var primaryBase = c.Bases.OrderBy(b => b.Order).FirstOrDefault();
+            var platforms = "linux/amd64";
+            if (primaryBase != null && catalog.Bases.TryGetValue(primaryBase.Id, out var pb))
+            {
+                platforms = pb.Platforms.Count > 0
+                    ? string.Join(",", pb.Platforms)
+                    : "linux/amd64";
+            }
+
+            include.Add(new
+            {
+                id,
+                type = "combo",
+                display_name = c.DisplayName,
+                context = $"generated/docker/combos/{id}",
+                dockerfile = "Dockerfile",
+                image_name = $"ghcr.io/${{{{ github.repository_owner }}}}/{id}",
+                platforms,
+                family = string.Join("+", c.Bases.OrderBy(b => b.Order).Select(b => b.Id)),
+                manifest_hash = manifestHash
+            });
+        }
+
+        var matrix = new { include };
+        Console.Write(JsonSerializer.Serialize(matrix, JsonOptions));
         return 0;
     }
 
@@ -367,11 +427,24 @@ public static class Program
             sb.AppendLine($"  CMD [\"{testStr}\"]");
         }
 
-        // Labels
+        // Labels — OCI image spec + build-time metadata
+        sb.AppendLine();
+        sb.AppendLine("# OCI Image Labels");
+        sb.AppendLine("ARG BUILD_DATE=unknown");
+        sb.AppendLine("ARG VCS_REF=unknown");
+        sb.AppendLine($"ARG IMAGE_VERSION={baseManifest.Version}");
         sb.AppendLine();
         sb.AppendLine($"LABEL org.opencontainers.image.title=\"{baseManifest.DisplayName}\"");
         sb.AppendLine($"LABEL org.opencontainers.image.description=\"{baseManifest.Description}\"");
+        sb.AppendLine($"LABEL org.opencontainers.image.source=\"https://github.com/agentcontainers/AgentContainers\"");
+        sb.AppendLine($"LABEL org.opencontainers.image.url=\"https://github.com/agentcontainers/AgentContainers\"");
+        sb.AppendLine($"LABEL org.opencontainers.image.vendor=\"AgentContainers\"");
+        sb.AppendLine($"LABEL org.opencontainers.image.licenses=\"MIT\"");
+        sb.AppendLine($"LABEL org.opencontainers.image.version=\"${{IMAGE_VERSION}}\"");
+        sb.AppendLine($"LABEL org.opencontainers.image.created=\"${{BUILD_DATE}}\"");
+        sb.AppendLine($"LABEL org.opencontainers.image.revision=\"${{VCS_REF}}\"");
         sb.AppendLine($"LABEL dev.agentcontainers.runtime-family=\"{baseManifest.Family}\"");
+        sb.AppendLine($"LABEL dev.agentcontainers.image-type=\"base\"");
 
         return sb.ToString();
     }
@@ -417,8 +490,21 @@ public static class Program
             }
         }
 
+        sb.AppendLine("# OCI Image Labels");
+        sb.AppendLine("ARG BUILD_DATE=unknown");
+        sb.AppendLine("ARG VCS_REF=unknown");
+        sb.AppendLine($"ARG IMAGE_VERSION={combo.Version}");
+        sb.AppendLine();
         sb.AppendLine($"LABEL org.opencontainers.image.title=\"{combo.DisplayName}\"");
         sb.AppendLine($"LABEL org.opencontainers.image.description=\"{combo.Description}\"");
+        sb.AppendLine($"LABEL org.opencontainers.image.source=\"https://github.com/agentcontainers/AgentContainers\"");
+        sb.AppendLine($"LABEL org.opencontainers.image.url=\"https://github.com/agentcontainers/AgentContainers\"");
+        sb.AppendLine($"LABEL org.opencontainers.image.vendor=\"AgentContainers\"");
+        sb.AppendLine($"LABEL org.opencontainers.image.licenses=\"MIT\"");
+        sb.AppendLine($"LABEL org.opencontainers.image.version=\"${{IMAGE_VERSION}}\"");
+        sb.AppendLine($"LABEL org.opencontainers.image.created=\"${{BUILD_DATE}}\"");
+        sb.AppendLine($"LABEL org.opencontainers.image.revision=\"${{VCS_REF}}\"");
+        sb.AppendLine($"LABEL dev.agentcontainers.image-type=\"combo\"");
 
         return sb.ToString();
     }
@@ -478,19 +564,29 @@ public static class Program
                 display_name = b.DisplayName,
                 family = b.Family,
                 from_image = b.From.Image,
-                provides = b.Provides
+                provides = b.Provides,
+                platforms = b.Platforms,
+                registry = $"ghcr.io/agentcontainers/{id}"
             });
         }
 
         foreach (var (id, c) in catalog.Combos)
         {
+            // Derive platforms from primary base
+            var primaryBase = c.Bases.OrderBy(b => b.Order).FirstOrDefault();
+            var platforms = new List<string> { "linux/amd64" };
+            if (primaryBase != null && catalog.Bases.TryGetValue(primaryBase.Id, out var pb) && pb.Platforms.Count > 0)
+                platforms = pb.Platforms;
+
             entries.Add(new
             {
                 type = "combo",
                 id,
                 display_name = c.DisplayName,
                 bases = c.Bases.OrderBy(b => b.Order).Select(b => b.Id).ToList(),
-                provides = c.Provides
+                provides = c.Provides,
+                platforms,
+                registry = $"ghcr.io/agentcontainers/{id}"
             });
         }
 
@@ -510,6 +606,7 @@ public static class Program
         {
             manifest_hash = manifestHash,
             generator_version = "0.1.0",
+            registry = "ghcr.io/agentcontainers",
             images = entries
         };
     }
@@ -597,6 +694,7 @@ public static class Program
         Console.WriteLine("  generate      Load manifests, validate, and generate artifacts");
         Console.WriteLine("  validate      Load and validate manifests only");
         Console.WriteLine("  list-matrix   Print compatibility matrix");
+        Console.WriteLine("  build-matrix  Output JSON build matrix for CI/CD publishing");
         Console.WriteLine();
         return 1;
     }

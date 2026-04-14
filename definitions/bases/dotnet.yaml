@@ -15,6 +15,10 @@ provides:
   - csharp
   - fsharp
 
+platforms:
+  - linux/amd64
+  - linux/arm64
+
 install:
   steps:
     - description: "Configure dotnet CLI telemetry opt-out"
