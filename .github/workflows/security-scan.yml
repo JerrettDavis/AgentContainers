@@ -110,16 +110,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Prebuild local combo dependencies
+        if: matrix.type == 'combo'
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker build -t agentcontainers/node-bun:latest generated/docker/bases/node-bun
+          docker build -t agentcontainers/python:latest generated/docker/bases/python
+          docker build -t agentcontainers/dotnet:latest generated/docker/bases/dotnet
+          if grep -q 'agentcontainers/rust:latest' "${{ matrix.context }}/${{ matrix.dockerfile }}"; then
+            docker build -t agentcontainers/rust:latest generated/docker/bases/rust
+          fi
 
       - name: Build image locally
-        uses: docker/build-push-action@v6
-        with:
-          context: ${{ matrix.context }}
-          file: ${{ matrix.context }}/${{ matrix.dockerfile }}
-          load: true
-          tags: scan-target:${{ matrix.id }}
+        run: docker build --tag scan-target:${{ matrix.id }} --file ${{ matrix.context }}/${{ matrix.dockerfile }} ${{ matrix.context }}
 
       - name: Run Trivy (image vulnerability scan)
         uses: aquasecurity/trivy-action@master
