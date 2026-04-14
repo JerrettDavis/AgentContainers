@@ -100,7 +100,7 @@ validate_in_container() {
     local tag="$1"
     local cmd="$2"
 
-    if timeout 30 docker run --rm "$tag" bash -lc "$cmd" > /dev/null 2>&1; then
+    if timeout 30 docker run --rm "$tag" bash -c "$cmd" > /dev/null 2>&1; then
         log_pass "$tag → $cmd"
     else
         log_fail "$tag → $cmd"
@@ -435,8 +435,12 @@ EOF
     local healthy=false
     for attempt in $(seq 1 12); do
         sleep 5
-        local status
-        status=$(docker compose -f "$solo_claude_path" -f "$override_file" -p "$compose_project" ps --format json 2>/dev/null | jq -r 'if type == "array" then (.[0].Health // .[0].State // "unknown") else (.Health // .State // "unknown") end' 2>/dev/null || echo "unknown")
+        local container_id status
+        container_id=$(docker compose -f "$solo_claude_path" -f "$override_file" -p "$compose_project" ps -q claude 2>/dev/null || true)
+        status="unknown"
+        if [[ -n "$container_id" ]]; then
+            status=$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "$container_id" 2>/dev/null || echo "unknown")
+        fi
         if [[ "$status" == "healthy" ]]; then
             healthy=true
             break

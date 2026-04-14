@@ -505,6 +505,13 @@ public static class Program
             sb.AppendLine();
         }
 
+        if (string.Equals(baseManifest.Family, "rust", StringComparison.OrdinalIgnoreCase))
+        {
+            sb.AppendLine("# Ensure Rust toolchain binaries are on PATH for the runtime user");
+            sb.AppendLine("ENV PATH=\"/usr/local/cargo/bin:${PATH}\"");
+            sb.AppendLine();
+        }
+
         // User setup (idempotent — handles base images that already have a group/user at the target GID/UID)
         sb.AppendLine($"# User setup");
         sb.AppendLine($"RUN groupadd -g {baseManifest.User.Gid} {baseManifest.User.Name} 2>/dev/null || true \\");

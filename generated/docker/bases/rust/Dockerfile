@@ -46,6 +46,9 @@ ENV CARGO_HOME=${CARGO_HOME}
 ARG RUSTUP_HOME=/usr/local/rustup
 ENV RUSTUP_HOME=${RUSTUP_HOME}
 
+# Ensure Rust toolchain binaries are on PATH for the runtime user
+ENV PATH="/usr/local/cargo/bin:${PATH}"
+
 # User setup
 RUN groupadd -g 1000 dev 2>/dev/null || true \
   && useradd -m -u 1000 -g 1000 dev 2>/dev/null \

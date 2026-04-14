@@ -24,7 +24,7 @@
       "type": "dockerfile",
       "id": "base-rust",
       "path": "docker/bases/rust/Dockerfile",
-      "content_hash": "9620bb4819331daa399bcca677a662706137ccd423b5381b3a86069a844128b9"
+      "content_hash": "813af0d766727b9d024f3144c42e14f00ddb6dc1ef36782fa294d7d54633ee2d"
     },
     {
       "type": "dockerfile",
