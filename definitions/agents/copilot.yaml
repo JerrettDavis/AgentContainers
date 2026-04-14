@@ -1,0 +1,71 @@
+id: copilot
+display_name: GitHub Copilot CLI
+version: v1
+description: GitHub Copilot CLI agent overlay
+
+requires:
+  - "node>=18"
+
+conflicts: []
+
+install:
+  method: npm_global
+  package: "@githubnext/github-copilot-cli"
+  version: latest
+  post_install:
+    - command: "github-copilot-cli --version || true"
+      description: "Verify Copilot CLI installation"
+
+env:
+  - name: GITHUB_TOKEN
+    required: true
+    description: GitHub token with Copilot access
+    sensitive: true
+    inject_from: environment
+  - name: COPILOT_CONFIG_DIR
+    required: false
+    default: "/home/dev/.config/github-copilot"
+    description: Configuration directory
+    sensitive: false
+  - name: COPILOT_WORKSPACE
+    required: false
+    default: "/workspace"
+    description: Default workspace path
+    sensitive: false
+
+mounts:
+  - name: workspace
+    container_path: /workspace
+    description: Project workspace (bind mount from host)
+    required: false
+    suggested_host_path: "."
+  - name: copilot-config
+    container_path: /home/dev/.config/github-copilot
+    description: Config and state persistence
+    required: false
+    suggested_host_path: "~/.config/github-copilot"
+
+healthcheck:
+  test: ["CMD-SHELL", "github-copilot-cli --version || exit 1"]
+  interval: 30s
+  timeout: 10s
+  retries: 3
+  start_period: 15s
+
+validation:
+  commands:
+    - "github-copilot-cli --version || true"
+
+shell_helpers: []
+
+known_caveats:
+  - "Requires GITHUB_TOKEN at runtime; not set at build time"
+  - "Running as non-root user dev; workspace mount must be owned by UID 1000"
+
+privileged_modes: []
+
+compose_capabilities:
+  service_name_default: copilot
+  ports: []
+  networks:
+    - agent-net

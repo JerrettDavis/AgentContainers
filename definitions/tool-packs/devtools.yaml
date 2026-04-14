@@ -1,0 +1,85 @@
+id: devtools
+display_name: Developer Power Tools
+version: v1
+description: Batteries-included developer tooling pack — linters, formatters, debug utilities, build helpers, and productivity CLIs
+
+compatible_with:
+  bases:
+    - node-bun
+    - python
+    - dotnet
+    - rust
+    - node-py-dotnet
+    - fullstack-polyglot
+  agents:
+    - claude
+    - codex
+    - copilot
+    - openclaw
+
+conflicts: []
+
+install:
+  method: apt
+  package: ""
+  version: ""
+  post_install:
+    - command: |
+        apt-get update && apt-get install -y --no-install-recommends \
+          shellcheck \
+          yamllint \
+          clang-format \
+          valgrind \
+          strace \
+          ltrace \
+          gdb \
+          cmake \
+          make \
+          build-essential \
+          lldb \
+          lsof \
+          net-tools \
+          dnsutils \
+          iproute2 \
+          tcpdump \
+          httpie \
+          silversearcher-ag \
+          bat \
+          fzf \
+          tmux \
+          entr \
+          watchman \
+          socat \
+          file \
+          patchelf \
+        && rm -rf /var/lib/apt/lists/*
+      description: "Install system-level dev/debug/build/productivity tools"
+    - command: "npm install -g prettier eslint typescript ts-node @biomejs/biome turbo"
+      description: "Install JS/TS dev tools globally"
+    - command: "pip install --no-cache-dir ruff mypy black isort bandit pre-commit cookiecutter"
+      description: "Install Python dev/lint tools"
+
+env:
+  - name: DEVTOOLS_ENABLED
+    required: false
+    default: "1"
+    description: Flag indicating developer power-tools are installed
+    sensitive: false
+
+sidecar:
+  enabled: false
+  service_definition: ""
+  depends_on_agent: false
+
+validation:
+  commands:
+    - "shellcheck --version"
+    - "prettier --version"
+    - "ruff --version"
+    - "gdb --version"
+    - "cmake --version"
+    - "fzf --version"
+
+compose_capabilities:
+  sidecar_service: ""
+  networks: []

@@ -24,7 +24,7 @@ These are captured in detail within the documents above. This table is a quick-r
 
 | Decision | Choice | Rationale |
 |---|---|---|
-| Generator language | .NET 8 (C#) | Strong typing, rich serialization, deterministic output, testable |
+| Generator language | .NET 10 (C#) | Strong typing, rich serialization, deterministic output, testable |
 | Definition format | YAML with JSON Schema validation | Human-friendly authoring, machine-strict validation |
 | Template engine | Scriban | Lightweight .NET-native, logic-minimal, whitespace-predictable |
 | Output location | `generated/` (committed) | Full transparency; CI can detect drift |
@@ -41,20 +41,20 @@ These are captured in detail within the documents above. This table is a quick-r
 
 **In scope for v1:**
 - YAML manifest schema and JSON Schema validator
-- .NET generator producing static Dockerfiles
-- Common tools layer + 3 base runtimes (Node/Bun, Python, .NET)
-- 1 combo image (node-py-dotnet)
-- 2 agent overlays (Claude Code, OpenClaw)
-- 1 tool pack (headroom)
-- 3 Compose examples (solo, dual-agent, gateway+headroom)
+- .NET 10 generator producing static Dockerfiles
+- Common tools layer + 4 base runtimes (Node/Bun, Rust, Python, .NET)
+- 2 combo images (node-py-dotnet, fullstack-polyglot)
+- 4 agent overlays (Claude Code, Codex, Copilot, OpenClaw)
+- 2 tool packs (headroom, devtools)
+- 5 Compose stacks (solo-claude, solo-codex, solo-copilot, gateway-headroom, polyglot-devtools)
 - CI drift detection + build validation
 - OCI labels on all built images
 - Basic image catalog documentation
 
 **Deferred post-v1:**
-- Rust, C/C++, Haskell base images
-- Gemini, OpenCode, Codex overlays
-- Additional tool packs (discord, gh-azure, build, database)
+- C/C++, Haskell, Go base images
+- Additional agent overlays (Gemini, OpenCode)
+- Additional tool packs (discord, gh-azure, database)
 - SBOM / SLSA provenance attestation
 - Web-based image catalog dashboard
 - Universal secret/auth abstraction UI

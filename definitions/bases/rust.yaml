@@ -1,0 +1,63 @@
+id: rust
+display_name: Rust
+version: v1
+description: Rust stable toolchain with cargo and rustup
+family: rust
+
+from:
+  image: "rust:1-slim-bookworm"
+
+common_tools: default
+
+provides:
+  - rust
+  - "rust>=1.80"
+  - cargo
+  - rustup
+
+platforms:
+  - linux/amd64
+  - linux/arm64
+
+install:
+  steps:
+    - description: "Install additional Rust development tools"
+      run: |
+        rustup component add clippy rustfmt rust-analyzer
+        cargo install cargo-watch cargo-edit
+
+env:
+  - name: CARGO_HOME
+    default: /usr/local/cargo
+    description: Cargo home directory
+    sensitive: false
+  - name: RUSTUP_HOME
+    default: /usr/local/rustup
+    description: Rustup home directory
+    sensitive: false
+
+mounts: []
+
+user:
+  name: dev
+  uid: 1000
+  gid: 1000
+  sudo: true
+
+shell: bash
+
+healthcheck:
+  test: ["CMD", "rustc", "--version"]
+  interval: 30s
+  timeout: 5s
+  retries: 3
+
+validation:
+  commands:
+    - "rustc --version"
+    - "cargo --version"
+    - "rustup --version"
+
+resource_hints:
+  image_size_class: large
+  memory_minimum_mb: 512

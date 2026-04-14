@@ -1,5 +1,5 @@
 {
-  "manifest_hash": "12b7757b39523c90df6633ed3b3f697338a3f4ce7b7d37136a47e58373069725",
+  "manifest_hash": "e9059d91c312366af5a34f954c77d0f214f379d3bda6aff236dcef9746bd49d9",
   "generator_version": "0.1.0",
   "artifacts": [
     {
@@ -22,6 +22,18 @@
     },
     {
       "type": "dockerfile",
+      "id": "base-rust",
+      "path": "docker/bases/rust/Dockerfile",
+      "content_hash": "ce8ff2826ab574a62739dc1666ec39e2e6635a717f613596cba244a96f5efbcf"
+    },
+    {
+      "type": "dockerfile",
+      "id": "combo-fullstack-polyglot",
+      "path": "docker/combos/fullstack-polyglot/Dockerfile",
+      "content_hash": "6b94b38a568861252cb188a73b792c6a7abad9307e599bc97b1e60d400af9dd3"
+    },
+    {
+      "type": "dockerfile",
       "id": "combo-node-py-dotnet",
       "path": "docker/combos/node-py-dotnet/Dockerfile",
       "content_hash": "726d46c92b9ce01e6bf6a7429a0da7b5fae623a852f3128dfa22068f8d8d1da3"
@@ -31,6 +43,18 @@
       "id": "agent-claude",
       "path": "compose/fragments/claude-service.yaml",
       "content_hash": "66190a9ff8caa4018e140979ff84bb26ef99f910fd6b94c3177738df7aac39d8"
+    },
+    {
+      "type": "compose-fragment",
+      "id": "agent-codex",
+      "path": "compose/fragments/codex-service.yaml",
+      "content_hash": "a3f1eaee51abf4814c4fb6bfea1817d9724170f67316dd4a7eec0481d02d1be4"
+    },
+    {
+      "type": "compose-fragment",
+      "id": "agent-copilot",
+      "path": "compose/fragments/copilot-service.yaml",
+      "content_hash": "d822dcd1b1104920fca58b4253d014f7f33d5dc952bf7285d676d75cbf13ff62"
     },
     {
       "type": "compose-fragment",
@@ -46,15 +70,33 @@
     },
     {
       "type": "compose-stack",
+      "id": "stack-polyglot-devtools",
+      "path": "compose/stacks/polyglot-devtools/docker-compose.yaml",
+      "content_hash": "a48ebee1dd8aa745a4ac6393ccf8141363965c8d3739e5d26f1b2727b43f1627"
+    },
+    {
+      "type": "compose-stack",
       "id": "stack-solo-claude",
       "path": "compose/stacks/solo-claude/docker-compose.yaml",
       "content_hash": "87edefff21e9791ab85b85fab1c899b7175c9b095d6914a5f704558c31322903"
     },
     {
+      "type": "compose-stack",
+      "id": "stack-solo-codex",
+      "path": "compose/stacks/solo-codex/docker-compose.yaml",
+      "content_hash": "030745eaf2653f9d49e1bfcc08f7a3ce2c918d0e6b50b7dcc2edb1c4b07ed955"
+    },
+    {
+      "type": "compose-stack",
+      "id": "stack-solo-copilot",
+      "path": "compose/stacks/solo-copilot/docker-compose.yaml",
+      "content_hash": "b636b0a2de1e84f4cb555ede33ce75980ce0dadc91ef1c566c3ea32930d74743"
+    },
+    {
       "type": "catalog",
       "id": "image-catalog",
       "path": "image-catalog.json",
-      "content_hash": "408e555b9f60a130ea4bc52ced537b6ca05f1ebc64f35cead7b5cbe78cb005c4"
+      "content_hash": "4b30841b99cb658b1140c230cde226afcbd58ee258f2175dffb72ec5e0e8d549"
     }
   ]
 }

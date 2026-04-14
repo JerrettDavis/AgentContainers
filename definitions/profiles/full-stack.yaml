@@ -6,6 +6,9 @@ description: Activates all agents and tool packs
 include_services: []
 include_agents:
   - claude
+  - codex
+  - copilot
   - openclaw
 include_tool_packs:
   - headroom
+  - devtools

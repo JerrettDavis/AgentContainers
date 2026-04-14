@@ -4,7 +4,7 @@ Thank you for your interest in contributing! This document covers the basics.
 
 ## Prerequisites
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) or later
 - Git
 
 ## Repository Layout
@@ -19,6 +19,39 @@ Thank you for your interest in contributing! This document covers the basics.
 | `tests/AgentContainers.Tests/` | Unit & integration tests |
 | `generated/` | **Auto-generated** — do not edit by hand |
 | `scripts/` | Helper scripts for local dev |
+
+## Current Corpus
+
+### Agents (4)
+| Agent | Description |
+|---|---|
+| `claude` | Anthropic Claude Code CLI |
+| `codex` | OpenAI Codex CLI |
+| `copilot` | GitHub Copilot CLI |
+| `openclaw` | OpenClaw agent |
+
+### Base Runtimes (4)
+| Base | Description |
+|---|---|
+| `node-bun` | Node.js 22 LTS + Bun |
+| `rust` | Rust stable toolchain |
+| `python` | Python 3.12 + pip/venv |
+| `dotnet` | .NET 8 SDK |
+
+### Combo Runtimes (2)
+| Combo | Bases |
+|---|---|
+| `node-py-dotnet` | node-bun → python → dotnet |
+| `fullstack-polyglot` | node-bun → rust → python → dotnet |
+
+### Tool Packs (2)
+| Pack | Description |
+|---|---|
+| `headroom` | Token-optimization proxy (sidecar) |
+| `devtools` | Batteries-included developer power tools — linters, formatters, debuggers, build tools, productivity CLIs |
+
+### Compose Stacks (5)
+`solo-claude`, `solo-codex`, `solo-copilot`, `gateway-headroom`, `polyglot-devtools`
 
 ## Quick Start
 

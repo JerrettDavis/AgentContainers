@@ -1,0 +1,21 @@
+id: solo-codex
+display_name: Solo Codex Stack
+version: v1
+description: Single OpenAI Codex agent on node-bun base
+
+services:
+  - id: codex
+    agent: codex
+    base: node-bun
+    toolpacks: []
+    depends_on: []
+
+networks:
+  - name: agent-net
+    driver: bridge
+
+volumes:
+  - name: workspace
+    description: Shared project workspace
+  - name: codex-config
+    description: Codex configuration persistence

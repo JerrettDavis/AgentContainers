@@ -1,0 +1,53 @@
+id: polyglot-devtools
+display_name: Polyglot Developer Workstation
+version: v1
+description: Full-stack polyglot combo with Claude, devtools pack, and Headroom proxy
+
+services:
+  - id: claude-polyglot
+    agent: claude
+    base: fullstack-polyglot
+    toolpacks:
+      - devtools
+      - headroom
+    depends_on:
+      - id: headroom
+        condition: service_healthy
+
+  - id: headroom
+    type: sidecar
+    toolpack: headroom
+    image: "headroom/headroom:latest"
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  - id: codex-polyglot
+    agent: codex
+    base: fullstack-polyglot
+    toolpacks:
+      - devtools
+    optional: true
+    profiles:
+      - codex
+    depends_on:
+      - id: headroom
+        condition: service_healthy
+
+networks:
+  - name: agent-net
+    driver: bridge
+
+volumes:
+  - name: workspace
+    description: Shared project workspace
+  - name: claude-state
+    description: Claude runtime state
+  - name: codex-state
+    description: Codex runtime state
+  - name: headroom-data
+    description: Headroom proxy data

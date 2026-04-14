@@ -1,5 +1,5 @@
 {
-  "manifest_hash": "12b7757b39523c90df6633ed3b3f697338a3f4ce7b7d37136a47e58373069725",
+  "manifest_hash": "e9059d91c312366af5a34f954c77d0f214f379d3bda6aff236dcef9746bd49d9",
   "generator_version": "0.1.0",
   "registry": "ghcr.io/agentcontainers",
   "images": [
@@ -60,6 +60,60 @@
       "registry": "ghcr.io/agentcontainers/python"
     },
     {
+      "type": "base",
+      "id": "rust",
+      "display_name": "Rust",
+      "family": "rust",
+      "from_image": "rust:1-slim-bookworm",
+      "provides": [
+        "rust",
+        "rust\u003E=1.80",
+        "cargo",
+        "rustup"
+      ],
+      "platforms": [
+        "linux/amd64",
+        "linux/arm64"
+      ],
+      "registry": "ghcr.io/agentcontainers/rust"
+    },
+    {
+      "type": "combo",
+      "id": "fullstack-polyglot",
+      "display_name": "Full-Stack Polyglot",
+      "bases": [
+        "node-bun",
+        "rust",
+        "python",
+        "dotnet"
+      ],
+      "provides": [
+        "node",
+        "node\u003E=22",
+        "npm",
+        "bun",
+        "bun\u003E=1.0",
+        "javascript",
+        "rust",
+        "rust\u003E=1.80",
+        "cargo",
+        "rustup",
+        "python",
+        "python\u003E=3.12",
+        "pip",
+        "venv",
+        "dotnet",
+        "dotnet\u003E=8",
+        "csharp",
+        "fsharp"
+      ],
+      "platforms": [
+        "linux/amd64",
+        "linux/arm64"
+      ],
+      "registry": "ghcr.io/agentcontainers/fullstack-polyglot"
+    },
+    {
       "type": "combo",
       "id": "node-py-dotnet",
       "display_name": "Node.js \u002B Python \u002B .NET",
@@ -92,6 +146,24 @@
       "type": "agent",
       "id": "claude",
       "display_name": "Claude Code",
+      "requires": [
+        "node\u003E=18"
+      ],
+      "install_method": "npm_global"
+    },
+    {
+      "type": "agent",
+      "id": "codex",
+      "display_name": "OpenAI Codex CLI",
+      "requires": [
+        "node\u003E=18"
+      ],
+      "install_method": "npm_global"
+    },
+    {
+      "type": "agent",
+      "id": "copilot",
+      "display_name": "GitHub Copilot CLI",
       "requires": [
         "node\u003E=18"
       ],

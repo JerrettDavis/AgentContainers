@@ -1,0 +1,51 @@
+id: fullstack-polyglot
+display_name: Full-Stack Polyglot
+version: v1
+description: Node.js 22 + Bun + Rust + Python 3.12 + .NET — the works
+
+bases:
+  - id: node-bun
+    order: 1
+  - id: rust
+    order: 2
+  - id: python
+    order: 3
+  - id: dotnet
+    order: 4
+
+provides:
+  - node
+  - "node>=22"
+  - npm
+  - bun
+  - "bun>=1.0"
+  - javascript
+  - rust
+  - "rust>=1.80"
+  - cargo
+  - rustup
+  - python
+  - "python>=3.12"
+  - pip
+  - venv
+  - dotnet
+  - "dotnet>=8"
+  - csharp
+  - fsharp
+
+cross_runtime_utilities:
+  apt:
+    - pipx
+    - pkg-config
+    - libssl-dev
+
+validation:
+  commands:
+    - "node --version"
+    - "rustc --version"
+    - "python3 --version"
+    - "dotnet --version"
+
+resource_hints:
+  image_size_class: xlarge
+  memory_minimum_mb: 2048

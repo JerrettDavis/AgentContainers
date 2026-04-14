@@ -1,0 +1,21 @@
+id: solo-copilot
+display_name: Solo Copilot Stack
+version: v1
+description: Single GitHub Copilot CLI agent on node-bun base
+
+services:
+  - id: copilot
+    agent: copilot
+    base: node-bun
+    toolpacks: []
+    depends_on: []
+
+networks:
+  - name: agent-net
+    driver: bridge
+
+volumes:
+  - name: workspace
+    description: Shared project workspace
+  - name: copilot-config
+    description: Copilot configuration persistence

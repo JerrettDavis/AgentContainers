@@ -1,0 +1,23 @@
+# AUTO-GENERATED — do not edit by hand.
+# Source: definitions/agents/codex.yaml
+
+services:
+  codex:
+    image: ghcr.io/agentcontainers/node-bun-codex:latest
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:?OPENAI_API_KEY is required}
+      - CODEX_HOME=/home/dev/.config/codex
+      - CODEX_WORKSPACE=/workspace
+    volumes:
+      - workspace:/workspace
+      - codex-config:/home/dev/.config/codex
+    networks:
+      - agent-net
+    healthcheck:
+      test: ["CMD-SHELL", "codex --version || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    user: "1000:1000"

@@ -1,0 +1,71 @@
+id: codex
+display_name: OpenAI Codex CLI
+version: v1
+description: OpenAI Codex CLI agent overlay
+
+requires:
+  - "node>=18"
+
+conflicts: []
+
+install:
+  method: npm_global
+  package: "@openai/codex"
+  version: latest
+  post_install:
+    - command: "codex --version"
+      description: "Verify Codex installation"
+
+env:
+  - name: OPENAI_API_KEY
+    required: true
+    description: OpenAI API key
+    sensitive: true
+    inject_from: environment
+  - name: CODEX_HOME
+    required: false
+    default: "/home/dev/.config/codex"
+    description: Configuration directory
+    sensitive: false
+  - name: CODEX_WORKSPACE
+    required: false
+    default: "/workspace"
+    description: Default workspace path
+    sensitive: false
+
+mounts:
+  - name: workspace
+    container_path: /workspace
+    description: Project workspace (bind mount from host)
+    required: false
+    suggested_host_path: "."
+  - name: codex-config
+    container_path: /home/dev/.config/codex
+    description: Config and state persistence
+    required: false
+    suggested_host_path: "~/.config/codex"
+
+healthcheck:
+  test: ["CMD-SHELL", "codex --version || exit 1"]
+  interval: 30s
+  timeout: 10s
+  retries: 3
+  start_period: 15s
+
+validation:
+  commands:
+    - "codex --version"
+
+shell_helpers: []
+
+known_caveats:
+  - "Requires OPENAI_API_KEY at runtime; not set at build time"
+  - "Running as non-root user dev; workspace mount must be owned by UID 1000"
+
+privileged_modes: []
+
+compose_capabilities:
+  service_name_default: codex
+  ports: []
+  networks:
+    - agent-net

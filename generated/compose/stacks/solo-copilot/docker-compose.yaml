@@ -1,0 +1,31 @@
+# AUTO-GENERATED — do not edit by hand.
+# Stack: solo-copilot (Solo Copilot Stack)
+
+services:
+  copilot:
+    image: ghcr.io/agentcontainers/node-bun-copilot:latest
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN:?GITHUB_TOKEN is required}
+      - COPILOT_CONFIG_DIR=/home/dev/.config/github-copilot
+      - COPILOT_WORKSPACE=/workspace
+    volumes:
+      - workspace:/workspace
+      - copilot-config:/home/dev/.config/github-copilot
+    networks:
+      - agent-net
+    healthcheck:
+      test: ["CMD-SHELL", "github-copilot-cli --version || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    user: "1000:1000"
+
+networks:
+  agent-net:
+    driver: bridge
+
+volumes:
+  workspace:
+  copilot-config:

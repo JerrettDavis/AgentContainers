@@ -1,0 +1,72 @@
+# AUTO-GENERATED — do not edit by hand.
+# Stack: polyglot-devtools (Polyglot Developer Workstation)
+
+services:
+  claude-polyglot:
+    image: ghcr.io/agentcontainers/fullstack-polyglot-claude:latest
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:?ANTHROPIC_API_KEY is required}
+      - CLAUDE_CONFIG_DIR=/home/dev/.config/claude
+      - CLAUDE_WORKSPACE=/workspace
+    volumes:
+      - workspace:/workspace
+      - claude-config:/home/dev/.config/claude
+    networks:
+      - agent-net
+    depends_on:
+      headroom:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "claude --version || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    user: "1000:1000"
+  headroom:
+    image: headroom/headroom:latest
+    ports:
+      - "8080:8080"
+    networks:
+      - agent-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+  codex-polyglot:
+    image: ghcr.io/agentcontainers/fullstack-polyglot-codex:latest
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:?OPENAI_API_KEY is required}
+      - CODEX_HOME=/home/dev/.config/codex
+      - CODEX_WORKSPACE=/workspace
+    volumes:
+      - workspace:/workspace
+      - codex-config:/home/dev/.config/codex
+    networks:
+      - agent-net
+    depends_on:
+      headroom:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "codex --version || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    profiles:
+      - codex
+    restart: unless-stopped
+    user: "1000:1000"
+
+networks:
+  agent-net:
+    driver: bridge
+
+volumes:
+  workspace:
+  claude-state:
+  codex-state:
+  headroom-data:
