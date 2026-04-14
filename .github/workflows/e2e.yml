@@ -79,7 +79,11 @@ jobs:
       - name: Run E2E
         run: |
           chmod +x scripts/run-e2e.sh
-          SCOPE="${{ github.event.inputs.scope || 'bases' }}"
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            SCOPE="full"
+          else
+            SCOPE="${{ github.event.inputs.scope || 'full' }}"
+          fi
           FILTER="${{ github.event.inputs.filter || '' }}"
           ARGS="$SCOPE"
           [[ -n "$FILTER" ]] && ARGS="$ARGS --filter $FILTER"
