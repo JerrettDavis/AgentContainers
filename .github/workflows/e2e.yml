@@ -1,0 +1,85 @@
+name: E2E — Container Validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'definitions/**'
+      - 'generated/**'
+      - 'src/**'
+      - 'templates/**'
+      - 'scripts/run-e2e.sh'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'definitions/**'
+      - 'generated/**'
+      - 'src/**'
+      - 'templates/**'
+      - 'scripts/run-e2e.sh'
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: 'E2E scope (quick, bases, agents, compose, full)'
+        required: false
+        default: 'quick'
+      filter:
+        description: 'Comma-separated image IDs to test (empty = all in scope)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  # Quick e2e on every PR — lightweight, fast feedback
+  e2e-quick:
+    if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && github.event.inputs.scope == 'quick')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build generator
+        run: dotnet build --configuration Release
+
+      - name: Regenerate artifacts (includes agent Dockerfiles)
+        run: dotnet run --project src/AgentContainers.Generator --configuration Release -- generate
+
+      - name: Run E2E (quick scope)
+        run: |
+          chmod +x scripts/run-e2e.sh
+          scripts/run-e2e.sh quick
+
+  # Full e2e on main push or manual dispatch
+  e2e-full:
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.scope != 'quick')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build generator
+        run: dotnet build --configuration Release
+
+      - name: Regenerate artifacts (includes agent Dockerfiles)
+        run: dotnet run --project src/AgentContainers.Generator --configuration Release -- generate
+
+      - name: Run E2E
+        run: |
+          chmod +x scripts/run-e2e.sh
+          SCOPE="${{ github.event.inputs.scope || 'bases' }}"
+          FILTER="${{ github.event.inputs.filter || '' }}"
+          ARGS="$SCOPE"
+          [[ -n "$FILTER" ]] && ARGS="$ARGS --filter $FILTER"
+          scripts/run-e2e.sh $ARGS --no-cleanup

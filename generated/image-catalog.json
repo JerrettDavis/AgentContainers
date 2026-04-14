@@ -1,5 +1,5 @@
 {
-  "manifest_hash": "60c1c575cc38549f4a4d3591e281930127672c1e12d0976624bd300fe410ac9d",
+  "manifest_hash": "16df29260fa9f617a06f2e66e156773dbdfca19dde73b7c39d12c1b6e88f95e9",
   "generator_version": "0.1.0",
   "registry": "ghcr.io/agentcontainers",
   "images": [
@@ -152,9 +152,63 @@
       "install_method": "npm_global"
     },
     {
+      "type": "agent-image",
+      "id": "node-bun-claude",
+      "display_name": "Claude Code on Node.js \u002B Bun",
+      "requires": [
+        "node\u003E=18"
+      ],
+      "install_method": "npm_global"
+    },
+    {
+      "type": "agent-image",
+      "id": "fullstack-polyglot-claude",
+      "display_name": "Claude Code on Full-Stack Polyglot",
+      "requires": [
+        "node\u003E=18"
+      ],
+      "install_method": "npm_global"
+    },
+    {
+      "type": "agent-image",
+      "id": "node-py-dotnet-claude",
+      "display_name": "Claude Code on Node.js \u002B Python \u002B .NET",
+      "requires": [
+        "node\u003E=18"
+      ],
+      "install_method": "npm_global"
+    },
+    {
       "type": "agent",
       "id": "codex",
       "display_name": "OpenAI Codex CLI",
+      "requires": [
+        "node\u003E=18"
+      ],
+      "install_method": "npm_global"
+    },
+    {
+      "type": "agent-image",
+      "id": "node-bun-codex",
+      "display_name": "OpenAI Codex CLI on Node.js \u002B Bun",
+      "requires": [
+        "node\u003E=18"
+      ],
+      "install_method": "npm_global"
+    },
+    {
+      "type": "agent-image",
+      "id": "fullstack-polyglot-codex",
+      "display_name": "OpenAI Codex CLI on Full-Stack Polyglot",
+      "requires": [
+        "node\u003E=18"
+      ],
+      "install_method": "npm_global"
+    },
+    {
+      "type": "agent-image",
+      "id": "node-py-dotnet-codex",
+      "display_name": "OpenAI Codex CLI on Node.js \u002B Python \u002B .NET",
       "requires": [
         "node\u003E=18"
       ],
@@ -170,9 +224,63 @@
       "install_method": "npm_global"
     },
     {
+      "type": "agent-image",
+      "id": "node-bun-copilot",
+      "display_name": "GitHub Copilot CLI on Node.js \u002B Bun",
+      "requires": [
+        "node\u003E=18"
+      ],
+      "install_method": "npm_global"
+    },
+    {
+      "type": "agent-image",
+      "id": "fullstack-polyglot-copilot",
+      "display_name": "GitHub Copilot CLI on Full-Stack Polyglot",
+      "requires": [
+        "node\u003E=18"
+      ],
+      "install_method": "npm_global"
+    },
+    {
+      "type": "agent-image",
+      "id": "node-py-dotnet-copilot",
+      "display_name": "GitHub Copilot CLI on Node.js \u002B Python \u002B .NET",
+      "requires": [
+        "node\u003E=18"
+      ],
+      "install_method": "npm_global"
+    },
+    {
       "type": "agent",
       "id": "openclaw",
       "display_name": "OpenClaw",
+      "requires": [
+        "node"
+      ],
+      "install_method": "npm_global"
+    },
+    {
+      "type": "agent-image",
+      "id": "node-bun-openclaw",
+      "display_name": "OpenClaw on Node.js \u002B Bun",
+      "requires": [
+        "node"
+      ],
+      "install_method": "npm_global"
+    },
+    {
+      "type": "agent-image",
+      "id": "fullstack-polyglot-openclaw",
+      "display_name": "OpenClaw on Full-Stack Polyglot",
+      "requires": [
+        "node"
+      ],
+      "install_method": "npm_global"
+    },
+    {
+      "type": "agent-image",
+      "id": "node-py-dotnet-openclaw",
+      "display_name": "OpenClaw on Node.js \u002B Python \u002B .NET",
       "requires": [
         "node"
       ],

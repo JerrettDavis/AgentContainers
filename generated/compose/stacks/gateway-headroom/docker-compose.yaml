@@ -47,6 +47,8 @@ services:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - HEADROOM_TELEMETRY=${HEADROOM_TELEMETRY:-off}
+      - HEADROOM_CODE_AWARE_ENABLED=${HEADROOM_CODE_AWARE_ENABLED:-false}
+      - HEADROOM_HTTP2=${HEADROOM_HTTP2:-true}
     env_file:
       - .env
     ports:
@@ -93,6 +95,6 @@ networks:
 
 volumes:
   workspace:
-  openclaw-state:
+  openclaw-config:
   claude-state:
   headroom-data:

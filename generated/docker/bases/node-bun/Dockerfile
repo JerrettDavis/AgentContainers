@@ -27,7 +27,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     xz-utils \
     tree \
     htop \
-    openssh-client
+    openssh-client \
   && rm -rf /var/lib/apt/lists/*
 
 # Alias fd-find to fd
@@ -48,8 +48,10 @@ ARG BUN_INSTALL=/home/dev/.bun
 ENV BUN_INSTALL=${BUN_INSTALL}
 
 # User setup
-RUN groupadd -g 1000 dev \
-  && useradd -m -u 1000 -g 1000 dev
+RUN groupadd -g 1000 dev 2>/dev/null || true \
+  && useradd -m -u 1000 -g 1000 dev 2>/dev/null \
+  || id -u dev >/dev/null 2>&1 \
+  || (useradd -m -o -u 1000 -g 1000 dev)
 RUN echo 'dev ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/dev
 USER dev
 

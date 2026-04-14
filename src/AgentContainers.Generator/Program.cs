@@ -28,7 +28,7 @@ public static class Program
             return 1;
         }
 
-        if (!jsonOutput)
+        if (!jsonOutput && command != "emit-e2e-plan")
         {
             Console.WriteLine($"AgentContainers Generator v0.1.0");
             Console.WriteLine($"Repository root: {repoRoot}");
@@ -41,6 +41,7 @@ public static class Program
             "validate" => RunValidate(repoRoot),
             "list-matrix" => RunListMatrix(repoRoot, jsonOutput),
             "build-matrix" => RunBuildMatrix(repoRoot),
+            "emit-e2e-plan" => RunEmitE2EPlan(repoRoot),
             _ => PrintUsage()
         };
     }
@@ -294,6 +295,57 @@ public static class Program
             Console.WriteLine($"  [dockerfile] combos/{comboId}/Dockerfile");
         }
 
+        // Generate agent overlay Dockerfiles for compatible base×agent pairs
+        foreach (var (agentId, agent) in catalog.Agents)
+        {
+            var installCmd = GetAgentInstallCommand(agent);
+            if (installCmd == null) continue;
+
+            // Agent overlays on base runtimes
+            foreach (var (baseId, baseManifest) in catalog.Bases)
+            {
+                if (!agent.Requires.All(req => CapabilitySatisfied(req, baseManifest.Provides)))
+                    continue;
+
+                var imageId = $"{baseId}-{agentId}";
+                var dir = Path.Combine(dockerRoot, "agents", imageId);
+                Directory.CreateDirectory(dir);
+                var dockerfilePath = Path.Combine(dir, "Dockerfile");
+                var content = GenerateAgentDockerfile(agent, baseId, baseManifest.DisplayName, installCmd);
+                File.WriteAllText(dockerfilePath, content);
+                report.Artifacts.Add(new ArtifactEntry
+                {
+                    Type = "dockerfile",
+                    Id = $"agent-{imageId}",
+                    Path = ContentHasher.NormalizePath(Path.GetRelativePath(generatedRoot, dockerfilePath)),
+                    ContentHash = ContentHasher.ComputeContentHash(content)
+                });
+                Console.WriteLine($"  [dockerfile] agents/{imageId}/Dockerfile");
+            }
+
+            // Agent overlays on combo runtimes
+            foreach (var (comboId, combo) in catalog.Combos)
+            {
+                if (!agent.Requires.All(req => CapabilitySatisfied(req, combo.Provides)))
+                    continue;
+
+                var imageId = $"{comboId}-{agentId}";
+                var dir = Path.Combine(dockerRoot, "agents", imageId);
+                Directory.CreateDirectory(dir);
+                var dockerfilePath = Path.Combine(dir, "Dockerfile");
+                var content = GenerateAgentDockerfile(agent, comboId, combo.DisplayName, installCmd);
+                File.WriteAllText(dockerfilePath, content);
+                report.Artifacts.Add(new ArtifactEntry
+                {
+                    Type = "dockerfile",
+                    Id = $"agent-{imageId}",
+                    Path = ContentHasher.NormalizePath(Path.GetRelativePath(generatedRoot, dockerfilePath)),
+                    ContentHash = ContentHasher.ComputeContentHash(content)
+                });
+                Console.WriteLine($"  [dockerfile] agents/{imageId}/Dockerfile");
+            }
+        }
+
         // Generate compose fragments
         var composeRoot = Path.Combine(generatedRoot, "compose");
         Directory.CreateDirectory(Path.Combine(composeRoot, "fragments"));
@@ -376,7 +428,7 @@ public static class Program
             for (int i = 0; i < aptPkgs.Count; i++)
             {
                 sb.Append($"    {aptPkgs[i]}");
-                sb.AppendLine(i < aptPkgs.Count - 1 ? " \\" : "");
+                sb.AppendLine(" \\");
             }
             sb.AppendLine("  && rm -rf /var/lib/apt/lists/*");
             sb.AppendLine();
@@ -414,10 +466,12 @@ public static class Program
             sb.AppendLine();
         }
 
-        // User setup
+        // User setup (idempotent — handles base images that already have a group/user at the target GID/UID)
         sb.AppendLine($"# User setup");
-        sb.AppendLine($"RUN groupadd -g {baseManifest.User.Gid} {baseManifest.User.Name} \\");
-        sb.AppendLine($"  && useradd -m -u {baseManifest.User.Uid} -g {baseManifest.User.Gid} {baseManifest.User.Name}");
+        sb.AppendLine($"RUN groupadd -g {baseManifest.User.Gid} {baseManifest.User.Name} 2>/dev/null || true \\");
+        sb.AppendLine($"  && useradd -m -u {baseManifest.User.Uid} -g {baseManifest.User.Gid} {baseManifest.User.Name} 2>/dev/null \\");
+        sb.AppendLine($"  || id -u {baseManifest.User.Name} >/dev/null 2>&1 \\");
+        sb.AppendLine($"  || (useradd -m -o -u {baseManifest.User.Uid} -g {baseManifest.User.Gid} {baseManifest.User.Name})");
         if (baseManifest.User.Sudo)
         {
             sb.AppendLine($"RUN echo '{baseManifest.User.Name} ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/{baseManifest.User.Name}");
@@ -606,6 +660,40 @@ public static class Program
                 requires = a.Requires,
                 install_method = a.Install.Method
             });
+
+            // Agent overlay images on compatible bases
+            foreach (var (baseId, baseManifest) in catalog.Bases)
+            {
+                if (!a.Requires.All(req => CapabilitySatisfied(req, baseManifest.Provides)))
+                    continue;
+
+                var imageId = $"{baseId}-{id}";
+                entries.Add(new
+                {
+                    type = "agent-image",
+                    id = imageId,
+                    display_name = $"{a.DisplayName} on {baseManifest.DisplayName}",
+                    requires = a.Requires,
+                    install_method = a.Install.Method
+                });
+            }
+
+            // Agent overlay images on compatible combos
+            foreach (var (comboId, combo) in catalog.Combos)
+            {
+                if (!a.Requires.All(req => CapabilitySatisfied(req, combo.Provides)))
+                    continue;
+
+                var imageId = $"{comboId}-{id}";
+                entries.Add(new
+                {
+                    type = "agent-image",
+                    id = imageId,
+                    display_name = $"{a.DisplayName} on {combo.DisplayName}",
+                    requires = a.Requires,
+                    install_method = a.Install.Method
+                });
+            }
         }
 
         return new
@@ -677,6 +765,186 @@ public static class Program
         return string.Join(" && \\\n    ", lines);
     }
 
+    private static int RunEmitE2EPlan(string repoRoot)
+    {
+        var loader = new ManifestLoader();
+        var catalog = loader.LoadAll(Path.Combine(repoRoot, "definitions"));
+
+        var plan = new E2EPlan();
+
+        // Common-tool validation commands (applied to every base image)
+        var commonValidations = new List<string>();
+        if (catalog.CommonTools.TryGetValue("default", out var defaultTools))
+            commonValidations = defaultTools.Validation.Commands;
+
+        // Base images
+        foreach (var (id, b) in catalog.Bases)
+        {
+            plan.Bases.Add(new E2EImageTestCase
+            {
+                Id = id,
+                DisplayName = b.DisplayName,
+                BuildContext = $"generated/docker/bases/{id}",
+                Tag = $"agentcontainers/{id}:latest",
+                ValidationCommands = b.Validation.Commands,
+                CommonToolValidations = commonValidations,
+                SizeClass = b.ResourceHints.ImageSizeClass
+            });
+        }
+
+        // Combo images
+        foreach (var (id, c) in catalog.Combos)
+        {
+            plan.Combos.Add(new E2EImageTestCase
+            {
+                Id = id,
+                DisplayName = c.DisplayName,
+                BuildContext = $"generated/docker/combos/{id}",
+                Tag = $"agentcontainers/{id}:latest",
+                ValidationCommands = c.Validation.Commands,
+                CommonToolValidations = [],
+                SizeClass = c.ResourceHints.ImageSizeClass
+            });
+        }
+
+        // Agent overlay images (compatible base×agent)
+        foreach (var (agentId, agent) in catalog.Agents)
+        {
+            foreach (var (baseId, baseManifest) in catalog.Bases)
+            {
+                if (!agent.Requires.All(req => CapabilitySatisfied(req, baseManifest.Provides)))
+                    continue;
+
+                var imageId = $"{baseId}-{agentId}";
+                plan.Agents.Add(new E2EAgentTestCase
+                {
+                    Id = imageId,
+                    AgentId = agentId,
+                    BaseId = baseId,
+                    DisplayName = $"{agent.DisplayName} on {baseManifest.DisplayName}",
+                    BuildContext = $"generated/docker/agents/{imageId}",
+                    Tag = $"agentcontainers/{imageId}:latest",
+                    BaseTag = $"agentcontainers/{baseId}:latest",
+                    ValidationCommands = agent.Validation.Commands,
+                    SizeClass = baseManifest.ResourceHints.ImageSizeClass
+                });
+            }
+
+            foreach (var (comboId, combo) in catalog.Combos)
+            {
+                if (!agent.Requires.All(req => CapabilitySatisfied(req, combo.Provides)))
+                    continue;
+
+                var imageId = $"{comboId}-{agentId}";
+                plan.Agents.Add(new E2EAgentTestCase
+                {
+                    Id = imageId,
+                    AgentId = agentId,
+                    BaseId = comboId,
+                    DisplayName = $"{agent.DisplayName} on {combo.DisplayName}",
+                    BuildContext = $"generated/docker/agents/{imageId}",
+                    Tag = $"agentcontainers/{imageId}:latest",
+                    BaseTag = $"agentcontainers/{comboId}:latest",
+                    ValidationCommands = agent.Validation.Commands,
+                    SizeClass = combo.ResourceHints.ImageSizeClass
+                });
+            }
+        }
+
+        // Compose stacks
+        foreach (var (stackId, stack) in catalog.ComposeStacks)
+        {
+            var requiredImages = new List<string>();
+            foreach (var svc in stack.Services)
+            {
+                if (svc.Agent != null)
+                {
+                    var baseName = svc.Base ?? "node-bun";
+                    requiredImages.Add($"agentcontainers/{baseName}-{svc.Agent}:latest");
+                }
+            }
+
+            plan.ComposeStacks.Add(new E2EComposeTestCase
+            {
+                Id = stackId,
+                DisplayName = stack.DisplayName,
+                ComposePath = $"generated/compose/stacks/{stackId}/docker-compose.yaml",
+                RequiredImages = requiredImages
+            });
+        }
+
+        Console.Write(JsonSerializer.Serialize(plan, JsonOptions));
+        return 0;
+    }
+
+    private static string GenerateAgentDockerfile(
+        AgentContainers.Core.Models.AgentManifest agent,
+        string baseId,
+        string baseDisplayName,
+        string installCommand)
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine($"# AUTO-GENERATED — do not edit by hand.");
+        sb.AppendLine($"# Agent overlay: {agent.Id} on {baseId}");
+        sb.AppendLine($"# Generated by AgentContainers.Generator v0.1.0");
+        sb.AppendLine();
+        sb.AppendLine($"ARG BASE_IMAGE=agentcontainers/{baseId}:latest");
+        sb.AppendLine($"FROM ${{BASE_IMAGE}}");
+        sb.AppendLine();
+        sb.AppendLine("USER root");
+        sb.AppendLine();
+        sb.AppendLine($"# Install {agent.DisplayName} via {agent.Install.Method}");
+        sb.AppendLine($"RUN {installCommand}");
+        sb.AppendLine();
+
+        // Post-install verification steps
+        foreach (var step in agent.Install.PostInstall)
+        {
+            sb.AppendLine($"# {step.Description}");
+            sb.AppendLine($"RUN {step.Command}");
+        }
+        if (agent.Install.PostInstall.Count > 0)
+            sb.AppendLine();
+
+        sb.AppendLine("USER dev");
+        sb.AppendLine();
+
+        // OCI Labels
+        sb.AppendLine("# OCI Image Labels");
+        sb.AppendLine($"ARG BUILD_DATE=unknown");
+        sb.AppendLine($"ARG VCS_REF=unknown");
+        sb.AppendLine($"ARG IMAGE_VERSION={agent.Version}");
+        sb.AppendLine();
+        sb.AppendLine($"LABEL org.opencontainers.image.title=\"{agent.DisplayName} on {baseDisplayName}\"");
+        sb.AppendLine($"LABEL org.opencontainers.image.description=\"{agent.Description}\"");
+        sb.AppendLine($"LABEL org.opencontainers.image.source=\"https://github.com/agentcontainers/AgentContainers\"");
+        sb.AppendLine($"LABEL org.opencontainers.image.vendor=\"AgentContainers\"");
+        sb.AppendLine($"LABEL org.opencontainers.image.licenses=\"MIT\"");
+        sb.AppendLine($"LABEL org.opencontainers.image.version=\"${{IMAGE_VERSION}}\"");
+        sb.AppendLine($"LABEL org.opencontainers.image.created=\"${{BUILD_DATE}}\"");
+        sb.AppendLine($"LABEL org.opencontainers.image.revision=\"${{VCS_REF}}\"");
+        sb.AppendLine($"LABEL dev.agentcontainers.image-type=\"agent\"");
+        sb.AppendLine($"LABEL dev.agentcontainers.agent=\"{agent.Id}\"");
+        sb.AppendLine($"LABEL dev.agentcontainers.base=\"{baseId}\"");
+
+        return sb.ToString();
+    }
+
+    private static string? GetAgentInstallCommand(AgentContainers.Core.Models.AgentManifest agent)
+    {
+        var pkg = agent.Install.Package;
+        var version = agent.Install.Version;
+        var versionSuffix = string.IsNullOrEmpty(version) || version == "latest" ? "" : $"@{version}";
+
+        return agent.Install.Method switch
+        {
+            "npm_global" => $"npm install -g {pkg}{versionSuffix}",
+            "pip" => $"pip install --no-cache-dir {pkg}{versionSuffix}",
+            "apt" => $"apt-get update && apt-get install -y --no-install-recommends {pkg} && rm -rf /var/lib/apt/lists/*",
+            _ => null
+        };
+    }
+
     private static string? FindRepoRoot()
     {
         // Try current directory first, then walk up
@@ -697,10 +965,11 @@ public static class Program
         Console.WriteLine("Usage: AgentContainers.Generator <command>");
         Console.WriteLine();
         Console.WriteLine("Commands:");
-        Console.WriteLine("  generate      Load manifests, validate, and generate artifacts");
-        Console.WriteLine("  validate      Load and validate manifests only");
-        Console.WriteLine("  list-matrix   Print compatibility matrix");
-        Console.WriteLine("  build-matrix  Output JSON build matrix for CI/CD publishing");
+        Console.WriteLine("  generate        Load manifests, validate, and generate artifacts");
+        Console.WriteLine("  validate        Load and validate manifests only");
+        Console.WriteLine("  list-matrix     Print compatibility matrix");
+        Console.WriteLine("  build-matrix    Output JSON build matrix for CI/CD publishing");
+        Console.WriteLine("  emit-e2e-plan   Output JSON test plan for e2e container validation");
         Console.WriteLine();
         return 1;
     }
@@ -720,3 +989,47 @@ internal sealed class ArtifactEntry
     public string Path { get; set; } = string.Empty;
     public string ContentHash { get; set; } = string.Empty;
 }
+
+#region E2E Plan Models
+
+internal sealed class E2EPlan
+{
+    public List<E2EImageTestCase> Bases { get; set; } = [];
+    public List<E2EImageTestCase> Combos { get; set; } = [];
+    public List<E2EAgentTestCase> Agents { get; set; } = [];
+    public List<E2EComposeTestCase> ComposeStacks { get; set; } = [];
+}
+
+internal sealed class E2EImageTestCase
+{
+    public string Id { get; set; } = string.Empty;
+    public string DisplayName { get; set; } = string.Empty;
+    public string BuildContext { get; set; } = string.Empty;
+    public string Tag { get; set; } = string.Empty;
+    public List<string> ValidationCommands { get; set; } = [];
+    public List<string> CommonToolValidations { get; set; } = [];
+    public string SizeClass { get; set; } = "medium";
+}
+
+internal sealed class E2EAgentTestCase
+{
+    public string Id { get; set; } = string.Empty;
+    public string AgentId { get; set; } = string.Empty;
+    public string BaseId { get; set; } = string.Empty;
+    public string DisplayName { get; set; } = string.Empty;
+    public string BuildContext { get; set; } = string.Empty;
+    public string Tag { get; set; } = string.Empty;
+    public string BaseTag { get; set; } = string.Empty;
+    public List<string> ValidationCommands { get; set; } = [];
+    public string SizeClass { get; set; } = "medium";
+}
+
+internal sealed class E2EComposeTestCase
+{
+    public string Id { get; set; } = string.Empty;
+    public string DisplayName { get; set; } = string.Empty;
+    public string ComposePath { get; set; } = string.Empty;
+    public List<string> RequiredImages { get; set; } = [];
+}
+
+#endregion
