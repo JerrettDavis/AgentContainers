@@ -40,8 +40,11 @@ RUN ln -sf /usr/bin/rg /usr/local/bin/rg || true
 RUN pip install --no-cache-dir pipx && \
     pipx ensurepath
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+# Environment defaults (override at build time with --build-arg)
+ARG PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONDONTWRITEBYTECODE=${PYTHONDONTWRITEBYTECODE}
+ARG PYTHONUNBUFFERED=1
+ENV PYTHONUNBUFFERED=${PYTHONUNBUFFERED}
 
 # User setup
 RUN groupadd -g 1000 dev \

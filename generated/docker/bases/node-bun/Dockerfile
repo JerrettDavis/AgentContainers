@@ -41,8 +41,11 @@ RUN curl -fsSL https://bun.sh/install | bash && \
     echo 'export BUN_INSTALL="$HOME/.bun"' >> /etc/profile.d/bun.sh && \
     echo 'export PATH="$HOME/.bun/bin:$PATH"' >> /etc/profile.d/bun.sh
 
-ENV NODE_ENV=development
-ENV BUN_INSTALL=/home/dev/.bun
+# Environment defaults (override at build time with --build-arg)
+ARG NODE_ENV=development
+ENV NODE_ENV=${NODE_ENV}
+ARG BUN_INSTALL=/home/dev/.bun
+ENV BUN_INSTALL=${BUN_INSTALL}
 
 # User setup
 RUN groupadd -g 1000 dev \

@@ -8,6 +8,9 @@ services:
       - OPENCLAW_API_KEY=${OPENCLAW_API_KEY:?OPENCLAW_API_KEY is required}
       - OPENCLAW_PORT=3000
       - OPENCLAW_CONFIG_DIR=/home/dev/.config/openclaw
+      - HEADROOM_PROXY_URL=${HEADROOM_PROXY_URL:-http://headroom:8787}
+    env_file:
+      - .env
     volumes:
       - workspace:/workspace
       - openclaw-config:/home/dev/.config/openclaw
@@ -28,15 +31,34 @@ services:
     user: "1000:1000"
   headroom:
     image: headroom/headroom:latest
+    environment:
+      - HEADROOM_HOST=${HEADROOM_HOST:-0.0.0.0}
+      - HEADROOM_PORT=${HEADROOM_PORT:-8787}
+      - HEADROOM_MODE=${HEADROOM_MODE:-token}
+      - HEADROOM_OPTIMIZE=${HEADROOM_OPTIMIZE:-true}
+      - HEADROOM_MIN_TOKENS=${HEADROOM_MIN_TOKENS:-500}
+      - HEADROOM_SMART_ROUTING=${HEADROOM_SMART_ROUTING:-true}
+      - HEADROOM_CACHE_ENABLED=${HEADROOM_CACHE_ENABLED:-true}
+      - HEADROOM_CACHE_TTL=${HEADROOM_CACHE_TTL:-3600}
+      - HEADROOM_RATE_LIMIT_ENABLED=${HEADROOM_RATE_LIMIT_ENABLED:-true}
+      - HEADROOM_RPM=${HEADROOM_RPM:-60}
+      - HEADROOM_TPM=${HEADROOM_TPM:-100000}
+      - HEADROOM_BACKEND=${HEADROOM_BACKEND:-anthropic}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - HEADROOM_TELEMETRY=${HEADROOM_TELEMETRY:-off}
+    env_file:
+      - .env
     ports:
-      - "8080:8080"
+      - "8787:8787"
     networks:
       - agent-net
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"]
+      test: ["CMD-SHELL", "curl -sf http://localhost:8787/readyz || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 15s
     restart: unless-stopped
   claude:
     image: ghcr.io/agentcontainers/node-bun-claude:latest
@@ -44,6 +66,8 @@ services:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:?ANTHROPIC_API_KEY is required}
       - CLAUDE_CONFIG_DIR=/home/dev/.config/claude
       - CLAUDE_WORKSPACE=/workspace
+    env_file:
+      - .env
     volumes:
       - workspace:/workspace
       - claude-config:/home/dev/.config/claude

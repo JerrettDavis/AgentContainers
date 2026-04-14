@@ -122,7 +122,7 @@ public class ComposeStackGeneratorTests
         var services = ComposeStackGenerator.ResolveServices(stack, catalog);
 
         var headroom = services.First(s => s.Name == "headroom");
-        Assert.Contains("8080:8080", headroom.Ports);
+        Assert.Contains("8787:8787", headroom.Ports);
     }
 
     [Fact]
@@ -216,5 +216,117 @@ public class ComposeStackGeneratorTests
         var output = ComposeStackGenerator.GenerateStack(stack, catalog, template);
 
         Assert.Contains("profiles:", output);
+    }
+
+    [Fact]
+    public void ResolveServices_GatewayHeadroom_SidecarHasEnvironment()
+    {
+        var catalog = LoadCatalog();
+        var stack = catalog.ComposeStacks["gateway-headroom"];
+        var services = ComposeStackGenerator.ResolveServices(stack, catalog);
+
+        var headroom = services.First(s => s.Name == "headroom");
+        // Sidecar env vars wired from tool-pack sidecar_env
+        Assert.NotEmpty(headroom.Environment);
+        Assert.Contains(headroom.Environment, e => e.Contains("HEADROOM_HOST"));
+        Assert.Contains(headroom.Environment, e => e.Contains("HEADROOM_PORT"));
+        Assert.Contains(headroom.Environment, e => e.Contains("HEADROOM_MODE"));
+    }
+
+    [Fact]
+    public void ResolveServices_GatewayHeadroom_SidecarGuardsSensitiveVars()
+    {
+        var catalog = LoadCatalog();
+        var stack = catalog.ComposeStacks["gateway-headroom"];
+        var services = ComposeStackGenerator.ResolveServices(stack, catalog);
+
+        var headroom = services.First(s => s.Name == "headroom");
+        // ANTHROPIC_API_KEY is sensitive/optional → should use ${VAR:-} pattern
+        Assert.Contains(headroom.Environment, e => e.StartsWith("ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}"));
+    }
+
+    [Fact]
+    public void ResolveServices_GatewayHeadroom_SidecarUsesOverrideDefaults()
+    {
+        var catalog = LoadCatalog();
+        var stack = catalog.ComposeStacks["gateway-headroom"];
+        var services = ComposeStackGenerator.ResolveServices(stack, catalog);
+
+        var headroom = services.First(s => s.Name == "headroom");
+        // Non-sensitive sidecar env vars use ${VAR:-default} override pattern
+        Assert.Contains(headroom.Environment, e => e == "HEADROOM_HOST=${HEADROOM_HOST:-0.0.0.0}");
+        Assert.Contains(headroom.Environment, e => e == "HEADROOM_PORT=${HEADROOM_PORT:-8787}");
+    }
+
+    [Fact]
+    public void ResolveServices_GatewayHeadroom_AgentGetsToolPackClientEnv()
+    {
+        var catalog = LoadCatalog();
+        var stack = catalog.ComposeStacks["gateway-headroom"];
+        var services = ComposeStackGenerator.ResolveServices(stack, catalog);
+
+        var openclaw = services.First(s => s.Name == "openclaw");
+        // OpenClaw has toolpacks: [headroom], should get HEADROOM_PROXY_URL
+        Assert.Contains(openclaw.Environment, e => e.Contains("HEADROOM_PROXY_URL"));
+    }
+
+    [Fact]
+    public void ResolveServices_GatewayHeadroom_EnvFileSet()
+    {
+        var catalog = LoadCatalog();
+        var stack = catalog.ComposeStacks["gateway-headroom"];
+        var services = ComposeStackGenerator.ResolveServices(stack, catalog);
+
+        // All services should have env_file from stack-level setting
+        Assert.All(services, s => Assert.Equal(".env", s.EnvFile));
+    }
+
+    [Fact]
+    public void GenerateStack_GatewayHeadroom_ContainsEnvFile()
+    {
+        var catalog = LoadCatalog();
+        var stack = catalog.ComposeStacks["gateway-headroom"];
+        var template = LoadStackTemplate();
+
+        var output = ComposeStackGenerator.GenerateStack(stack, catalog, template);
+
+        Assert.Contains("env_file:", output);
+        Assert.Contains(".env", output);
+    }
+
+    [Fact]
+    public void ResolveServices_SoloClaude_NoEnvFile()
+    {
+        var catalog = LoadCatalog();
+        var stack = catalog.ComposeStacks["solo-claude"];
+        var services = ComposeStackGenerator.ResolveServices(stack, catalog);
+
+        // solo-claude has no env_file, should be null
+        Assert.All(services, s => Assert.Null(s.EnvFile));
+    }
+
+    [Fact]
+    public void GenerateStack_GatewayHeadroom_HeadroomCorrectPort()
+    {
+        var catalog = LoadCatalog();
+        var stack = catalog.ComposeStacks["gateway-headroom"];
+        var template = LoadStackTemplate();
+
+        var output = ComposeStackGenerator.GenerateStack(stack, catalog, template);
+
+        Assert.Contains("8787:8787", output);
+        Assert.DoesNotContain("8080", output);
+    }
+
+    [Fact]
+    public void GenerateStack_GatewayHeadroom_HeadroomReadyzHealthcheck()
+    {
+        var catalog = LoadCatalog();
+        var stack = catalog.ComposeStacks["gateway-headroom"];
+        var template = LoadStackTemplate();
+
+        var output = ComposeStackGenerator.GenerateStack(stack, catalog, template);
+
+        Assert.Contains("/readyz", output);
     }
 }

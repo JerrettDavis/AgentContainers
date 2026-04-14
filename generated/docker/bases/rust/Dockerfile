@@ -40,8 +40,11 @@ RUN ln -sf /usr/bin/rg /usr/local/bin/rg || true
 RUN rustup component add clippy rustfmt rust-analyzer && \
     cargo install cargo-watch cargo-edit
 
-ENV CARGO_HOME=/usr/local/cargo
-ENV RUSTUP_HOME=/usr/local/rustup
+# Environment defaults (override at build time with --build-arg)
+ARG CARGO_HOME=/usr/local/cargo
+ENV CARGO_HOME=${CARGO_HOME}
+ARG RUSTUP_HOME=/usr/local/rustup
+ENV RUSTUP_HOME=${RUSTUP_HOME}
 
 # User setup
 RUN groupadd -g 1000 dev \

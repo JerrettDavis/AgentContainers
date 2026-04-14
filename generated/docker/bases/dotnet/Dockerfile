@@ -39,8 +39,11 @@ RUN ln -sf /usr/bin/rg /usr/local/bin/rg || true
 # Configure dotnet CLI telemetry opt-out
 RUN echo 'export DOTNET_CLI_TELEMETRY_OPTOUT=1' >> /etc/profile.d/dotnet.sh
 
-ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
-ENV DOTNET_NOLOGO=1
+# Environment defaults (override at build time with --build-arg)
+ARG DOTNET_CLI_TELEMETRY_OPTOUT=1
+ENV DOTNET_CLI_TELEMETRY_OPTOUT=${DOTNET_CLI_TELEMETRY_OPTOUT}
+ARG DOTNET_NOLOGO=1
+ENV DOTNET_NOLOGO=${DOTNET_NOLOGO}
 
 # User setup
 RUN groupadd -g 1000 dev \

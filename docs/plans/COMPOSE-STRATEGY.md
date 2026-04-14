@@ -171,8 +171,8 @@ OPENCLAW_PORT=3000
                   ┌──────────────────────────┐
                   │  headroom                │
                   │  (headroom:latest)       │
-                  │  port: 8080              │
-                  │  healthcheck: /health    │
+                  │  port: 8787              │
+                  │  healthcheck: /readyz    │
                   └───────────┬──────────────┘
                               │ condition: service_healthy
                   ┌───────────▼──────────────┐
@@ -180,7 +180,7 @@ OPENCLAW_PORT=3000
                   │  (node-bun-openclaw-     │
                   │   headroom)              │
                   │  HEADROOM_PROXY_URL=     │
-                  │    http://headroom:8080  │
+                  │    http://headroom:8787  │
                   └──────────────────────────┘
              (optional)
                   ┌──────────────────────────┐
@@ -210,20 +210,26 @@ services:
   headroom:
     image: headroom/headroom:latest
     environment:
-      - HEADROOM_PORT=8080
-      - HEADROOM_LOG_LEVEL=${HEADROOM_LOG_LEVEL:-info}
-    volumes:
-      - headroom-data:/data
+      - HEADROOM_HOST=${HEADROOM_HOST:-0.0.0.0}
+      - HEADROOM_PORT=${HEADROOM_PORT:-8787}
+      - HEADROOM_MODE=${HEADROOM_MODE:-token}
+      - HEADROOM_OPTIMIZE=${HEADROOM_OPTIMIZE:-true}
+      - HEADROOM_BACKEND=${HEADROOM_BACKEND:-anthropic}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - HEADROOM_TELEMETRY=${HEADROOM_TELEMETRY:-off}
+    env_file:
+      - .env
     networks:
       - agent-net
     ports:
-      - "8080:8080"
+      - "8787:8787"
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"]
+      test: ["CMD-SHELL", "curl -sf http://localhost:8787/readyz || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 15s
     restart: unless-stopped
 ```
 
@@ -231,10 +237,12 @@ services:
 
 ```env
 OPENCLAW_API_KEY=
-HEADROOM_LOG_LEVEL=info
+# Headroom sidecar defaults (all overridable)
+HEADROOM_MODE=token
+HEADROOM_BACKEND=anthropic
+ANTHROPIC_API_KEY=
 # Optional: include claude service
 # COMPOSE_PROFILES=claude
-# ANTHROPIC_API_KEY=
 ```
 
 ---

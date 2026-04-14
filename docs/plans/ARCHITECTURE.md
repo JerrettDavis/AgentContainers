@@ -89,8 +89,8 @@ Each agent manifest declares:
 - Known caveats and privilege requirements
 - Extension hooks (plugin directories, sidecar coordination)
 
-**v1 agents:** `claude`, `openclaw`
-**Deferred:** `opencode`, `gemini`, `codex`
+**v1 agents:** `claude`, `openclaw`, `codex`, `copilot`
+**Deferred:** `opencode`, `gemini`
 
 ### Layer 5 — Tool Pack Overlay
 
@@ -263,7 +263,7 @@ AgentContainers/
     manifests/
     docs/
   src/
-    AgentContainers.Generator/   ← CLI tool, .NET 8
+    AgentContainers.Generator/   ← CLI tool, .NET 10
     AgentContainers.Core/        ← shared models, schemas, resolvers
     AgentContainers.Validation/  ← validation harness
   schemas/

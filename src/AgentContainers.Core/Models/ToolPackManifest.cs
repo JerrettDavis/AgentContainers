@@ -9,7 +9,13 @@ public sealed class ToolPackManifest : ManifestBase
     public CompatibilityFilter CompatibleWith { get; set; } = new();
     public List<string> Conflicts { get; set; } = [];
     public AgentInstallBlock Install { get; set; } = new();
+
+    /// <summary>Client-side env vars injected into agent containers that use this pack.</summary>
     public List<EnvVar> Env { get; set; } = [];
+
+    /// <summary>Env vars injected into the sidecar container itself.</summary>
+    public List<EnvVar> SidecarEnv { get; set; } = [];
+
     public SidecarConfig? Sidecar { get; set; }
     public ValidationBlock Validation { get; set; } = new();
     public ComposeCapabilities ComposeCapabilities { get; set; } = new();

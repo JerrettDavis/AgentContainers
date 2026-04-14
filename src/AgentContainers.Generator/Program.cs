@@ -401,12 +401,18 @@ public static class Program
             sb.AppendLine();
         }
 
-        // Environment variables
-        foreach (var env in baseManifest.Env.Where(e => e.Default != null && !e.Sensitive))
+        // Environment variables — ARG/ENV pattern for overridable defaults
+        var envVars = baseManifest.Env.Where(e => e.Default != null && !e.Sensitive).ToList();
+        if (envVars.Count > 0)
         {
-            sb.AppendLine($"ENV {env.Name}={env.Default}");
+            sb.AppendLine("# Environment defaults (override at build time with --build-arg)");
+            foreach (var env in envVars)
+            {
+                sb.AppendLine($"ARG {env.Name}={env.Default}");
+                sb.AppendLine($"ENV {env.Name}=${{{env.Name}}}");
+            }
+            sb.AppendLine();
         }
-        if (baseManifest.Env.Any(e => e.Default != null)) sb.AppendLine();
 
         // User setup
         sb.AppendLine($"# User setup");

@@ -11,6 +11,10 @@ services:
       - {{ env }}
 {{~ end ~}}
 {{~ end ~}}
+{{~ if svc.env_file ~}}
+    env_file:
+      - {{ svc.env_file }}
+{{~ end ~}}
 {{~ if svc.volumes.size > 0 ~}}
     volumes:
 {{~ for vol in svc.volumes ~}}

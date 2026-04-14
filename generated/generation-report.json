@@ -1,30 +1,30 @@
 {
-  "manifest_hash": "e9059d91c312366af5a34f954c77d0f214f379d3bda6aff236dcef9746bd49d9",
+  "manifest_hash": "60c1c575cc38549f4a4d3591e281930127672c1e12d0976624bd300fe410ac9d",
   "generator_version": "0.1.0",
   "artifacts": [
     {
       "type": "dockerfile",
       "id": "base-dotnet",
       "path": "docker/bases/dotnet/Dockerfile",
-      "content_hash": "9c8c3a8b64e99bedbcfb32bab18ea29d9fac8540234cf019d1233560ee411390"
+      "content_hash": "2c54ca796998c334b1e013eff2dae9b5b0b7e6ff63a32fb8f13d87359d0ef8f6"
     },
     {
       "type": "dockerfile",
       "id": "base-node-bun",
       "path": "docker/bases/node-bun/Dockerfile",
-      "content_hash": "d07224394b0de83ff3aa97596493dbe9f38163c31e6ae9e66d2e4edf3d2f374a"
+      "content_hash": "ce3c7ae95dc290890eaf0ce8d4661a0f05ddec8449a10886890f1a2178b4e41f"
     },
     {
       "type": "dockerfile",
       "id": "base-python",
       "path": "docker/bases/python/Dockerfile",
-      "content_hash": "2bfa0b8fc5d3c502a5cbba9831446e6a8af74671940dacff8874d96914ee43a2"
+      "content_hash": "4c26f318bdd8ad6b78789ad74768cc0df624f843b2b7c760b787ed1b7a3da61f"
     },
     {
       "type": "dockerfile",
       "id": "base-rust",
       "path": "docker/bases/rust/Dockerfile",
-      "content_hash": "ce8ff2826ab574a62739dc1666ec39e2e6635a717f613596cba244a96f5efbcf"
+      "content_hash": "df455059ca9286068aa0be2ce0e1e498ff561592f0f57d058857349d86fa1051"
     },
     {
       "type": "dockerfile",
@@ -66,13 +66,13 @@
       "type": "compose-stack",
       "id": "stack-gateway-headroom",
       "path": "compose/stacks/gateway-headroom/docker-compose.yaml",
-      "content_hash": "232a941b78590d247cbc4ffb6c7648d06417313b3b9aa2515e2af8ccc0a1a17c"
+      "content_hash": "8959a56a0260278de772ae62e219ec310902044463a2aaccce604f1e2f8d4d28"
     },
     {
       "type": "compose-stack",
       "id": "stack-polyglot-devtools",
       "path": "compose/stacks/polyglot-devtools/docker-compose.yaml",
-      "content_hash": "a48ebee1dd8aa745a4ac6393ccf8141363965c8d3739e5d26f1b2727b43f1627"
+      "content_hash": "fc919a4bf0329808ad879ed1ce4a2edef96b167e090e1e26534d84ecb278f788"
     },
     {
       "type": "compose-stack",
@@ -96,7 +96,7 @@
       "type": "catalog",
       "id": "image-catalog",
       "path": "image-catalog.json",
-      "content_hash": "4b30841b99cb658b1140c230cde226afcbd58ee258f2175dffb72ec5e0e8d549"
+      "content_hash": "237ac9c2fe8cee7f37cb9514a7b532656d7a14777365c9429c37513304c042f9"
     }
   ]
 }

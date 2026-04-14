@@ -36,7 +36,7 @@ The first milestone is intentionally narrow: prove the matrix model works end to
 
 ### Key Decisions Resolved in This Phase
 
-- Generator language: **.NET 8 (C#)** — enforced by project creation
+- Generator language: **.NET 10 (C#)** — enforced by project creation
 - Definition format: **YAML** — enforced by schema stub creation
 - Template engine: **Scriban** — added as NuGet dependency in this phase
 
@@ -131,19 +131,21 @@ The first milestone is intentionally narrow: prove the matrix model works end to
 
 - [ ] `definitions/agents/claude.yaml` — full manifest with env, mounts, health, install
 - [ ] `definitions/agents/openclaw.yaml` — full manifest
+- [ ] `definitions/agents/codex.yaml` — full manifest
+- [ ] `definitions/agents/copilot.yaml` — full manifest
 - [ ] Generated Dockerfiles for all base × agent combinations (v1 matrix)
 - [ ] Agent overlay template (`templates/dockerfiles/agent.dockerfile.scriban`)
 - [ ] Runtime smoke tests for each agent overlay
-- [ ] Per-agent documentation page (`docs/agents/claude.md`, `docs/agents/openclaw.md`)
+- [ ] Per-agent documentation page (`docs/agents/claude.md`, `docs/agents/openclaw.md`, `docs/agents/codex.md`, `docs/agents/copilot.md`)
 
 ### v1 Agent Matrix
 
-| Base | Claude | OpenClaw |
-|---|---|---|
-| node-bun | ✓ | ✓ |
-| python | — (deferred) | ✓ |
-| dotnet | — (deferred) | — (deferred) |
-| node-py-dotnet | ✓ | ✓ |
+| Base | Claude | OpenClaw | Codex | Copilot |
+|---|---|---|---|---|
+| node-bun | ✓ | ✓ | ✓ | ✓ |
+| python | — (deferred) | ✓ | — (deferred) | — (deferred) |
+| dotnet | — (deferred) | — (deferred) | — (deferred) | — (deferred) |
+| node-py-dotnet | ✓ | ✓ | ✓ | ✓ |
 
 ### Acceptance Criteria
 
@@ -281,7 +283,7 @@ The `headroom` tool pack installs the Headroom CLI into agent images and documen
 - [ ] SLSA provenance attestation (Level 1 minimum)
 - [ ] Policy check for risky manifest declarations (e.g., `privileged: true` without documented rationale)
 - [ ] Additional base images: `rust`, `cpp`, `haskell`
-- [ ] Additional agent overlays: `opencode`, `gemini`, `codex`
+- [ ] Additional agent overlays: `opencode`, `gemini`
 - [ ] Additional tool packs: `gh-azure`, `discord`, `build-tools`, `diagnostics`
 - [ ] ARM64 multi-platform builds
 
@@ -321,7 +323,7 @@ Track A must complete Phase 1 before Track B can produce real artifacts. All oth
 This milestone is the target for the first demo-able state of the system.
 
 **Scope:**
-1. Generator runs and produces correct Dockerfiles for `node-bun-claude`, `node-bun-openclaw`, `node-py-dotnet-openclaw-headroom`
+1. Generator runs and produces correct Dockerfiles for `node-bun-claude`, `node-bun-openclaw`, `node-bun-codex`, `node-bun-copilot`, `node-py-dotnet-openclaw-headroom`
 2. All three build locally
 3. `solo-claude` Compose example starts and passes health check
 4. CI drift detection catches a definition change that was not regenerated

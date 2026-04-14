@@ -1,7 +1,7 @@
 id: headroom
 display_name: Headroom Proxy Pack
 version: v1
-description: Headroom token-optimization proxy client
+description: Headroom token-optimization proxy — context compression, caching, and rate-limiting sidecar
 
 compatible_with:
   bases:
@@ -27,17 +27,102 @@ install:
     - command: "headroom --version || true"
       description: "Verify Headroom CLI installation"
 
+# --- client-side env vars injected into agent containers that use this tool-pack ---
 env:
   - name: HEADROOM_PROXY_URL
     required: false
-    default: "http://headroom:8080"
-    description: URL of Headroom sidecar
+    default: "http://headroom:8787"
+    description: URL of the Headroom sidecar proxy reachable from agent containers
     sensitive: false
-  - name: HEADROOM_API_KEY
+
+# --- env vars for the headroom sidecar container itself ---
+sidecar_env:
+  # Server
+  - name: HEADROOM_HOST
     required: false
-    description: Optional auth token
+    default: "0.0.0.0"
+    description: Bind address (must be 0.0.0.0 inside Docker)
+    sensitive: false
+  - name: HEADROOM_PORT
+    required: false
+    default: "8787"
+    description: Proxy listen port
+    sensitive: false
+  - name: HEADROOM_MODE
+    required: false
+    default: "token"
+    description: "Optimization mode: token, cache, cost_savings"
+    sensitive: false
+  # Optimization
+  - name: HEADROOM_OPTIMIZE
+    required: false
+    default: "true"
+    description: Enable context optimization (set false for passthrough)
+    sensitive: false
+  - name: HEADROOM_MIN_TOKENS
+    required: false
+    default: "500"
+    description: Minimum token count before compression triggers
+    sensitive: false
+  - name: HEADROOM_SMART_ROUTING
+    required: false
+    default: "true"
+    description: Enable smart content routing
+    sensitive: false
+  # Caching
+  - name: HEADROOM_CACHE_ENABLED
+    required: false
+    default: "true"
+    description: Enable semantic caching
+    sensitive: false
+  - name: HEADROOM_CACHE_TTL
+    required: false
+    default: "3600"
+    description: Cache TTL in seconds
+    sensitive: false
+  # Rate limiting
+  - name: HEADROOM_RATE_LIMIT_ENABLED
+    required: false
+    default: "true"
+    description: Enable rate limiting
+    sensitive: false
+  - name: HEADROOM_RPM
+    required: false
+    default: "60"
+    description: Requests per minute limit
+    sensitive: false
+  - name: HEADROOM_TPM
+    required: false
+    default: "100000"
+    description: Tokens per minute limit
+    sensitive: false
+  # Backend / provider credentials — pass-through from host
+  - name: HEADROOM_BACKEND
+    required: false
+    default: "anthropic"
+    description: "LLM backend: anthropic, bedrock, litellm-<provider>, anyllm"
+    sensitive: false
+  - name: ANTHROPIC_API_KEY
+    required: false
+    description: Anthropic API key (pass-through to proxy)
     sensitive: true
     inject_from: environment
+  - name: OPENAI_API_KEY
+    required: false
+    description: OpenAI API key (pass-through to proxy)
+    sensitive: true
+    inject_from: environment
+  # Telemetry
+  - name: HEADROOM_TELEMETRY
+    required: false
+    default: "off"
+    description: "Anonymous telemetry: on or off"
+    sensitive: false
+  # Logging
+  - name: HEADROOM_LOG_FILE
+    required: false
+    description: Path to JSONL request log file
+    sensitive: false
 
 sidecar:
   enabled: true

@@ -9,6 +9,12 @@ public sealed class ComposeStackManifest : ManifestBase
     public List<ComposeService> Services { get; set; } = [];
     public List<NetworkDeclaration> Networks { get; set; } = [];
     public List<VolumeDeclaration> Volumes { get; set; } = [];
+
+    /// <summary>
+    /// Optional env_file reference (e.g. ".env") applied to all services in the stack.
+    /// Allows operators to provide overrides without editing compose YAML.
+    /// </summary>
+    public string? EnvFile { get; set; }
 }
 
 public sealed class ComposeService

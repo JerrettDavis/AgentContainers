@@ -57,7 +57,7 @@ internal static class ComposeStackGenerator
             }
             else if (svc.Type == "sidecar" || svc.Image != null)
             {
-                ResolveSidecarService(rs, svc);
+                ResolveSidecarService(rs, svc, catalog);
             }
 
             // Dependencies
@@ -68,6 +68,10 @@ internal static class ComposeStackGenerator
             rs.Profiles.AddRange(svc.Profiles);
             if (svc.Optional && svc.Profiles.Count == 0)
                 rs.Profiles.Add(svc.Id);
+
+            // Stack-level env_file
+            if (stack.EnvFile != null)
+                rs.EnvFile = stack.EnvFile;
 
             resolved.Add(rs);
         }
@@ -87,6 +91,20 @@ internal static class ComposeStackGenerator
                 rs.Environment.Add($"{env.Name}=${{{env.Name}:?{env.Name} is required}}");
             else if (env.Default != null)
                 rs.Environment.Add($"{env.Name}={env.Default}");
+        }
+
+        // Wire tool-pack client env vars into agent services
+        foreach (var packId in svc.Toolpacks)
+        {
+            if (catalog.ToolPacks.TryGetValue(packId, out var pack))
+            {
+                foreach (var env in pack.Env)
+                {
+                    var formatted = FormatEnvEntry(env);
+                    if (formatted != null && !rs.Environment.Any(e => e.StartsWith(env.Name + "=")))
+                        rs.Environment.Add(formatted);
+                }
+            }
         }
 
         foreach (var mount in agent.Mounts)
@@ -110,11 +128,23 @@ internal static class ComposeStackGenerator
         rs.User = "1000:1000";
     }
 
-    private static void ResolveSidecarService(ResolvedService rs, ComposeService svc)
+    private static void ResolveSidecarService(ResolvedService rs, ComposeService svc, ManifestCatalog catalog)
     {
         rs.Image = svc.Image ?? $"ghcr.io/agentcontainers/{svc.Id}:latest";
         rs.Ports.AddRange(svc.Ports);
         rs.Networks.Add("agent-net");
+
+        // Wire sidecar_env from the referenced tool-pack
+        var packId = svc.Toolpack;
+        if (packId != null && catalog.ToolPacks.TryGetValue(packId, out var pack))
+        {
+            foreach (var env in pack.SidecarEnv)
+            {
+                var formatted = FormatEnvEntry(env);
+                if (formatted != null)
+                    rs.Environment.Add(formatted);
+            }
+        }
 
         if (svc.Healthcheck is { Test.Count: > 0 })
         {
@@ -129,6 +159,28 @@ internal static class ComposeStackGenerator
         }
 
         rs.User = null; // sidecars run as their own user
+    }
+
+    /// <summary>
+    /// Formats a single EnvVar into a compose environment entry string.
+    /// Sensitive vars use ${VAR:-} (optional) or ${VAR:?error} (required) for host injection.
+    /// Non-sensitive vars with defaults are inlined; others use ${VAR:-default} override pattern.
+    /// </summary>
+    private static string? FormatEnvEntry(EnvVar env)
+    {
+        if (env.Sensitive)
+        {
+            // Required sensitive: guard with error; optional sensitive: pass-through if set
+            return env.Required
+                ? $"{env.Name}=${{{env.Name}:?{env.Name} is required}}"
+                : $"{env.Name}=${{{env.Name}:-}}";
+        }
+
+        if (env.Default != null)
+            return $"{env.Name}=${{{env.Name}:-{env.Default}}}";
+
+        // Non-sensitive, no default, not required — skip
+        return null;
     }
 
     #region Scriban model builders
@@ -154,7 +206,8 @@ internal static class ComposeStackGenerator
                 ["ports"] = new ScriptArray(svc.Ports),
                 ["networks"] = new ScriptArray(svc.Networks),
                 ["profiles"] = new ScriptArray(svc.Profiles),
-                ["user"] = svc.User
+                ["user"] = svc.User,
+                ["env_file"] = svc.EnvFile
             };
 
             var depsArr = new ScriptArray();
@@ -213,6 +266,7 @@ internal sealed class ResolvedService
     public ResolvedHealthcheck? Healthcheck { get; set; }
     public List<string> Profiles { get; set; } = [];
     public string? User { get; set; }
+    public string? EnvFile { get; set; }
 }
 
 internal sealed class ResolvedDependency
