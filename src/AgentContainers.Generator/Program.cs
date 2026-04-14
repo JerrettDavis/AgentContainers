@@ -35,7 +35,7 @@ public static class Program
             return 1;
         }
 
-        if (!jsonOutput && command != "emit-e2e-plan")
+        if (!jsonOutput && command is not ("emit-e2e-plan" or "build-matrix"))
         {
             Console.WriteLine($"AgentContainers Generator v0.1.0");
             Console.WriteLine($"Repository root: {repoRoot}");

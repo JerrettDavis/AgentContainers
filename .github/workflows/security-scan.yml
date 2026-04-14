@@ -42,7 +42,7 @@ jobs:
       - name: Emit build matrix
         id: matrix
         run: |
-          raw=$(dotnet run --project src/AgentContainers.Generator --configuration Release --no-build -- build-matrix 2>/dev/null | grep -v '^AgentContainers')
+          raw=$(dotnet run --project src/AgentContainers.Generator --configuration Release --no-build -- build-matrix 2>/dev/null)
           echo "matrix<<EOF" >> "$GITHUB_OUTPUT"
           echo "$raw" >> "$GITHUB_OUTPUT"
           echo "EOF" >> "$GITHUB_OUTPUT"
