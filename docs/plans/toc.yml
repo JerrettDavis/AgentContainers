@@ -1,0 +1,10 @@
+- name: Planning overview
+  href: README.md
+- name: Architecture
+  href: ARCHITECTURE.md
+- name: Implementation plan
+  href: IMPLEMENTATION-PLAN.md
+- name: Manifest model
+  href: MANIFEST-MODEL.md
+- name: Compose strategy
+  href: COMPOSE-STRATEGY.md

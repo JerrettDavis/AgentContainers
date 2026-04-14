@@ -2,7 +2,7 @@
 
 This directory is the **canonical home for architectural and implementation planning** for AgentContainers.
 
-The high-level product vision is in [VISION.md](../../VISION.md) at the repo root.
+The high-level product vision remains in the repo-root `VISION.md` file.
 The documents here translate that vision into concrete, decision-oriented specifications ready for implementation.
 
 ---

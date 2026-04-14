@@ -131,9 +131,13 @@ install:
   steps:
     - description: "Install Bun"
       run: |
+        export BUN_INSTALL=/usr/local/bun
+        mkdir -p "$BUN_INSTALL"
         curl -fsSL https://bun.sh/install | bash
-        echo 'export BUN_INSTALL="$HOME/.bun"' >> /etc/profile.d/bun.sh
-        echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> /etc/profile.d/bun.sh
+        ln -sf /usr/local/bun/bin/bun /usr/local/bin/bun
+        ln -sf /usr/local/bun/bin/bunx /usr/local/bin/bunx
+        echo 'export BUN_INSTALL=/usr/local/bun' >> /etc/profile.d/bun.sh
+        echo 'export PATH="/usr/local/bun/bin:$PATH"' >> /etc/profile.d/bun.sh
 
 env:
   - name: NODE_ENV
@@ -141,7 +145,7 @@ env:
     description: Node.js environment mode
     sensitive: false
   - name: BUN_INSTALL
-    default: /home/dev/.bun
+    default: /usr/local/bun
     description: Bun install path
     sensitive: false
 

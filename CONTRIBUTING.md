@@ -19,6 +19,7 @@ Thank you for your interest in contributing! This document covers the basics.
 | `tests/AgentContainers.Tests/` | Unit & integration tests |
 | `generated/` | **Auto-generated** — do not edit by hand |
 | `scripts/` | Helper scripts for local dev |
+| `docs/` | DocFX site content, guides, API/reference wiring |
 
 ## Current Corpus
 
@@ -36,7 +37,7 @@ Thank you for your interest in contributing! This document covers the basics.
 | `node-bun` | Node.js 22 LTS + Bun |
 | `rust` | Rust stable toolchain |
 | `python` | Python 3.12 + pip/venv |
-| `dotnet` | .NET 8 SDK |
+| `dotnet` | .NET SDK runtime image |
 
 ### Combo Runtimes (2)
 | Combo | Bases |
@@ -73,6 +74,10 @@ dotnet run --project src/AgentContainers.Generator -- list-matrix
 
 # Emit build matrix for CI/CD publishing
 dotnet run --project src/AgentContainers.Generator -- build-matrix
+
+# Build the DocFX site
+dotnet tool restore
+dotnet tool run docfx docs/docfx.json --warningsAsErrors
 ```
 
 ## Making Changes
@@ -83,6 +88,13 @@ dotnet run --project src/AgentContainers.Generator -- build-matrix
 2. Run `dotnet run --project src/AgentContainers.Generator -- validate` to check.
 3. Run `dotnet run --project src/AgentContainers.Generator -- generate` to regenerate.
 4. Commit both the definition change **and** the regenerated output.
+
+### Documentation changes (`docs/`, `README.md`)
+
+1. Update the relevant user, operator, or architecture docs.
+2. Run `dotnet tool restore`.
+3. Run `dotnet tool run docfx docs/docfx.json --warningsAsErrors`.
+4. If you changed manifests or generator behavior, regenerate artifacts and verify docs still match the matrix.
 
 ### Code changes (`src/`)
 

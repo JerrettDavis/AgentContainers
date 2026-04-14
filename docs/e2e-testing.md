@@ -18,19 +18,20 @@ hard-coded tool checks.
 | Layer | Coverage | Validation source |
 |-------|----------|-------------------|
 | **Base images** (python, node-bun, dotnet, rust) | Build + runtime validation + common tools | `definitions/bases/*.yaml` + `definitions/common-tools/default.yaml` |
+| **Combo images** (`node-py-dotnet`, `fullstack-polyglot`) | Build + runtime validation | `definitions/combos/*.yaml` |
 | **Agent overlay images** (e.g., node-bun-claude) | Build + agent CLI validation | `definitions/agents/*.yaml` |
-| **Compose readiness** | Service start + healthcheck + exec commands | Generated compose + dynamic e2e stack |
-| **Combo images** | _Skipped_ — combo Dockerfiles don't include common tools layer (known gap) | — |
+| **Tool-packed images** (e.g., `node-bun-devtools`) | Build + tool validation commands | `definitions/tool-packs/*.yaml` |
+| **Compose readiness** | Generated stack syntax validation + runtime check of representative generated stack | Generated compose stacks |
 
 ### Test scopes
 
 | Scope | What runs | Approximate time |
 |-------|-----------|-----------------|
-| `quick` | 1 base (python) + 1 agent (node-bun-claude) + compose health | ~5 min |
+| `quick` | 1 base (`node-bun`) + 1 agent (`node-bun-claude`) + generated compose path | ~5 min |
 | `bases` | All 4 base images | ~10 min |
-| `agents` | All bases + all agent overlays on bases | ~20 min |
-| `compose` | All bases + agents + compose service readiness | ~25 min |
-| `full` | Everything above | ~25 min |
+| `agents` | All bases + agent overlays on supported bases | ~20 min |
+| `compose` | Generated compose syntax validation + runtime check of representative generated stack | ~10 min |
+| `full` | Bases + combos + agents + tool-packs + compose | ~30 min |
 
 ---
 
@@ -84,9 +85,11 @@ hard-coded tool checks.
 
 The e2e workflow (`.github/workflows/e2e.yml`) runs:
 
-- **PR**: `quick` scope — builds python base + claude agent overlay + compose
-  health check. Fast feedback, ~5 min.
-- **Main push**: `bases` scope — builds all 4 base images with full validation.
+- **PR**: `quick` scope — builds `node-bun`, validates `node-bun-claude`, and
+  exercises a generated compose path. Fast feedback, ~5 min.
+- **Main push**: `full`-style container validation is available through the
+  dedicated workflow, while the default scheduled/push path keeps the Docker
+  workload bounded.
 - **Manual dispatch**: Any scope with optional filter.
 
 The e2e workflow is separate from the main CI (`ci.yml`) to avoid blocking
@@ -104,7 +107,9 @@ scripts/run-e2e.ps1         PowerShell e2e runner
     ├── dotnet run ... emit-e2e-plan    ← Generator outputs JSON test plan
     │       │
     │       ├── bases[]        Build context + validation commands
+    │       ├── combos[]       Build context + validation commands
     │       ├── agents[]       Build context + base dependency + validation
+    │       ├── tool_packs[]   Build context + base dependency + validation
     │       └── compose_stacks[]   Compose paths + required images
     │
     ├── docker build           Build each image from generated/ context
@@ -139,6 +144,13 @@ docker build --build-arg BASE_IMAGE=ghcr.io/agentcontainers/node-bun:latest \
   -t ghcr.io/agentcontainers/node-bun-claude:latest generated/docker/agents/node-bun-claude/
 ```
 
+### Tool-pack overlay Dockerfiles
+
+Non-sidecar tool packs also generate overlay Dockerfiles at
+`generated/docker/tool-packs/{base}-{toolpack}/Dockerfile`. For example,
+`node-bun-devtools` layers the developer tools pack onto the `node-bun` base
+and validates the installed CLI/toolchain surface from the manifest.
+
 ---
 
 ## Adding new e2e coverage
@@ -155,18 +167,12 @@ No changes to the e2e scripts are needed for new bases, agents, or tool packs.
 
 ## Known limitations
 
-- **Combo images are skipped** in e2e: the generated combo Dockerfiles currently
-  omit the common-tools layer and user setup, making them non-buildable in
-  isolation. This is a pre-existing generator gap.
 - **Agent CLI version validation** uses `|| true` for some agents (copilot,
   openclaw) because their packages may not be published or may have different
   CLI names. These are soft checks.
-- **Compose tests** use a synthetic health-check service rather than the
-  full gateway-headroom stack, which requires the third-party `headroom/headroom`
-  sidecar image.
+- **Compose runtime validation** currently exercises a representative generated
+  stack and validates all generated stack files syntactically. Full end-to-end
+  execution of every generated stack is still more expensive than the default
+  CI budget.
 - **Rust base** builds are slow (~5 min) due to `cargo install` compilation.
   Excluded from `quick` scope.
-- **Bun on node-bun** base: the `bun --version` validation currently fails because
-  the bun installer targets `$HOME/.bun` (root during build) but the image
-  switches to the `dev` user. This is a pre-existing manifest bug, not an e2e
-  issue. The e2e harness correctly surfaces it.

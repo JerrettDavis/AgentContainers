@@ -123,13 +123,10 @@ function Test-ToolPacks {
 # --- Test Agents ---
 function Test-Agents {
     Log-Hdr "Testing Agent Overlay Images"
-    $comboIds = @()
-    if ($plan.combos) { $comboIds = $plan.combos | ForEach-Object { $_.id } }
 
     foreach ($a in $plan.agents) {
         if (-not (Test-Filter $a.id)) { Log-Skip "Agent $($a.id) filtered"; continue }
         if ($Scope -eq "quick" -and $a.id -ne "node-bun-claude") { Log-Skip "Agent $($a.id) quick-skip"; continue }
-        if ($comboIds -contains $a.base_id) { Log-Skip "Agent $($a.id) combo-skip"; continue }
 
         Write-Host "`n  Agent: $($a.display_name) [$($a.size_class)]" -ForegroundColor White
         docker image inspect $a.base_tag 2>&1 | Out-Null

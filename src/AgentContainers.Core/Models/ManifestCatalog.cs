@@ -5,19 +5,36 @@ namespace AgentContainers.Core.Models;
 /// </summary>
 public sealed class ManifestCatalog
 {
+    /// <summary>Common-tools manifests keyed by ID.</summary>
     public Dictionary<string, CommonToolsManifest> CommonTools { get; } = [];
+
+    /// <summary>Base runtime manifests keyed by ID.</summary>
     public Dictionary<string, BaseRuntimeManifest> Bases { get; } = [];
+
+    /// <summary>Combo runtime manifests keyed by ID.</summary>
     public Dictionary<string, ComboRuntimeManifest> Combos { get; } = [];
+
+    /// <summary>Agent manifests keyed by ID.</summary>
     public Dictionary<string, AgentManifest> Agents { get; } = [];
+
+    /// <summary>Tool-pack manifests keyed by ID.</summary>
     public Dictionary<string, ToolPackManifest> ToolPacks { get; } = [];
+
+    /// <summary>Compose stack manifests keyed by ID.</summary>
     public Dictionary<string, ComposeStackManifest> ComposeStacks { get; } = [];
+
+    /// <summary>Profile manifests keyed by ID.</summary>
     public Dictionary<string, ProfileManifest> Profiles { get; } = [];
 
+    /// <summary>Total number of loaded manifests across all categories.</summary>
     public int TotalCount =>
         CommonTools.Count + Bases.Count + Combos.Count +
         Agents.Count + ToolPacks.Count + ComposeStacks.Count +
         Profiles.Count;
 
+    /// <summary>
+    /// Enumerates all manifests as a normalized sequence of <c>(type, id, manifest)</c> tuples.
+    /// </summary>
     public IEnumerable<(string Type, string Id, ManifestBase Manifest)> All()
     {
         foreach (var kv in CommonTools) yield return ("common-tools", kv.Key, kv.Value);

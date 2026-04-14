@@ -37,14 +37,18 @@ RUN ln -sf /usr/bin/rg /usr/local/bin/rg || true
 
 # Layer 2: Node.js + Bun Runtime
 # Install Bun
-RUN curl -fsSL https://bun.sh/install | bash && \
-    echo 'export BUN_INSTALL="$HOME/.bun"' >> /etc/profile.d/bun.sh && \
-    echo 'export PATH="$HOME/.bun/bin:$PATH"' >> /etc/profile.d/bun.sh
+RUN export BUN_INSTALL=/usr/local/bun && \
+    mkdir -p "$BUN_INSTALL" && \
+    curl -fsSL https://bun.sh/install | bash && \
+    ln -sf /usr/local/bun/bin/bun /usr/local/bin/bun && \
+    ln -sf /usr/local/bun/bin/bunx /usr/local/bin/bunx && \
+    echo 'export BUN_INSTALL=/usr/local/bun' >> /etc/profile.d/bun.sh && \
+    echo 'export PATH="/usr/local/bun/bin:$PATH"' >> /etc/profile.d/bun.sh
 
 # Environment defaults (override at build time with --build-arg)
 ARG NODE_ENV=development
 ENV NODE_ENV=${NODE_ENV}
-ARG BUN_INSTALL=/home/dev/.bun
+ARG BUN_INSTALL=/usr/local/bun
 ENV BUN_INSTALL=${BUN_INSTALL}
 
 # User setup

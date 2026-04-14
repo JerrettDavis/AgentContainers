@@ -1,5 +1,5 @@
 {
-  "manifest_hash": "663438a998887e632e5d7627c0d00bd203e7d0026e38907bcec311bccc322ed2",
+  "manifest_hash": "d90284777aa99c2847a854e057d1ea8d78b7e450f71ff0ffc8456ea2166f2a2b",
   "generator_version": "0.1.0",
   "artifacts": [
     {
@@ -12,7 +12,7 @@
       "type": "dockerfile",
       "id": "base-node-bun",
       "path": "docker/bases/node-bun/Dockerfile",
-      "content_hash": "f3020813fe2a5357187174d3d10de1c1cdb47305bc9b4e4da6c44b87a007c3bd"
+      "content_hash": "6c741d6e67b438c03e8bd77763a6c8089ee2c4dc9d7868c1a29b2c5031aae880"
     },
     {
       "type": "dockerfile",
@@ -30,13 +30,13 @@
       "type": "dockerfile",
       "id": "combo-fullstack-polyglot",
       "path": "docker/combos/fullstack-polyglot/Dockerfile",
-      "content_hash": "6b94b38a568861252cb188a73b792c6a7abad9307e599bc97b1e60d400af9dd3"
+      "content_hash": "f47b1418fce002c61fe57836db18924c4d767839bd511ec442fa8cf0d5295670"
     },
     {
       "type": "dockerfile",
       "id": "combo-node-py-dotnet",
       "path": "docker/combos/node-py-dotnet/Dockerfile",
-      "content_hash": "726d46c92b9ce01e6bf6a7429a0da7b5fae623a852f3128dfa22068f8d8d1da3"
+      "content_hash": "28f372cd946a5bac0175976562c64ac1ef90e9e435780d7632f07299cb538d62"
     },
     {
       "type": "dockerfile",
@@ -114,37 +114,19 @@
       "type": "dockerfile",
       "id": "tool-pack-node-bun-devtools",
       "path": "docker/tool-packs/node-bun-devtools/Dockerfile",
-      "content_hash": "63c85d706cf363c6872b7addce2ec3855b8a135ca6673c39a5d07d1fe0fb530f"
-    },
-    {
-      "type": "dockerfile",
-      "id": "tool-pack-python-devtools",
-      "path": "docker/tool-packs/python-devtools/Dockerfile",
-      "content_hash": "9bbf002b13d433c823940dc1e241fa8d5b4d22203e544a2f16eee558c2a68a97"
-    },
-    {
-      "type": "dockerfile",
-      "id": "tool-pack-dotnet-devtools",
-      "path": "docker/tool-packs/dotnet-devtools/Dockerfile",
-      "content_hash": "54d489dcb8ca71eb60841352af4e1b5f781a2d7c1937f6ac316d72ac2ec2ecff"
-    },
-    {
-      "type": "dockerfile",
-      "id": "tool-pack-rust-devtools",
-      "path": "docker/tool-packs/rust-devtools/Dockerfile",
-      "content_hash": "e108974b7e028efbb9e23fc16e2166af2d9859f204cc9fde8fa95fda6fdf1ce5"
+      "content_hash": "e8347c77380fe57bccc0dfc1abf20ba68072454a96cdef464f60035acdfcbbb3"
     },
     {
       "type": "dockerfile",
       "id": "tool-pack-node-py-dotnet-devtools",
       "path": "docker/tool-packs/node-py-dotnet-devtools/Dockerfile",
-      "content_hash": "3abc1514c196b9e3443da3569123e1c1e05478bea229c64854cb61ab4bb47ff9"
+      "content_hash": "3e263cf328d30be9f2492286ce66780676f0cf881896629bf21396de5a68ac08"
     },
     {
       "type": "dockerfile",
       "id": "tool-pack-fullstack-polyglot-devtools",
       "path": "docker/tool-packs/fullstack-polyglot-devtools/Dockerfile",
-      "content_hash": "b0f2c7acf902dd6278def058c38150faa80740a5e4eff5f9fce0ad811c2d42b9"
+      "content_hash": "e72c29ee3b40a7a4773c36f6a53324640c477c861f5122c48980f0e166650b48"
     },
     {
       "type": "compose-fragment",
@@ -174,13 +156,13 @@
       "type": "compose-stack",
       "id": "stack-gateway-headroom",
       "path": "compose/stacks/gateway-headroom/docker-compose.yaml",
-      "content_hash": "1898e12ccfc9c99a8d3aaa0e039d69ea7099643f738d08558c0db5aef685a7a9"
+      "content_hash": "3603112fb716368f2622e07eedd2a1c91ae349d1930fab57b8f2656f26f5d9b9"
     },
     {
       "type": "compose-stack",
       "id": "stack-polyglot-devtools",
       "path": "compose/stacks/polyglot-devtools/docker-compose.yaml",
-      "content_hash": "370ca9b449934489809e1de019c771428f8dd82e45802a918b3014fa654f2a36"
+      "content_hash": "04d78fdac462d8f7659ef182fd7a70641e07b19466692cbe4cacf8983a786d77"
     },
     {
       "type": "compose-stack",
@@ -204,7 +186,7 @@
       "type": "catalog",
       "id": "image-catalog",
       "path": "image-catalog.json",
-      "content_hash": "9f213e144d4babd79952b32447315ecbf3a87a18a3c733708b7289fd3ced4e1c"
+      "content_hash": "19523f3247381dc3b5d81afe66c44b01566f0ed456f53f3f717bb4af39bc0fc1"
     }
   ]
 }

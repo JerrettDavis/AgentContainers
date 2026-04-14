@@ -6,9 +6,6 @@ description: Batteries-included developer tooling pack — linters, formatters, 
 compatible_with:
   bases:
     - node-bun
-    - python
-    - dotnet
-    - rust
     - node-py-dotnet
     - fullstack-polyglot
   agents:
@@ -56,7 +53,7 @@ install:
       description: "Install system-level dev/debug/build/productivity tools"
     - command: "npm install -g prettier eslint typescript ts-node @biomejs/biome turbo"
       description: "Install JS/TS dev tools globally"
-    - command: "pip install --no-cache-dir ruff mypy black isort bandit pre-commit cookiecutter"
+    - command: "python3 -m pip install --break-system-packages --no-cache-dir ruff mypy black isort bandit pre-commit cookiecutter"
       description: "Install Python dev/lint tools"
 
 env:

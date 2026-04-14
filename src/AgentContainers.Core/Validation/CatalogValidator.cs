@@ -11,6 +11,9 @@ public sealed record ValidationResult(
     ValidationSeverity Severity,
     string Message);
 
+/// <summary>
+/// Severity level attached to a catalog validation result.
+/// </summary>
 public enum ValidationSeverity
 {
     Info,
@@ -24,6 +27,9 @@ public enum ValidationSeverity
 /// </summary>
 public sealed class CatalogValidator
 {
+    /// <summary>
+    /// Validates all loaded manifests and returns the accumulated findings.
+    /// </summary>
     public List<ValidationResult> Validate(ManifestCatalog catalog)
     {
         var results = new List<ValidationResult>();

@@ -29,6 +29,9 @@ jobs:
       - name: Test
         run: dotnet test --no-build --configuration Release --verbosity normal
 
+      - name: Restore local tools
+        run: dotnet tool restore
+
       - name: Validate manifests
         run: dotnet run --project src/AgentContainers.Generator --configuration Release -- validate
 
@@ -40,6 +43,9 @@ jobs:
 
       - name: Regenerate artifacts
         run: dotnet run --project src/AgentContainers.Generator --configuration Release -- generate
+
+      - name: Build documentation site
+        run: dotnet tool run docfx docs/docfx.json --warningsAsErrors
 
       - name: Drift check — generated/ must be up-to-date
         run: |

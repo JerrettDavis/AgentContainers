@@ -22,3 +22,11 @@ Thumbs.db
 # E2E ephemeral compose stacks (created during test runs)
 generated/compose/e2e-validation/
 docker-compose.e2e.yaml
+
+# DocFX outputs
+docs/_site/
+docs/api/
+docs/.manifest
+docs/.manifest/*
+docs/.xrefmap.json
+docs/.cache/

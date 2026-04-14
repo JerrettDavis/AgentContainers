@@ -1,5 +1,5 @@
 {
-  "manifest_hash": "663438a998887e632e5d7627c0d00bd203e7d0026e38907bcec311bccc322ed2",
+  "manifest_hash": "d90284777aa99c2847a854e057d1ea8d78b7e450f71ff0ffc8456ea2166f2a2b",
   "generator_version": "0.1.0",
   "registry": "ghcr.io/agentcontainers",
   "images": [
@@ -293,30 +293,6 @@
       "tool_pack": "devtools",
       "base_id": "node-bun",
       "registry": "ghcr.io/agentcontainers/node-bun-devtools"
-    },
-    {
-      "type": "tool-pack-image",
-      "id": "python-devtools",
-      "display_name": "Developer Power Tools on python",
-      "tool_pack": "devtools",
-      "base_id": "python",
-      "registry": "ghcr.io/agentcontainers/python-devtools"
-    },
-    {
-      "type": "tool-pack-image",
-      "id": "dotnet-devtools",
-      "display_name": "Developer Power Tools on dotnet",
-      "tool_pack": "devtools",
-      "base_id": "dotnet",
-      "registry": "ghcr.io/agentcontainers/dotnet-devtools"
-    },
-    {
-      "type": "tool-pack-image",
-      "id": "rust-devtools",
-      "display_name": "Developer Power Tools on rust",
-      "tool_pack": "devtools",
-      "base_id": "rust",
-      "registry": "ghcr.io/agentcontainers/rust-devtools"
     },
     {
       "type": "tool-pack-image",

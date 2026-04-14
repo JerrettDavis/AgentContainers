@@ -227,12 +227,6 @@ test_agents() {
             continue
         fi
 
-        # Skip agents on combo bases (combos have known build issues)
-        if echo "$E2E_PLAN" | jq -r ".combos[].id" | grep -q "^${base_id}$"; then
-            log_skip "Agent $id (combo base — skipped)"
-            continue
-        fi
-
         echo -e "\n  ${BOLD}Agent: $display_name ($id)${NC} [${size_class}]"
 
         # Verify base image exists

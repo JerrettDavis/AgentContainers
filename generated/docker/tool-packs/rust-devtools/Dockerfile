@@ -40,7 +40,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install JS/TS dev tools globally
 RUN npm install -g prettier eslint typescript ts-node @biomejs/biome turbo
 # Install Python dev/lint tools
-RUN pip install --no-cache-dir ruff mypy black isort bandit pre-commit cookiecutter
+RUN python3 -m pip install --break-system-packages --no-cache-dir ruff mypy black isort bandit pre-commit cookiecutter
 
 # Environment defaults
 ARG DEVTOOLS_ENABLED=1
