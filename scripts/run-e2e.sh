@@ -436,7 +436,10 @@ EOF
     for attempt in $(seq 1 12); do
         sleep 5
         local container_id status
-        container_id=$(docker compose -f "$solo_claude_path" -f "$override_file" -p "$compose_project" ps -q claude 2>/dev/null || true)
+        container_id=$(docker ps -aq \
+            --filter "label=com.docker.compose.project=$compose_project" \
+            --filter "label=com.docker.compose.service=claude" \
+            | head -n 1)
         status="unknown"
         if [[ -n "$container_id" ]]; then
             status=$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "$container_id" 2>/dev/null || echo "unknown")
