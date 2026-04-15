@@ -28,7 +28,6 @@ install:
           clang-format \
           valgrind \
           strace \
-          ltrace \
           gdb \
           cmake \
           make \

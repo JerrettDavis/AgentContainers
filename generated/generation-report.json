@@ -1,5 +1,5 @@
 {
-  "manifest_hash": "d90284777aa99c2847a854e057d1ea8d78b7e450f71ff0ffc8456ea2166f2a2b",
+  "manifest_hash": "f237fcc2e37cced75ebca24b02025efb7ccad5c4d9459073c318c4ab00da2281",
   "generator_version": "0.1.0",
   "artifacts": [
     {
@@ -114,19 +114,19 @@
       "type": "dockerfile",
       "id": "tool-pack-node-bun-devtools",
       "path": "docker/tool-packs/node-bun-devtools/Dockerfile",
-      "content_hash": "e8347c77380fe57bccc0dfc1abf20ba68072454a96cdef464f60035acdfcbbb3"
+      "content_hash": "55a7aa000ce9383d6a5c1a4f3b44043b1b7e7b97e7d50ffbfefb60260ca389cb"
     },
     {
       "type": "dockerfile",
       "id": "tool-pack-node-py-dotnet-devtools",
       "path": "docker/tool-packs/node-py-dotnet-devtools/Dockerfile",
-      "content_hash": "3e263cf328d30be9f2492286ce66780676f0cf881896629bf21396de5a68ac08"
+      "content_hash": "4c321b9fb92e800c7de9bd73e1de1e7f29996ec708fe3be60a9d2df59d087a1b"
     },
     {
       "type": "dockerfile",
       "id": "tool-pack-fullstack-polyglot-devtools",
       "path": "docker/tool-packs/fullstack-polyglot-devtools/Dockerfile",
-      "content_hash": "e72c29ee3b40a7a4773c36f6a53324640c477c861f5122c48980f0e166650b48"
+      "content_hash": "44eab9220139fbba940bb616110bcc94a1b6fd97a088f4820dc949da45088ec5"
     },
     {
       "type": "compose-fragment",
@@ -186,7 +186,7 @@
       "type": "catalog",
       "id": "image-catalog",
       "path": "image-catalog.json",
-      "content_hash": "19523f3247381dc3b5d81afe66c44b01566f0ed456f53f3f717bb4af39bc0fc1"
+      "content_hash": "627016e88f50eeb1ba6b7dcf838777f1ae8173e14e6edfc60f26cbed33b83b45"
     }
   ]
 }
