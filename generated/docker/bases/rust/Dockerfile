@@ -5,7 +5,7 @@
 FROM rust:1-slim-bookworm
 
 # Layer 1: Common Tools
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     git \
     curl \
     wget \
@@ -36,9 +36,8 @@ RUN ln -sf /usr/bin/fdfind /usr/local/bin/fd
 RUN ln -sf /usr/bin/rg /usr/local/bin/rg || true
 
 # Layer 2: Rust Runtime
-# Install additional Rust development tools
-RUN rustup component add clippy rustfmt rust-analyzer && \
-    cargo install cargo-watch cargo-edit
+# Install Rust toolchain components
+RUN rustup component add clippy rustfmt rust-analyzer
 
 # Environment defaults (override at build time with --build-arg)
 ARG CARGO_HOME=/usr/local/cargo

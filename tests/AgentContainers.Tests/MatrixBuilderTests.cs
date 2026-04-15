@@ -47,7 +47,7 @@ public class MatrixBuilderTests
             m => m.RuntimeId == "node-bun" && m.AgentId == "claude");
         Assert.NotNull(entry);
         Assert.True(entry.Compatible,
-            "node-bun should be compatible with claude (provides node>=22, claude requires node>=18).");
+            "node-bun should be compatible with claude (provides node>=24, claude requires node>=18).");
     }
 
     [Fact]
@@ -137,7 +137,7 @@ public class MatrixBuilderTests
     [Fact]
     public void CapabilitySatisfied_VersionRangeSatisfied()
     {
-        Assert.True(MatrixBuilder.CapabilitySatisfied("node>=18", ["node>=22", "npm"]));
+        Assert.True(MatrixBuilder.CapabilitySatisfied("node>=18", ["node>=24", "npm"]));
     }
 
     [Fact]
@@ -149,6 +149,6 @@ public class MatrixBuilderTests
     [Fact]
     public void CapabilitySatisfied_BaseTokenMatch()
     {
-        Assert.True(MatrixBuilder.CapabilitySatisfied("node", ["node>=22"]));
+        Assert.True(MatrixBuilder.CapabilitySatisfied("node", ["node>=24"]));
     }
 }

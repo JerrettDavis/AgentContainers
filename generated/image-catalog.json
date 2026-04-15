@@ -1,5 +1,5 @@
 {
-  "manifest_hash": "f237fcc2e37cced75ebca24b02025efb7ccad5c4d9459073c318c4ab00da2281",
+  "manifest_hash": "40beaa84c496d625f18545602b8f8d709a9be01509b555e4f79a657017950f24",
   "generator_version": "0.1.0",
   "registry": "ghcr.io/agentcontainers",
   "images": [
@@ -8,10 +8,10 @@
       "id": "dotnet",
       "display_name": ".NET SDK",
       "family": "dotnet",
-      "from_image": "mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim",
+      "from_image": "mcr.microsoft.com/dotnet/sdk:10.0-noble",
       "provides": [
         "dotnet",
-        "dotnet\u003E=8",
+        "dotnet\u003E=10",
         "csharp",
         "fsharp"
       ],
@@ -26,10 +26,10 @@
       "id": "node-bun",
       "display_name": "Node.js \u002B Bun",
       "family": "javascript",
-      "from_image": "node:22-bookworm-slim",
+      "from_image": "node:24-bookworm-slim",
       "provides": [
         "node",
-        "node\u003E=22",
+        "node\u003E=24",
         "npm",
         "bun",
         "bun\u003E=1.0",
@@ -89,7 +89,7 @@
       ],
       "provides": [
         "node",
-        "node\u003E=22",
+        "node\u003E=24",
         "npm",
         "bun",
         "bun\u003E=1.0",
@@ -103,7 +103,7 @@
         "pip",
         "venv",
         "dotnet",
-        "dotnet\u003E=8",
+        "dotnet\u003E=10",
         "csharp",
         "fsharp"
       ],
@@ -124,7 +124,7 @@
       ],
       "provides": [
         "node",
-        "node\u003E=22",
+        "node\u003E=24",
         "npm",
         "bun",
         "bun\u003E=1.0",
@@ -133,7 +133,7 @@
         "python\u003E=3.12",
         "pip",
         "dotnet",
-        "dotnet\u003E=8",
+        "dotnet\u003E=10",
         "csharp"
       ],
       "platforms": [

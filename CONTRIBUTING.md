@@ -34,7 +34,7 @@ Thank you for your interest in contributing! This document covers the basics.
 ### Base Runtimes (4)
 | Base | Description |
 |---|---|
-| `node-bun` | Node.js 22 LTS + Bun |
+| `node-bun` | Node.js 24 LTS + Bun |
 | `rust` | Rust stable toolchain |
 | `python` | Python 3.12 + pip/venv |
 | `dotnet` | .NET SDK runtime image |

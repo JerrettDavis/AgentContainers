@@ -15,6 +15,9 @@ RUN github-copilot-cli --version || true
 
 USER dev
 
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+  CMD ["CMD-SHELL", "github-copilot-cli --version || exit 1"]
+
 # OCI Image Labels
 ARG BUILD_DATE=unknown
 ARG VCS_REF=unknown

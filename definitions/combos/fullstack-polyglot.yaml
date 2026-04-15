@@ -1,7 +1,7 @@
 id: fullstack-polyglot
 display_name: Full-Stack Polyglot
 version: v1
-description: Node.js 22 + Bun + Rust + Python 3.12 + .NET — the works
+description: Node.js 24 + Bun + Rust + Python 3.12 + .NET — the works
 
 bases:
   - id: node-bun
@@ -15,7 +15,7 @@ bases:
 
 provides:
   - node
-  - "node>=22"
+  - "node>=24"
   - npm
   - bun
   - "bun>=1.0"
@@ -29,7 +29,7 @@ provides:
   - pip
   - venv
   - dotnet
-  - "dotnet>=8"
+  - "dotnet>=10"
   - csharp
   - fsharp
 

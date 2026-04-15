@@ -113,7 +113,7 @@ description: Node.js LTS with Bun runtime and npm/yarn/pnpm.
 family: javascript
 
 from:
-  image: "node:22-bookworm-slim"
+  image: "node:24-bookworm-slim"
   # digest pinning optional; recommended for production builds
   # digest: "sha256:..."
 
@@ -121,7 +121,7 @@ common_tools: default      # Reference to common-tools manifest ID
 
 provides:
   - node
-  - "node>=22"
+  - "node>=24"
   - npm
   - bun
   - "bun>=1.0"
@@ -202,11 +202,11 @@ bases:
 # (auto-derived; list here is for documentation clarity)
 provides:
   - node
-  - "node>=22"
+  - "node>=24"
   - python
   - "python>=3.12"
   - dotnet
-  - "dotnet>=8"
+  - "dotnet>=10"
   - bun
 
 cross_runtime_utilities:

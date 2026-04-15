@@ -5,7 +5,7 @@
 FROM python:3.12-slim-bookworm
 
 # Layer 1: Common Tools
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     git \
     curl \
     wget \

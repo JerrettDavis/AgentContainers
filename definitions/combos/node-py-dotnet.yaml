@@ -1,7 +1,7 @@
 id: node-py-dotnet
 display_name: Node.js + Python + .NET
 version: v1
-description: Full-stack combo with Node.js 22, Python 3.12, and .NET 8
+description: Full-stack combo with Node.js 24, Python 3.12, and .NET 10
 
 bases:
   - id: node-bun
@@ -13,7 +13,7 @@ bases:
 
 provides:
   - node
-  - "node>=22"
+  - "node>=24"
   - npm
   - bun
   - "bun>=1.0"
@@ -22,7 +22,7 @@ provides:
   - "python>=3.12"
   - pip
   - dotnet
-  - "dotnet>=8"
+  - "dotnet>=10"
   - csharp
 
 cross_runtime_utilities:

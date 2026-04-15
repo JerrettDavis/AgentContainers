@@ -29,7 +29,9 @@ RUN pip install --no-cache-dir pipx && \
 
 # --- Import runtime from .NET SDK base ---
 COPY --from=dotnet_stage /usr/share/dotnet /usr/share/dotnet
-RUN apt-get update && apt-get install -y --no-install-recommends libicu-dev && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
+    libicu-dev \
+  && rm -rf /var/lib/apt/lists/*
 RUN ln -sf /usr/share/dotnet/dotnet /usr/bin/dotnet
 
 # --- .NET SDK runtime setup ---
@@ -43,7 +45,7 @@ RUN ln -sf /usr/bin/fdfind /usr/local/bin/fd
 RUN ln -sf /usr/bin/rg /usr/local/bin/rg || true
 
 # Cross-runtime utilities
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     pipx \
   && rm -rf /var/lib/apt/lists/*
 
@@ -58,7 +60,7 @@ ARG VCS_REF=unknown
 ARG IMAGE_VERSION=v1
 
 LABEL org.opencontainers.image.title="Node.js + Python + .NET"
-LABEL org.opencontainers.image.description="Full-stack combo with Node.js 22, Python 3.12, and .NET 8"
+LABEL org.opencontainers.image.description="Full-stack combo with Node.js 24, Python 3.12, and .NET 10"
 LABEL org.opencontainers.image.source="https://github.com/agentcontainers/AgentContainers"
 LABEL org.opencontainers.image.url="https://github.com/agentcontainers/AgentContainers"
 LABEL org.opencontainers.image.vendor="AgentContainers"

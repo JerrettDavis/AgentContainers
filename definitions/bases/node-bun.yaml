@@ -1,17 +1,17 @@
 id: node-bun
 display_name: Node.js + Bun
 version: v1
-description: Node.js 22 LTS with Bun runtime
+description: Node.js 24 LTS with Bun runtime
 family: javascript
 
 from:
-  image: "node:22-bookworm-slim"
+  image: "node:24-bookworm-slim"
 
 common_tools: default
 
 provides:
   - node
-  - "node>=22"
+  - "node>=24"
   - npm
   - bun
   - "bun>=1.0"
@@ -23,8 +23,14 @@ platforms:
 
 install:
   steps:
-    - description: "Install Bun"
+    - description: "Update npm, patch npm's bundled dependencies, and install Bun"
       run: |
+        npm install -g npm@11.12.1
+        cd /usr/local/lib/node_modules/npm/node_modules/tinyglobby
+        npm install picomatch@4.0.4
+        cd /usr/local/lib/node_modules/npm/node_modules/node-gyp
+        npm prune --omit=dev
+        cd /
         export BUN_INSTALL=/usr/local/bun
         mkdir -p "$BUN_INSTALL"
         curl -fsSL https://bun.sh/install | bash

@@ -504,14 +504,7 @@ public static class Program
         if (catalog.CommonTools.TryGetValue(baseManifest.CommonTools, out var tools))
         {
             sb.AppendLine("# Layer 1: Common Tools");
-            sb.AppendLine("RUN apt-get update && apt-get install -y --no-install-recommends \\");
-            var aptPkgs = tools.Packages.Apt;
-            for (int i = 0; i < aptPkgs.Count; i++)
-            {
-                sb.Append($"    {aptPkgs[i]}");
-                sb.AppendLine(" \\");
-            }
-            sb.AppendLine("  && rm -rf /var/lib/apt/lists/*");
+            sb.AppendLine(FormatAptInstall(tools.Packages.Apt));
             sb.AppendLine();
 
             foreach (var step in tools.PostInstall)
@@ -673,7 +666,7 @@ public static class Program
                 if (baseManifest.Provides.Any(p => p == "dotnet" || p.StartsWith("dotnet>=")))
                 {
                     sb.AppendLine($"COPY --from={stageName} /usr/share/dotnet /usr/share/dotnet");
-                    sb.AppendLine("RUN apt-get update && apt-get install -y --no-install-recommends libicu-dev && rm -rf /var/lib/apt/lists/*");
+                    sb.AppendLine(FormatAptInstall(["libicu-dev"]));
                     sb.AppendLine("RUN ln -sf /usr/share/dotnet/dotnet /usr/bin/dotnet");
                 }
 
@@ -705,13 +698,7 @@ public static class Program
         if (combo.CrossRuntimeUtilities.Apt.Count > 0)
         {
             sb.AppendLine("# Cross-runtime utilities");
-            sb.AppendLine("RUN apt-get update && apt-get install -y --no-install-recommends \\");
-            for (int i = 0; i < combo.CrossRuntimeUtilities.Apt.Count; i++)
-            {
-                sb.Append($"    {combo.CrossRuntimeUtilities.Apt[i]}");
-                sb.AppendLine(i < combo.CrossRuntimeUtilities.Apt.Count - 1 ? " \\" : " \\");
-            }
-            sb.AppendLine("  && rm -rf /var/lib/apt/lists/*");
+            sb.AppendLine(FormatAptInstall(combo.CrossRuntimeUtilities.Apt));
             sb.AppendLine();
         }
 
@@ -961,6 +948,54 @@ public static class Program
         return string.Join(" && \\\n    ", lines);
     }
 
+    private static string FormatAptInstall(IEnumerable<string> packages)
+    {
+        var packageList = packages.Where(static p => !string.IsNullOrWhiteSpace(p)).ToList();
+        if (packageList.Count == 0)
+            throw new InvalidOperationException("Apt install generation requires at least one package.");
+
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \\");
+        for (var i = 0; i < packageList.Count; i++)
+        {
+            sb.Append($"    {packageList[i]}");
+            sb.AppendLine(i < packageList.Count - 1 ? " \\" : " \\");
+        }
+        sb.Append("  && rm -rf /var/lib/apt/lists/*");
+        return sb.ToString();
+    }
+
+    private static void AppendHealthcheck(
+        System.Text.StringBuilder sb,
+        AgentContainers.Core.Models.HealthcheckConfig healthcheck)
+    {
+        if (healthcheck.Test.Count == 0)
+            return;
+
+        var testStr = string.Join("\", \"", healthcheck.Test);
+        sb.AppendLine($"HEALTHCHECK --interval={healthcheck.Interval} --timeout={healthcheck.Timeout} --retries={healthcheck.Retries} \\");
+        sb.AppendLine($"  CMD [\"{testStr}\"]");
+        sb.AppendLine();
+    }
+
+    private static void AppendValidationHealthcheck(System.Text.StringBuilder sb, IEnumerable<string> commands)
+    {
+        var firstCommand = commands.FirstOrDefault(static command => !string.IsNullOrWhiteSpace(command));
+        if (string.IsNullOrWhiteSpace(firstCommand))
+            return;
+
+        var normalizedCommand = firstCommand
+            .Replace(" || true", string.Empty, StringComparison.Ordinal)
+            .Replace("|| true", string.Empty, StringComparison.Ordinal)
+            .Trim();
+        if (string.IsNullOrWhiteSpace(normalizedCommand))
+            return;
+
+        sb.AppendLine("HEALTHCHECK --interval=30s --timeout=10s --retries=3 \\");
+        sb.AppendLine($"  CMD [\"CMD-SHELL\", \"{normalizedCommand} || exit 1\"]");
+        sb.AppendLine();
+    }
+
     private static int RunEmitE2EPlan(string repoRoot)
     {
         var loader = new ManifestLoader();
@@ -1133,6 +1168,10 @@ public static class Program
 
         sb.AppendLine("USER dev");
         sb.AppendLine();
+        if (agent.Healthcheck.Test.Count > 0)
+            AppendHealthcheck(sb, agent.Healthcheck);
+        else
+            AppendValidationHealthcheck(sb, agent.Validation.Commands);
 
         // OCI Labels
         sb.AppendLine("# OCI Image Labels");
@@ -1182,7 +1221,7 @@ public static class Program
             {
                 "npm_global" => $"npm install -g {pkg}{versionSuffix}",
                 "pip" => $"pip install --no-cache-dir {pkg}{versionSuffix}",
-                "apt" => $"apt-get update && apt-get install -y --no-install-recommends {pkg} && rm -rf /var/lib/apt/lists/*",
+                "apt" => FormatAptInstall([pkg]),
                 _ => null
             };
             if (installCmd != null)
@@ -1216,6 +1255,7 @@ public static class Program
 
         sb.AppendLine("USER dev");
         sb.AppendLine();
+        AppendValidationHealthcheck(sb, toolPack.Validation.Commands);
 
         // OCI Labels
         sb.AppendLine("# OCI Image Labels");
@@ -1248,7 +1288,7 @@ public static class Program
         {
             "npm_global" => $"npm install -g {pkg}{versionSuffix}",
             "pip" => $"pip install --no-cache-dir {pkg}{versionSuffix}",
-            "apt" => $"apt-get update && apt-get install -y --no-install-recommends {pkg} && rm -rf /var/lib/apt/lists/*",
+            "apt" => FormatAptInstall([pkg]),
             _ => null
         };
     }

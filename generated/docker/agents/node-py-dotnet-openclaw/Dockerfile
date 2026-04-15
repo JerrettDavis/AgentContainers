@@ -15,6 +15,9 @@ RUN openclaw --version || true
 
 USER dev
 
+HEALTHCHECK --interval=15s --timeout=5s --retries=5 \
+  CMD ["CMD-SHELL", "curl -sf http://localhost:${OPENCLAW_PORT:-3000}/health || exit 1"]
+
 # OCI Image Labels
 ARG BUILD_DATE=unknown
 ARG VCS_REF=unknown

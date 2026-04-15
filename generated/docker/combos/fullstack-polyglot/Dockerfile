@@ -30,9 +30,8 @@ ENV RUSTUP_HOME=/usr/local/rustup
 ENV PATH="/usr/local/cargo/bin:${PATH}"
 
 # --- Rust runtime setup ---
-# Install additional Rust development tools
-RUN rustup component add clippy rustfmt rust-analyzer && \
-    cargo install cargo-watch cargo-edit
+# Install Rust toolchain components
+RUN rustup component add clippy rustfmt rust-analyzer
 
 # --- Import runtime from Python base ---
 COPY --from=python_stage /usr/local /usr/local
@@ -44,7 +43,9 @@ RUN pip install --no-cache-dir pipx && \
 
 # --- Import runtime from .NET SDK base ---
 COPY --from=dotnet_stage /usr/share/dotnet /usr/share/dotnet
-RUN apt-get update && apt-get install -y --no-install-recommends libicu-dev && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
+    libicu-dev \
+  && rm -rf /var/lib/apt/lists/*
 RUN ln -sf /usr/share/dotnet/dotnet /usr/bin/dotnet
 
 # --- .NET SDK runtime setup ---
@@ -58,7 +59,7 @@ RUN ln -sf /usr/bin/fdfind /usr/local/bin/fd
 RUN ln -sf /usr/bin/rg /usr/local/bin/rg || true
 
 # Cross-runtime utilities
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     pipx \
     pkg-config \
     libssl-dev \
@@ -75,7 +76,7 @@ ARG VCS_REF=unknown
 ARG IMAGE_VERSION=v1
 
 LABEL org.opencontainers.image.title="Full-Stack Polyglot"
-LABEL org.opencontainers.image.description="Node.js 22 + Bun + Rust + Python 3.12 + .NET — the works"
+LABEL org.opencontainers.image.description="Node.js 24 + Bun + Rust + Python 3.12 + .NET — the works"
 LABEL org.opencontainers.image.source="https://github.com/agentcontainers/AgentContainers"
 LABEL org.opencontainers.image.url="https://github.com/agentcontainers/AgentContainers"
 LABEL org.opencontainers.image.vendor="AgentContainers"

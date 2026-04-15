@@ -47,6 +47,9 @@ ENV DEVTOOLS_ENABLED=${DEVTOOLS_ENABLED}
 
 USER dev
 
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+  CMD ["CMD-SHELL", "shellcheck --version || exit 1"]
+
 # OCI Image Labels
 ARG BUILD_DATE=unknown
 ARG VCS_REF=unknown

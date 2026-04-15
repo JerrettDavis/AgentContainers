@@ -1,17 +1,17 @@
 id: dotnet
 display_name: .NET SDK
 version: v1
-description: .NET 8 SDK for C# and F# development
+description: .NET 10 SDK for C# and F# development
 family: dotnet
 
 from:
-  image: "mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim"
+  image: "mcr.microsoft.com/dotnet/sdk:10.0-noble"
 
 common_tools: default
 
 provides:
   - dotnet
-  - "dotnet>=8"
+  - "dotnet>=10"
   - csharp
   - fsharp
 

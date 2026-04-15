@@ -154,7 +154,7 @@ public sealed class CatalogValidator
 
     /// <summary>
     /// Simple capability satisfaction: exact match or version-range match.
-    /// For v1, we do prefix matching: "node>=18" is satisfied by "node>=22" or "node>=18".
+    /// For v1, we do prefix matching: "node>=18" is satisfied by "node>=24" or "node>=18".
     /// Full semver parsing is deferred.
     /// </summary>
     private static bool CapabilitySatisfied(string requirement, List<string> provides)

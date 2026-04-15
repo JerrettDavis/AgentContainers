@@ -21,10 +21,9 @@ platforms:
 
 install:
   steps:
-    - description: "Install additional Rust development tools"
+    - description: "Install Rust toolchain components"
       run: |
         rustup component add clippy rustfmt rust-analyzer
-        cargo install cargo-watch cargo-edit
 
 env:
   - name: CARGO_HOME

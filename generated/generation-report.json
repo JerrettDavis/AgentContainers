@@ -1,132 +1,132 @@
 {
-  "manifest_hash": "f237fcc2e37cced75ebca24b02025efb7ccad5c4d9459073c318c4ab00da2281",
+  "manifest_hash": "40beaa84c496d625f18545602b8f8d709a9be01509b555e4f79a657017950f24",
   "generator_version": "0.1.0",
   "artifacts": [
     {
       "type": "dockerfile",
       "id": "base-dotnet",
       "path": "docker/bases/dotnet/Dockerfile",
-      "content_hash": "870adb874be3a3c13f63c242926f20ba51c5c943efed54d19839e9ca34504d5e"
+      "content_hash": "2e8fe6d5d8ba20a421df598dba940a493aed92aa73b8ab2dc8b78ae19dc8aefc"
     },
     {
       "type": "dockerfile",
       "id": "base-node-bun",
       "path": "docker/bases/node-bun/Dockerfile",
-      "content_hash": "6c741d6e67b438c03e8bd77763a6c8089ee2c4dc9d7868c1a29b2c5031aae880"
+      "content_hash": "6dada4d1c9781961512a81593f98005caa04500d51fc9cb1bc353e34225c432b"
     },
     {
       "type": "dockerfile",
       "id": "base-python",
       "path": "docker/bases/python/Dockerfile",
-      "content_hash": "743bec8718dde4678ff3bcaf2639d726d81833bebe3b4529f3ef2c83be3232b9"
+      "content_hash": "a7174b3e3e1cf5ebc85846aceb6051e435392eb7a2ae67b99be0963060e1f805"
     },
     {
       "type": "dockerfile",
       "id": "base-rust",
       "path": "docker/bases/rust/Dockerfile",
-      "content_hash": "813af0d766727b9d024f3144c42e14f00ddb6dc1ef36782fa294d7d54633ee2d"
+      "content_hash": "7279540e0e3bf6bd0decebadf971c24056cde72ef419486bc271776969ded936"
     },
     {
       "type": "dockerfile",
       "id": "combo-fullstack-polyglot",
       "path": "docker/combos/fullstack-polyglot/Dockerfile",
-      "content_hash": "f47b1418fce002c61fe57836db18924c4d767839bd511ec442fa8cf0d5295670"
+      "content_hash": "8e07c07b11bb827529e1ce39348ee5da925ea9e4861ef24bdc071bbebbd02fbd"
     },
     {
       "type": "dockerfile",
       "id": "combo-node-py-dotnet",
       "path": "docker/combos/node-py-dotnet/Dockerfile",
-      "content_hash": "28f372cd946a5bac0175976562c64ac1ef90e9e435780d7632f07299cb538d62"
+      "content_hash": "e43ac8b08fb6dc99a7077731b90048460804ae86b444ddd93a07292b868962e3"
     },
     {
       "type": "dockerfile",
       "id": "agent-node-bun-claude",
       "path": "docker/agents/node-bun-claude/Dockerfile",
-      "content_hash": "d159e0c7441a2a0b8f11ce4c4a8c7ff7926b86cf469838cc0b33c680c2482f0b"
+      "content_hash": "bd2c506850665a69936d772f393926d509e8474bf42a65f58387223bf1707d8b"
     },
     {
       "type": "dockerfile",
       "id": "agent-fullstack-polyglot-claude",
       "path": "docker/agents/fullstack-polyglot-claude/Dockerfile",
-      "content_hash": "412328151c913a6d0b0d523de8f6fa9bfc20b6de36103f9dc50d8ef5c456f6ac"
+      "content_hash": "7c1257c8837a41ba29693fecb844256abb4e21f294ed17fcb9b1caae5039cbaa"
     },
     {
       "type": "dockerfile",
       "id": "agent-node-py-dotnet-claude",
       "path": "docker/agents/node-py-dotnet-claude/Dockerfile",
-      "content_hash": "5ad4ea851b04db7e0cab17e6710c9faeba077c790a61b7575db46892f6f352eb"
+      "content_hash": "18818fcdab1cdd6660ea7ac66d567dee9688c562e602e13ef3766e7869159957"
     },
     {
       "type": "dockerfile",
       "id": "agent-node-bun-codex",
       "path": "docker/agents/node-bun-codex/Dockerfile",
-      "content_hash": "9a81fa9baa70117695421345dd402ffa236aa1d7be355267ebf5581cc2bb4c81"
+      "content_hash": "11d20cd2df9850cd0be65f7a10893d1d92b4c76ea8f5361e2206c0e1dc47a3ad"
     },
     {
       "type": "dockerfile",
       "id": "agent-fullstack-polyglot-codex",
       "path": "docker/agents/fullstack-polyglot-codex/Dockerfile",
-      "content_hash": "d2e6cca0dda44e3c82cea54643de61895aa919aa5bf756ceedd039eed26856b8"
+      "content_hash": "3f318a64814b69225e8cd58854b4b6bd3d9ff02d52031b1d39ea191608658c58"
     },
     {
       "type": "dockerfile",
       "id": "agent-node-py-dotnet-codex",
       "path": "docker/agents/node-py-dotnet-codex/Dockerfile",
-      "content_hash": "26628853c45ed6df914b6c9ec52a69539a217b148d8d2f79390f3de61fdb92fa"
+      "content_hash": "c4782ea39ebd96d96db0527e6fd4a6896a34ea9840a9919f477f8535eb1f4519"
     },
     {
       "type": "dockerfile",
       "id": "agent-node-bun-copilot",
       "path": "docker/agents/node-bun-copilot/Dockerfile",
-      "content_hash": "bcc978f13c2e7547a9af270fbaef8ded454306d884de659bf28da2c50bccb84c"
+      "content_hash": "db5ef14189f4db0240cc70921b846c3ffde0da1ecd40fbf9e525bcc479c584d9"
     },
     {
       "type": "dockerfile",
       "id": "agent-fullstack-polyglot-copilot",
       "path": "docker/agents/fullstack-polyglot-copilot/Dockerfile",
-      "content_hash": "5d931fc2ab0b47f72b24258c4f52b108552f9d5b306245bf0ecc96fda72d9409"
+      "content_hash": "443b0945733b79e3a673bbee8e1f52bc657b9e4975fb355a44a9c11573938f9a"
     },
     {
       "type": "dockerfile",
       "id": "agent-node-py-dotnet-copilot",
       "path": "docker/agents/node-py-dotnet-copilot/Dockerfile",
-      "content_hash": "eaa67f9dee83a6db5f24ef49ece922bbf605d20f2387fcfc38dbb3788bb9984c"
+      "content_hash": "7e4d4440f003065cc9f5caf4737beb4b9746a329c0f352202e4d030300de87d8"
     },
     {
       "type": "dockerfile",
       "id": "agent-node-bun-openclaw",
       "path": "docker/agents/node-bun-openclaw/Dockerfile",
-      "content_hash": "39f703bb09beb8bf4f7df9b369e2a8011e86400930e5ce0694d998ce302eaf04"
+      "content_hash": "64b756747ac2cb508f7bf500e2fb488cb2fb8b7360077be26224e3c6fcf0b2c9"
     },
     {
       "type": "dockerfile",
       "id": "agent-fullstack-polyglot-openclaw",
       "path": "docker/agents/fullstack-polyglot-openclaw/Dockerfile",
-      "content_hash": "0e417d5004263731c465edbe0fd31df8df654d6b3bdcb20d90ca2f0c9e294a99"
+      "content_hash": "c9163790d50b1bbdcd2b1f5b8e1493e648af02bd54d8f33a2dbc9fc9c94e8adc"
     },
     {
       "type": "dockerfile",
       "id": "agent-node-py-dotnet-openclaw",
       "path": "docker/agents/node-py-dotnet-openclaw/Dockerfile",
-      "content_hash": "674bb1da3d085a51fba7a346453abb03fc10c440997e97dd76a8fe1830980919"
+      "content_hash": "27e63487c016ae7c031f3665bba45eaf6b3aa4da51245633a975cd3dc300170e"
     },
     {
       "type": "dockerfile",
       "id": "tool-pack-node-bun-devtools",
       "path": "docker/tool-packs/node-bun-devtools/Dockerfile",
-      "content_hash": "55a7aa000ce9383d6a5c1a4f3b44043b1b7e7b97e7d50ffbfefb60260ca389cb"
+      "content_hash": "f00259f80ba0ad49aa9b5636810f9a6d85a5c9b69a02565ba0df8e0e14ac2dcf"
     },
     {
       "type": "dockerfile",
       "id": "tool-pack-node-py-dotnet-devtools",
       "path": "docker/tool-packs/node-py-dotnet-devtools/Dockerfile",
-      "content_hash": "4c321b9fb92e800c7de9bd73e1de1e7f29996ec708fe3be60a9d2df59d087a1b"
+      "content_hash": "52d8261c497797cb6e6ebac9fd84a468e7880e3569e23f63a659066a4919587b"
     },
     {
       "type": "dockerfile",
       "id": "tool-pack-fullstack-polyglot-devtools",
       "path": "docker/tool-packs/fullstack-polyglot-devtools/Dockerfile",
-      "content_hash": "44eab9220139fbba940bb616110bcc94a1b6fd97a088f4820dc949da45088ec5"
+      "content_hash": "f475423957b7f9a811858992ceb76c23ba0db14ff7a7252a11ba3a4c833e44dc"
     },
     {
       "type": "compose-fragment",
@@ -186,7 +186,7 @@
       "type": "catalog",
       "id": "image-catalog",
       "path": "image-catalog.json",
-      "content_hash": "627016e88f50eeb1ba6b7dcf838777f1ae8173e14e6edfc60f26cbed33b83b45"
+      "content_hash": "c287739f61701a1ba44e9d825f4ecc842cd2e445ec2e10d7db34372e43d07904"
     }
   ]
 }
