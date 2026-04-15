@@ -196,58 +196,100 @@ public static class Program
         var loader = new ManifestLoader();
         var catalog = loader.LoadAll(Path.Combine(repoRoot, "definitions"));
         var manifestHash = ContentHasher.ComputeManifestHash(Path.Combine(repoRoot, "definitions"));
+        var matrix = BuildPublishMatrix(catalog, manifestHash);
 
-        var include = new List<object>();
-
-        foreach (var (id, b) in catalog.Bases)
-        {
-            var platforms = b.Platforms.Count > 0
-                ? string.Join(",", b.Platforms)
-                : "linux/amd64";
-
-            include.Add(new
-            {
-                id,
-                type = "base",
-                display_name = b.DisplayName,
-                context = $"generated/docker/bases/{id}",
-                dockerfile = "Dockerfile",
-                image_name = $"ghcr.io/${{{{ github.repository_owner }}}}/{id}",
-                platforms,
-                family = b.Family,
-                manifest_hash = manifestHash
-            });
-        }
-
-        foreach (var (id, c) in catalog.Combos)
-        {
-            // Derive platforms from the primary (first-ordered) base
-            var primaryBase = c.Bases.OrderBy(b => b.Order).FirstOrDefault();
-            var platforms = "linux/amd64";
-            if (primaryBase != null && catalog.Bases.TryGetValue(primaryBase.Id, out var pb))
-            {
-                platforms = pb.Platforms.Count > 0
-                    ? string.Join(",", pb.Platforms)
-                    : "linux/amd64";
-            }
-
-            include.Add(new
-            {
-                id,
-                type = "combo",
-                display_name = c.DisplayName,
-                context = $"generated/docker/combos/{id}",
-                dockerfile = "Dockerfile",
-                image_name = $"ghcr.io/${{{{ github.repository_owner }}}}/{id}",
-                platforms,
-                family = string.Join("+", c.Bases.OrderBy(b => b.Order).Select(b => b.Id)),
-                manifest_hash = manifestHash
-            });
-        }
-
-        var matrix = new { include };
         Console.Write(JsonSerializer.Serialize(matrix, JsonOptions));
         return 0;
+    }
+
+    internal static PublishMatrix BuildPublishMatrix(
+        AgentContainers.Core.Models.ManifestCatalog catalog,
+        string manifestHash)
+    {
+        var include = new List<PublishMatrixEntry>();
+
+        foreach (var (id, b) in catalog.Bases.OrderBy(entry => entry.Key))
+        {
+            include.Add(new PublishMatrixEntry
+            {
+                Id = id,
+                Type = "base",
+                DisplayName = b.DisplayName,
+                Context = $"generated/docker/bases/{id}",
+                Dockerfile = "Dockerfile",
+                ImageName = $"ghcr.io/${{{{ github.repository_owner }}}}/{id}",
+                Platforms = string.Join(",", GetRuntimePlatforms(catalog, id)),
+                Family = b.Family,
+                ManifestHash = manifestHash
+            });
+        }
+
+        foreach (var (id, c) in catalog.Combos.OrderBy(entry => entry.Key))
+        {
+            include.Add(new PublishMatrixEntry
+            {
+                Id = id,
+                Type = "combo",
+                DisplayName = c.DisplayName,
+                Context = $"generated/docker/combos/{id}",
+                Dockerfile = "Dockerfile",
+                ImageName = $"ghcr.io/${{{{ github.repository_owner }}}}/{id}",
+                Platforms = string.Join(",", GetRuntimePlatforms(catalog, id)),
+                Family = string.Join("+", c.Bases.OrderBy(b => b.Order).Select(b => b.Id)),
+                ManifestHash = manifestHash
+            });
+        }
+
+        foreach (var (agentId, agent) in catalog.Agents.OrderBy(entry => entry.Key))
+        {
+            foreach (var (runtimeId, runtimeDisplayName) in GetCompatibleRuntimeTargets(catalog, agent))
+            {
+                include.Add(new PublishMatrixEntry
+                {
+                    Id = $"{runtimeId}-{agentId}",
+                    Type = "agent-image",
+                    DisplayName = $"{agent.DisplayName} on {runtimeDisplayName}",
+                    Context = $"generated/docker/agents/{runtimeId}-{agentId}",
+                    Dockerfile = "Dockerfile",
+                    ImageName = $"ghcr.io/${{{{ github.repository_owner }}}}/{runtimeId}-{agentId}",
+                    Platforms = string.Join(",", GetRuntimePlatforms(catalog, runtimeId)),
+                    BaseId = runtimeId,
+                    AgentId = agentId,
+                    ManifestHash = manifestHash
+                });
+            }
+        }
+
+        foreach (var (toolPackId, toolPack) in catalog.ToolPacks.OrderBy(entry => entry.Key))
+        {
+            if (toolPack.Sidecar?.Enabled == true)
+                continue;
+
+            foreach (var runtimeId in toolPack.CompatibleWith.Bases.OrderBy(id => id))
+            {
+                if (!TryGetRuntimeDisplayName(catalog, runtimeId, out var runtimeDisplayName))
+                    continue;
+
+                include.Add(new PublishMatrixEntry
+                {
+                    Id = $"{runtimeId}-{toolPackId}",
+                    Type = "tool-pack-image",
+                    DisplayName = $"{toolPack.DisplayName} on {runtimeDisplayName}",
+                    Context = $"generated/docker/tool-packs/{runtimeId}-{toolPackId}",
+                    Dockerfile = "Dockerfile",
+                    ImageName = $"ghcr.io/${{{{ github.repository_owner }}}}/{runtimeId}-{toolPackId}",
+                    Platforms = string.Join(",", GetRuntimePlatforms(catalog, runtimeId)),
+                    BaseId = runtimeId,
+                    ToolPackId = toolPackId,
+                    ManifestHash = manifestHash
+                });
+            }
+        }
+
+        return new PublishMatrix
+        {
+            Include = include
+        };
     }
 
     private static GenerationReport GenerateArtifacts(
@@ -1224,6 +1266,86 @@ public static class Program
             dir = parent.FullName;
         }
         return null;
+    }
+
+    private static IEnumerable<(string RuntimeId, string RuntimeDisplayName)> GetCompatibleRuntimeTargets(
+        AgentContainers.Core.Models.ManifestCatalog catalog,
+        AgentContainers.Core.Models.AgentManifest agent)
+    {
+        foreach (var (baseId, baseManifest) in catalog.Bases.OrderBy(entry => entry.Key))
+        {
+            if (agent.Requires.All(req => CapabilitySatisfied(req, baseManifest.Provides)))
+                yield return (baseId, baseManifest.DisplayName);
+        }
+
+        foreach (var (comboId, combo) in catalog.Combos.OrderBy(entry => entry.Key))
+        {
+            if (agent.Requires.All(req => CapabilitySatisfied(req, combo.Provides)))
+                yield return (comboId, combo.DisplayName);
+        }
+    }
+
+    private static IReadOnlyList<string> GetRuntimePlatforms(
+        AgentContainers.Core.Models.ManifestCatalog catalog,
+        string runtimeId)
+    {
+        if (catalog.Bases.TryGetValue(runtimeId, out var runtimeBase))
+            return runtimeBase.Platforms.Count > 0 ? runtimeBase.Platforms : ["linux/amd64"];
+
+        if (catalog.Combos.TryGetValue(runtimeId, out var combo))
+        {
+            var primaryBaseId = combo.Bases
+                .OrderBy(b => b.Order)
+                .Select(b => b.Id)
+                .FirstOrDefault();
+
+            if (primaryBaseId != null && catalog.Bases.TryGetValue(primaryBaseId, out var primaryBase))
+                return primaryBase.Platforms.Count > 0 ? primaryBase.Platforms : ["linux/amd64"];
+        }
+
+        return ["linux/amd64"];
+    }
+
+    private static bool TryGetRuntimeDisplayName(
+        AgentContainers.Core.Models.ManifestCatalog catalog,
+        string runtimeId,
+        out string displayName)
+    {
+        if (catalog.Bases.TryGetValue(runtimeId, out var runtimeBase))
+        {
+            displayName = runtimeBase.DisplayName;
+            return true;
+        }
+
+        if (catalog.Combos.TryGetValue(runtimeId, out var combo))
+        {
+            displayName = combo.DisplayName;
+            return true;
+        }
+
+        displayName = string.Empty;
+        return false;
+    }
+
+    internal sealed class PublishMatrix
+    {
+        public List<PublishMatrixEntry> Include { get; init; } = [];
+    }
+
+    internal sealed class PublishMatrixEntry
+    {
+        public required string Id { get; init; }
+        public required string Type { get; init; }
+        public required string DisplayName { get; init; }
+        public required string Context { get; init; }
+        public required string Dockerfile { get; init; }
+        public required string ImageName { get; init; }
+        public required string Platforms { get; init; }
+        public string? Family { get; init; }
+        public string? BaseId { get; init; }
+        public string? AgentId { get; init; }
+        public string? ToolPackId { get; init; }
+        public required string ManifestHash { get; init; }
     }
 
     private static int PrintUsage()

@@ -1,6 +1,7 @@
 using AgentContainers.Core.Loading;
 using AgentContainers.Core.Models;
 using AgentContainers.Generator;
+using System.Text.Json;
 
 namespace AgentContainers.Tests;
 
@@ -134,5 +135,38 @@ public class PublishingTests
         Assert.Contains("\"platforms\"", content);
         Assert.Contains("linux/amd64", content);
         Assert.Contains("linux/arm64", content);
+    }
+
+    [Fact]
+    public void BuildPublishMatrix_CoversEveryGeneratedDockerfile()
+    {
+        var repoRoot = GetRepoRoot();
+        var catalog = LoadCatalog();
+        var manifestHash = AgentContainers.Core.Hashing.ContentHasher.ComputeManifestHash(
+            Path.Combine(repoRoot, "definitions"));
+        var matrix = Program.BuildPublishMatrix(catalog, manifestHash);
+        var generationReportPath = Path.Combine(repoRoot, "generated", "generation-report.json");
+        using var generationReport = JsonDocument.Parse(File.ReadAllText(generationReportPath));
+        var dockerfileCount = generationReport.RootElement
+            .GetProperty("artifacts")
+            .EnumerateArray()
+            .Count(artifact => artifact.GetProperty("type").GetString() == "dockerfile");
+
+        Assert.Equal(dockerfileCount, matrix.Include.Count);
+        Assert.Equal(matrix.Include.Count, matrix.Include.Select(entry => entry.Id).Distinct().Count());
+    }
+
+    [Fact]
+    public void BuildPublishMatrix_IncludesAgentAndToolPackImages()
+    {
+        var repoRoot = GetRepoRoot();
+        var catalog = LoadCatalog();
+        var manifestHash = AgentContainers.Core.Hashing.ContentHasher.ComputeManifestHash(
+            Path.Combine(repoRoot, "definitions"));
+        var matrix = Program.BuildPublishMatrix(catalog, manifestHash);
+
+        Assert.Contains(matrix.Include, entry => entry.Id == "fullstack-polyglot-claude" && entry.Type == "agent-image");
+        Assert.Contains(matrix.Include, entry => entry.Id == "fullstack-polyglot-devtools" && entry.Type == "tool-pack-image");
+        Assert.DoesNotContain(matrix.Include, entry => entry.Id == "fullstack-polyglot-headroom");
     }
 }
