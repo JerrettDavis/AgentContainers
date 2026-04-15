@@ -28,7 +28,9 @@ jobs:
   generate-matrix:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.matrix.outputs.matrix }}
+      base-matrix: ${{ steps.matrix.outputs.base_matrix }}
+      combo-matrix: ${{ steps.matrix.outputs.combo_matrix }}
+      overlay-matrix: ${{ steps.matrix.outputs.overlay_matrix }}
     steps:
       - uses: actions/checkout@v4
 
@@ -54,20 +56,38 @@ jobs:
               .include |= [ .[] | select( .id as $id | ($ids | split(",") | map(gsub("^\\s+|\\s+$";"")) | index($id)) ) ]
             ')
           fi
-          echo "matrix<<EOF" >> "$GITHUB_OUTPUT"
-          echo "$raw" >> "$GITHUB_OUTPUT"
+
+          base_matrix=$(echo "$raw" | jq '{ include: [ .include[] | select(.type == "base") ] }')
+          combo_matrix=$(echo "$raw" | jq '{ include: [ .include[] | select(.type == "combo") ] }')
+          overlay_matrix=$(echo "$raw" | jq '{ include: [ .include[] | select(.type == "agent-image" or .type == "tool-pack-image") ] }')
+
+          echo "base_matrix<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$base_matrix" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+          echo "combo_matrix<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$combo_matrix" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+          echo "overlay_matrix<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$overlay_matrix" >> "$GITHUB_OUTPUT"
           echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: Show matrix
-        run: echo '${{ steps.matrix.outputs.matrix }}' | jq .
+        run: |
+          echo 'Base matrix:'
+          echo '${{ steps.matrix.outputs.base_matrix }}' | jq .
+          echo 'Combo matrix:'
+          echo '${{ steps.matrix.outputs.combo_matrix }}' | jq .
+          echo 'Overlay matrix:'
+          echo '${{ steps.matrix.outputs.overlay_matrix }}' | jq .
 
-  # ─── Stage 2: Build + push each image (parallel via matrix) ───
-  build-and-push:
+  # ─── Stage 2: Build + push base images ───
+  build-bases:
     needs: generate-matrix
     runs-on: ubuntu-latest
+    if: ${{ always() && fromJSON(needs.generate-matrix.outputs.base-matrix).include[0] != null }}
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.generate-matrix.outputs.matrix) }}
+      matrix: ${{ fromJSON(needs.generate-matrix.outputs.base-matrix) }}
 
     steps:
       - uses: actions/checkout@v4
@@ -119,7 +139,7 @@ jobs:
         if: github.event.inputs.dry_run != 'true'
         uses: anchore/sbom-action@v0
         with:
-          image: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.id }}:${{ steps.meta.outputs.version }}
+          image: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
           artifact-name: sbom-${{ matrix.id }}.spdx.json
           output-file: sbom-${{ matrix.id }}.spdx.json
           format: spdx-json
@@ -132,9 +152,192 @@ jobs:
           path: sbom-${{ matrix.id }}.spdx.json
           retention-days: 90
 
-  # ─── Stage 3: Post-publish summary ───
+  # ─── Stage 3: Build + push combo images after bases ───
+  build-combos:
+    needs:
+      - generate-matrix
+      - build-bases
+    runs-on: ubuntu-latest
+    if: ${{ always() && fromJSON(needs.generate-matrix.outputs.combo-matrix).include[0] != null && (needs.build-bases.result == 'success' || needs.build-bases.result == 'skipped') }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.generate-matrix.outputs.combo-matrix) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU (multi-arch)
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract image metadata (tags + labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.id }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable=${{ github.ref_type == 'tag' }}
+            type=ref,event=branch
+
+      - name: Compute combo base image args
+        id: combo_args
+        shell: bash
+        run: |
+          owner="${GITHUB_REPOSITORY_OWNER,,}"
+          version="${{ steps.meta.outputs.version }}"
+          IFS='+' read -ra bases <<< "${{ matrix.family }}"
+          {
+            echo "args<<EOF"
+            echo "PRIMARY_BASE_IMAGE=ghcr.io/${owner}/${bases[0]}:${version}"
+            for base in "${bases[@]:1}"; do
+              key="$(echo "$base" | tr '[:lower:]-' '[:upper:]_')_STAGE_IMAGE"
+              echo "${key}=ghcr.io/${owner}/${base}:${version}"
+            done
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.context }}/${{ matrix.dockerfile }}
+          platforms: ${{ matrix.platforms }}
+          push: ${{ github.event.inputs.dry_run != 'true' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            BUILD_DATE=${{ github.event.repository.updated_at }}
+            VCS_REF=${{ github.sha }}
+            IMAGE_VERSION=${{ steps.meta.outputs.version }}
+            ${{ steps.combo_args.outputs.args }}
+          provenance: true
+          sbom: true
+          cache-from: type=gha,scope=${{ matrix.id }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.id }}
+
+      - name: Generate SBOM with Syft
+        if: github.event.inputs.dry_run != 'true'
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
+          artifact-name: sbom-${{ matrix.id }}.spdx.json
+          output-file: sbom-${{ matrix.id }}.spdx.json
+          format: spdx-json
+
+      - name: Upload SBOM artifact
+        if: github.event.inputs.dry_run != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-${{ matrix.id }}
+          path: sbom-${{ matrix.id }}.spdx.json
+          retention-days: 90
+
+  # ─── Stage 4: Build + push overlays after combos ───
+  build-overlays:
+    needs:
+      - generate-matrix
+      - build-bases
+      - build-combos
+    runs-on: ubuntu-latest
+    if: ${{ always() && fromJSON(needs.generate-matrix.outputs.overlay-matrix).include[0] != null && (needs.build-bases.result == 'success' || needs.build-bases.result == 'skipped') && (needs.build-combos.result == 'success' || needs.build-combos.result == 'skipped') }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.generate-matrix.outputs.overlay-matrix) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU (multi-arch)
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract image metadata (tags + labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.id }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable=${{ github.ref_type == 'tag' }}
+            type=ref,event=branch
+
+      - name: Compute overlay base image arg
+        id: overlay_args
+        shell: bash
+        run: |
+          owner="${GITHUB_REPOSITORY_OWNER,,}"
+          version="${{ steps.meta.outputs.version }}"
+          {
+            echo "args<<EOF"
+            echo "BASE_IMAGE=ghcr.io/${owner}/${{ matrix.base_id }}:${version}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.context }}/${{ matrix.dockerfile }}
+          platforms: ${{ matrix.platforms }}
+          push: ${{ github.event.inputs.dry_run != 'true' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            BUILD_DATE=${{ github.event.repository.updated_at }}
+            VCS_REF=${{ github.sha }}
+            IMAGE_VERSION=${{ steps.meta.outputs.version }}
+            ${{ steps.overlay_args.outputs.args }}
+          provenance: true
+          sbom: true
+          cache-from: type=gha,scope=${{ matrix.id }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.id }}
+
+      - name: Generate SBOM with Syft
+        if: github.event.inputs.dry_run != 'true'
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
+          artifact-name: sbom-${{ matrix.id }}.spdx.json
+          output-file: sbom-${{ matrix.id }}.spdx.json
+          format: spdx-json
+
+      - name: Upload SBOM artifact
+        if: github.event.inputs.dry_run != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-${{ matrix.id }}
+          path: sbom-${{ matrix.id }}.spdx.json
+          retention-days: 90
+
+  # ─── Stage 5: Post-publish summary ───
   publish-summary:
-    needs: build-and-push
+    needs:
+      - build-bases
+      - build-combos
+      - build-overlays
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -149,4 +352,6 @@ jobs:
           echo "| **SHA** | \`${{ github.sha }}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| **Registry** | \`${{ env.REGISTRY }}/${{ github.repository_owner }}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| **Dry Run** | \`${{ github.event.inputs.dry_run || 'false' }}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| **Status** | \`${{ needs.build-and-push.result }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Base Images** | \`${{ needs.build-bases.result }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Combo Images** | \`${{ needs.build-combos.result }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Overlay Images** | \`${{ needs.build-overlays.result }}\` |" >> "$GITHUB_STEP_SUMMARY"
