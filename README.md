@@ -17,48 +17,65 @@ Agent CLIs all bring different runtime assumptions, auth models, shell expectati
 
 The repo still generates the full internal runtime and overlay matrix under `generated/docker/`, but public publishing is now driven by curated manifests in `definitions/tag-policies/`. That keeps ingredient generation transparent while letting GHCR expose a smaller set of convenience-oriented names and tags.
 
-### Base runtimes
+### Generated image directory
 
-| ID | Purpose | Generated Dockerfile |
-|---|---|---|
-| `node-bun` | Node.js + Bun agent runtime | `generated/docker/bases/node-bun/Dockerfile` |
-| `python` | Python runtime image | `generated/docker/bases/python/Dockerfile` |
-| `dotnet` | .NET SDK runtime image | `generated/docker/bases/dotnet/Dockerfile` |
-| `rust` | Rust toolchain runtime image | `generated/docker/bases/rust/Dockerfile` |
-
-### Combo runtimes
-
-| ID | Bases | Generated Dockerfile |
-|---|---|---|
-| `node-py-dotnet` | `node-bun` + `python` + `dotnet` | `generated/docker/combos/node-py-dotnet/Dockerfile` |
-| `fullstack-polyglot` | `node-bun` + `rust` + `python` + `dotnet` | `generated/docker/combos/fullstack-polyglot/Dockerfile` |
-
-### Agent overlays
-
-| Agent | Supported runtimes | Generated Dockerfile pattern |
-|---|---|---|
-| `claude` | `node-bun`, `node-py-dotnet`, `fullstack-polyglot` | `generated/docker/agents/<runtime>-claude/Dockerfile` |
-| `codex` | `node-bun`, `node-py-dotnet`, `fullstack-polyglot` | `generated/docker/agents/<runtime>-codex/Dockerfile` |
-| `copilot` | `node-bun`, `node-py-dotnet`, `fullstack-polyglot` | `generated/docker/agents/<runtime>-copilot/Dockerfile` |
-| `openclaw` | `node-bun`, `node-py-dotnet`, `fullstack-polyglot` | `generated/docker/agents/<runtime>-openclaw/Dockerfile` |
-
-### Tool packs
-
-| Tool pack | Mode | Compatible runtimes | Generated Dockerfile pattern |
+| Type | Image ID | Loadout | Generated Dockerfile |
 |---|---|---|---|
-| `devtools` | Overlay image | `node-bun`, `node-py-dotnet`, `fullstack-polyglot` | `generated/docker/tool-packs/<runtime>-devtools/Dockerfile` |
-| `headroom` | Sidecar/service pack | Compose-driven | Sidecar wiring is generated through compose stacks |
+| Base | `dotnet` | .NET 10 SDK runtime | `generated/docker/bases/dotnet/Dockerfile` |
+| Base | `node-bun` | Node.js 24 + Bun runtime | `generated/docker/bases/node-bun/Dockerfile` |
+| Base | `python` | Python 3.12 runtime | `generated/docker/bases/python/Dockerfile` |
+| Base | `rust` | Rust toolchain runtime | `generated/docker/bases/rust/Dockerfile` |
+| Combo | `node-py-dotnet` | `node-bun` + `python` + `dotnet` | `generated/docker/combos/node-py-dotnet/Dockerfile` |
+| Combo | `fullstack-polyglot` | `node-bun` + `rust` + `python` + `dotnet` | `generated/docker/combos/fullstack-polyglot/Dockerfile` |
+| Agent overlay | `node-bun-claude` | `node-bun` + `claude` | `generated/docker/agents/node-bun-claude/Dockerfile` |
+| Agent overlay | `node-bun-codex` | `node-bun` + `codex` | `generated/docker/agents/node-bun-codex/Dockerfile` |
+| Agent overlay | `node-bun-copilot` | `node-bun` + `copilot` | `generated/docker/agents/node-bun-copilot/Dockerfile` |
+| Agent overlay | `node-bun-openclaw` | `node-bun` + `openclaw` | `generated/docker/agents/node-bun-openclaw/Dockerfile` |
+| Agent overlay | `node-py-dotnet-claude` | `node-py-dotnet` + `claude` | `generated/docker/agents/node-py-dotnet-claude/Dockerfile` |
+| Agent overlay | `node-py-dotnet-codex` | `node-py-dotnet` + `codex` | `generated/docker/agents/node-py-dotnet-codex/Dockerfile` |
+| Agent overlay | `node-py-dotnet-copilot` | `node-py-dotnet` + `copilot` | `generated/docker/agents/node-py-dotnet-copilot/Dockerfile` |
+| Agent overlay | `node-py-dotnet-openclaw` | `node-py-dotnet` + `openclaw` | `generated/docker/agents/node-py-dotnet-openclaw/Dockerfile` |
+| Agent overlay | `fullstack-polyglot-claude` | `fullstack-polyglot` + `claude` | `generated/docker/agents/fullstack-polyglot-claude/Dockerfile` |
+| Agent overlay | `fullstack-polyglot-codex` | `fullstack-polyglot` + `codex` | `generated/docker/agents/fullstack-polyglot-codex/Dockerfile` |
+| Agent overlay | `fullstack-polyglot-copilot` | `fullstack-polyglot` + `copilot` | `generated/docker/agents/fullstack-polyglot-copilot/Dockerfile` |
+| Agent overlay | `fullstack-polyglot-openclaw` | `fullstack-polyglot` + `openclaw` | `generated/docker/agents/fullstack-polyglot-openclaw/Dockerfile` |
+| Tool-pack overlay | `node-bun-devtools` | `node-bun` + `devtools` | `generated/docker/tool-packs/node-bun-devtools/Dockerfile` |
+| Tool-pack overlay | `node-py-dotnet-devtools` | `node-py-dotnet` + `devtools` | `generated/docker/tool-packs/node-py-dotnet-devtools/Dockerfile` |
+| Tool-pack overlay | `fullstack-polyglot-devtools` | `fullstack-polyglot` + `devtools` | `generated/docker/tool-packs/fullstack-polyglot-devtools/Dockerfile` |
+| Curated publish target | `dotnet-claude` | `node-py-dotnet` + `claude` + `devtools` | `generated/docker/images/dotnet-claude/Dockerfile` |
+| Curated publish target | `dotnet-codex` | `node-py-dotnet` + `codex` + `devtools` | `generated/docker/images/dotnet-codex/Dockerfile` |
+| Curated publish target | `dotnet-copilot` | `node-py-dotnet` + `copilot` + `devtools` | `generated/docker/images/dotnet-copilot/Dockerfile` |
+| Curated publish target | `openclaw-dotnet` | `node-py-dotnet` + `openclaw` + `devtools` | `generated/docker/images/openclaw-dotnet/Dockerfile` |
+| Curated publish target | `polyglot-menagerie` | `fullstack-polyglot` + `claude` + `codex` + `copilot` + `openclaw` + `devtools` | `generated/docker/images/polyglot-menagerie/Dockerfile` |
+| Curated publish target | `tools-swiss-army` | `fullstack-polyglot` + `devtools` | `generated/docker/images/tools-swiss-army/Dockerfile` |
 
-### Curated publish targets
+`headroom` remains a sidecar/service pack and is published through generated compose stacks rather than a standalone Dockerfile image.
 
-| Publish target | Runtime | Bundled loadout | Generated Dockerfile |
-|---|---|---|---|
-| `dotnet-claude` | `node-py-dotnet` | `claude` + `devtools` | `generated/docker/images/dotnet-claude/Dockerfile` |
-| `dotnet-codex` | `node-py-dotnet` | `codex` + `devtools` | `generated/docker/images/dotnet-codex/Dockerfile` |
-| `dotnet-copilot` | `node-py-dotnet` | `copilot` + `devtools` | `generated/docker/images/dotnet-copilot/Dockerfile` |
-| `openclaw-dotnet` | `node-py-dotnet` | `openclaw` + `devtools` | `generated/docker/images/openclaw-dotnet/Dockerfile` |
-| `polyglot-menagerie` | `fullstack-polyglot` | `claude`, `codex`, `copilot`, `openclaw`, `devtools` | `generated/docker/images/polyglot-menagerie/Dockerfile` |
-| `tools-swiss-army` | `fullstack-polyglot` | `devtools` | `generated/docker/images/tools-swiss-army/Dockerfile` |
+### Published runtime ingredient repos
+
+These are the six runtime repos the workflow still publishes as build ingredients for overlays and curated images:
+
+| Repo | Backing image | Tag channels |
+|---|---|---|
+| `ghcr.io/<owner>/dotnet` | `dotnet` | `<version>`, `<major>.<minor>`, `sha-<commit>`, `<branch>`, `latest` on release tags |
+| `ghcr.io/<owner>/node-bun` | `node-bun` | `<version>`, `<major>.<minor>`, `sha-<commit>`, `<branch>`, `latest` on release tags |
+| `ghcr.io/<owner>/python` | `python` | `<version>`, `<major>.<minor>`, `sha-<commit>`, `<branch>`, `latest` on release tags |
+| `ghcr.io/<owner>/rust` | `rust` | `<version>`, `<major>.<minor>`, `sha-<commit>`, `<branch>`, `latest` on release tags |
+| `ghcr.io/<owner>/node-py-dotnet` | `node-py-dotnet` | `<version>`, `<major>.<minor>`, `sha-<commit>`, `<branch>`, `latest` on release tags |
+| `ghcr.io/<owner>/fullstack-polyglot` | `fullstack-polyglot` | `<version>`, `<major>.<minor>`, `sha-<commit>`, `<branch>`, `latest` on release tags |
+
+### Curated public tag directory
+
+The curated publish matrix is generator-owned. Floating major and minor aliases resolve to the newest declared `release_version` in that range.
+
+| Publish target | Primary tag | All published tags |
+|---|---|---|
+| `dotnet-claude` | `ghcr.io/<owner>/dotnet:claude-0.1.0` | `ghcr.io/<owner>/dotnet:claude-0.1.0`<br>`ghcr.io/<owner>/dotnet:claude-0.1`<br>`ghcr.io/<owner>/dotnet:claude-0`<br>`ghcr.io/<owner>/dotnet:claude-latest`<br>`ghcr.io/<owner>/claude:dotnet10-node24-0.1.0`<br>`ghcr.io/<owner>/claude:dotnet10-node24` |
+| `dotnet-codex` | `ghcr.io/<owner>/dotnet:codex-0.1.0` | `ghcr.io/<owner>/dotnet:codex-0.1.0`<br>`ghcr.io/<owner>/dotnet:codex-0.1`<br>`ghcr.io/<owner>/dotnet:codex-0`<br>`ghcr.io/<owner>/dotnet:codex-latest`<br>`ghcr.io/<owner>/codex:dotnet10-node24-0.1.0`<br>`ghcr.io/<owner>/codex:dotnet10-node24` |
+| `dotnet-copilot` | `ghcr.io/<owner>/dotnet:copilot-0.1.0` | `ghcr.io/<owner>/dotnet:copilot-0.1.0`<br>`ghcr.io/<owner>/dotnet:copilot-0.1`<br>`ghcr.io/<owner>/dotnet:copilot-0`<br>`ghcr.io/<owner>/dotnet:copilot-latest`<br>`ghcr.io/<owner>/copilot:dotnet10-node24-0.1.0`<br>`ghcr.io/<owner>/copilot:dotnet10-node24` |
+| `openclaw-dotnet` | `ghcr.io/<owner>/dotnet:openclaw-0.1.0` | `ghcr.io/<owner>/dotnet:openclaw-0.1.0`<br>`ghcr.io/<owner>/dotnet:openclaw-0.1`<br>`ghcr.io/<owner>/dotnet:openclaw-0`<br>`ghcr.io/<owner>/dotnet:openclaw-latest`<br>`ghcr.io/<owner>/openclaw:dotnet10-node24-devtools-0.1.0`<br>`ghcr.io/<owner>/openclaw:dotnet10-node24-devtools` |
+| `polyglot-menagerie` | `ghcr.io/<owner>/polyglot:menagerie-0.1.0` | `ghcr.io/<owner>/polyglot:menagerie-0.1.0`<br>`ghcr.io/<owner>/polyglot:menagerie`<br>`ghcr.io/<owner>/menagerie:dotnet10-node24-python312-rust-0.1.0`<br>`ghcr.io/<owner>/menagerie:dotnet10-node24-python312-rust-latest` |
+| `tools-swiss-army` | `ghcr.io/<owner>/tools:swiss-army-0.1.0` | `ghcr.io/<owner>/tools:swiss-army-0.1.0`<br>`ghcr.io/<owner>/tools:swiss-army`<br>`ghcr.io/<owner>/polyglot:toolbox-0.1.0`<br>`ghcr.io/<owner>/polyglot:toolbox` |
 
 ### Generated compose stacks
 
