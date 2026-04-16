@@ -10,6 +10,8 @@ USER root
 # Install GitHub Copilot CLI via npm_global
 RUN npm install -g @githubnext/github-copilot-cli
 
+# Patch vulnerable semver dependency
+RUN npm install --omit=dev --prefix /usr/local/lib/node_modules/@githubnext/github-copilot-cli/node_modules/simple-update-notifier semver@7.7.2
 # Verify Copilot CLI installation
 RUN github-copilot-cli --version || true
 

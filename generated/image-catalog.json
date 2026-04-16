@@ -1,5 +1,5 @@
 {
-  "manifest_hash": "21e8411b11b187d1248836ba898a488bc406b914b5008c266d0b3c0da35983fd",
+  "manifest_hash": "59f966805eba325f7442441e1a87d8bd17bec6b9d5d6b5d66205a8661d3c29b4",
   "generator_version": "0.1.0",
   "registry": "ghcr.io/agentcontainers",
   "images": [

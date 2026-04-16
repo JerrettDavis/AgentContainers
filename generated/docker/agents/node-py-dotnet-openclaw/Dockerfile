@@ -10,6 +10,14 @@ USER root
 # Install OpenClaw via npm_global
 RUN npm install -g openclaw
 
+# Patch vulnerable axios dependency
+RUN npm install --omit=dev --prefix /usr/local/lib/node_modules/openclaw/dist/extensions/feishu axios@1.15.0
+# Patch nested feishu axios dependency
+RUN npm install --omit=dev --prefix /usr/local/lib/node_modules/openclaw/dist/extensions/feishu/node_modules/@larksuiteoapi/node-sdk axios@1.15.0
+# Patch vulnerable tar dependency
+RUN npm install --omit=dev --prefix /usr/local/lib/node_modules/openclaw/dist/extensions/discord tar@7.5.11
+# Patch nested discord tar dependency
+RUN npm install --omit=dev --prefix /usr/local/lib/node_modules/openclaw/dist/extensions/discord/node_modules/@discordjs/node-pre-gyp tar@7.5.11
 # Verify OpenClaw installation
 RUN openclaw --version || true
 

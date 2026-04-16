@@ -13,6 +13,14 @@ install:
   package: "openclaw"
   version: latest
   post_install:
+    - command: "npm install --omit=dev --prefix /usr/local/lib/node_modules/openclaw/dist/extensions/feishu axios@1.15.0"
+      description: "Patch vulnerable axios dependency"
+    - command: "npm install --omit=dev --prefix /usr/local/lib/node_modules/openclaw/dist/extensions/feishu/node_modules/@larksuiteoapi/node-sdk axios@1.15.0"
+      description: "Patch nested feishu axios dependency"
+    - command: "npm install --omit=dev --prefix /usr/local/lib/node_modules/openclaw/dist/extensions/discord tar@7.5.11"
+      description: "Patch vulnerable tar dependency"
+    - command: "npm install --omit=dev --prefix /usr/local/lib/node_modules/openclaw/dist/extensions/discord/node_modules/@discordjs/node-pre-gyp tar@7.5.11"
+      description: "Patch nested discord tar dependency"
     - command: "openclaw --version || true"
       description: "Verify OpenClaw installation"
 

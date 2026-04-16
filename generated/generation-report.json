@@ -1,5 +1,5 @@
 {
-  "manifest_hash": "21e8411b11b187d1248836ba898a488bc406b914b5008c266d0b3c0da35983fd",
+  "manifest_hash": "59f966805eba325f7442441e1a87d8bd17bec6b9d5d6b5d66205a8661d3c29b4",
   "generator_version": "0.1.0",
   "artifacts": [
     {
@@ -78,37 +78,37 @@
       "type": "dockerfile",
       "id": "agent-node-bun-copilot",
       "path": "docker/agents/node-bun-copilot/Dockerfile",
-      "content_hash": "db5ef14189f4db0240cc70921b846c3ffde0da1ecd40fbf9e525bcc479c584d9"
+      "content_hash": "72203604ad9f8332c5c6614020ba4dceffa4a870e664c23cb0c40e5dc05cc122"
     },
     {
       "type": "dockerfile",
       "id": "agent-fullstack-polyglot-copilot",
       "path": "docker/agents/fullstack-polyglot-copilot/Dockerfile",
-      "content_hash": "443b0945733b79e3a673bbee8e1f52bc657b9e4975fb355a44a9c11573938f9a"
+      "content_hash": "ecc740637068aae7e5f9e0d86ca5e9166f9317f2cb071c38cc0a3ccf11a83196"
     },
     {
       "type": "dockerfile",
       "id": "agent-node-py-dotnet-copilot",
       "path": "docker/agents/node-py-dotnet-copilot/Dockerfile",
-      "content_hash": "7e4d4440f003065cc9f5caf4737beb4b9746a329c0f352202e4d030300de87d8"
+      "content_hash": "89ec4a6c668bdae2993279962f5acbe58bf512f09cccf968867c741a12e3e9a6"
     },
     {
       "type": "dockerfile",
       "id": "agent-node-bun-openclaw",
       "path": "docker/agents/node-bun-openclaw/Dockerfile",
-      "content_hash": "64b756747ac2cb508f7bf500e2fb488cb2fb8b7360077be26224e3c6fcf0b2c9"
+      "content_hash": "f0e75dfa57b4a48c170a500190a1fd474c86b7e568270a834b6eb14f5121660c"
     },
     {
       "type": "dockerfile",
       "id": "agent-fullstack-polyglot-openclaw",
       "path": "docker/agents/fullstack-polyglot-openclaw/Dockerfile",
-      "content_hash": "c9163790d50b1bbdcd2b1f5b8e1493e648af02bd54d8f33a2dbc9fc9c94e8adc"
+      "content_hash": "fe9b4d4e269f092925f7e3c62d12e81c255a1e904c23cc7572ac7b890c18b474"
     },
     {
       "type": "dockerfile",
       "id": "agent-node-py-dotnet-openclaw",
       "path": "docker/agents/node-py-dotnet-openclaw/Dockerfile",
-      "content_hash": "27e63487c016ae7c031f3665bba45eaf6b3aa4da51245633a975cd3dc300170e"
+      "content_hash": "a2f766eceac7125e979cb1e90b6ab709ccef17e2cd318ef6eef67e2c849d0f73"
     },
     {
       "type": "dockerfile",
@@ -186,7 +186,7 @@
       "type": "catalog",
       "id": "image-catalog",
       "path": "image-catalog.json",
-      "content_hash": "658f19672bf34f47cb39e561c9a938cfebe70c4719b8f634be66f1901863eacb"
+      "content_hash": "75d254ad923c0cc339fef76489509d2e30b15ed4841d5a29a07bd9e566bd6cd2"
     }
   ]
 }

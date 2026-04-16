@@ -13,6 +13,8 @@ install:
   package: "@githubnext/github-copilot-cli"
   version: latest
   post_install:
+    - command: "npm install --omit=dev --prefix /usr/local/lib/node_modules/@githubnext/github-copilot-cli/node_modules/simple-update-notifier semver@7.7.2"
+      description: "Patch vulnerable semver dependency"
     - command: "github-copilot-cli --version || true"
       description: "Verify Copilot CLI installation"
 
