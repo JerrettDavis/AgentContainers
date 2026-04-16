@@ -64,6 +64,24 @@ These are the six runtime repos the workflow still publishes as build ingredient
 | `ghcr.io/<owner>/node-py-dotnet` | `node-py-dotnet` | `<version>`, `<major>.<minor>`, `sha-<commit>`, `<branch>`, `latest` on release tags |
 | `ghcr.io/<owner>/fullstack-polyglot` | `fullstack-polyglot` | `<version>`, `<major>.<minor>`, `sha-<commit>`, `<branch>`, `latest` on release tags |
 
+#### Runtime ingredient `docker run` examples
+
+Replace `<owner>` with your GHCR namespace, for example `jerrettdavis`.
+
+```bash
+# Base runtime by exact release tag
+docker run --rm -it ghcr.io/<owner>/dotnet:0.1.0 dotnet --info
+
+# Base runtime by floating minor tag
+docker run --rm -it ghcr.io/<owner>/node-bun:0.1 node --version
+
+# Combo runtime by latest release tag
+docker run --rm -it ghcr.io/<owner>/node-py-dotnet:latest bash -lc "node --version && python3 --version && dotnet --version"
+
+# Polyglot combo on a branch tag
+docker run --rm -it ghcr.io/<owner>/fullstack-polyglot:main bash -lc "node --version && rustc --version && python3 --version && dotnet --version"
+```
+
 ### Curated public tag directory
 
 The curated publish matrix is generator-owned. Floating major and minor aliases resolve to the newest declared `release_version` in that range.
@@ -77,6 +95,63 @@ The curated publish matrix is generator-owned. Floating major and minor aliases 
 | `polyglot-menagerie` | `ghcr.io/<owner>/polyglot:menagerie-0.1.0` | `ghcr.io/<owner>/polyglot:menagerie-0.1.0`<br>`ghcr.io/<owner>/polyglot:menagerie`<br>`ghcr.io/<owner>/menagerie:dotnet10-node24-python312-rust-0.1.0`<br>`ghcr.io/<owner>/menagerie:dotnet10-node24-python312-rust-latest` |
 | `tools-swiss-army` | `ghcr.io/<owner>/tools:swiss-army-0.1.0` | `ghcr.io/<owner>/tools:swiss-army-0.1.0`<br>`ghcr.io/<owner>/tools:swiss-army`<br>`ghcr.io/<owner>/polyglot:toolbox-0.1.0`<br>`ghcr.io/<owner>/polyglot:toolbox` |
 
+#### Curated public `docker run` examples
+
+```bash
+# Stack-first Claude image by exact version
+docker run --rm -it \
+  -e ANTHROPIC_API_KEY=your-key \
+  -v "$PWD:/workspace" \
+  ghcr.io/<owner>/dotnet:claude-0.1.0 claude --version
+
+# Floating minor alias for the same image
+docker run --rm -it \
+  -e ANTHROPIC_API_KEY=your-key \
+  -v "$PWD:/workspace" \
+  ghcr.io/<owner>/dotnet:claude-0.1 bash
+
+# Agent-first alias for the same digest
+docker run --rm -it \
+  -e OPENAI_API_KEY=your-key \
+  -v "$PWD:/workspace" \
+  ghcr.io/<owner>/codex:dotnet10-node24 codex --version
+
+# OpenClaw agent-first alias
+docker run --rm -it \
+  -e OPENCLAW_API_KEY=your-key \
+  -p 3000:3000 \
+  ghcr.io/<owner>/openclaw:dotnet10-node24-devtools
+
+# Menagerie bundle by floating convenience tag
+docker run --rm -it \
+  -v "$PWD:/workspace" \
+  ghcr.io/<owner>/polyglot:menagerie bash -lc "claude --version && codex --version && github-copilot-cli --version && openclaw --version"
+
+# Toolbox/swiss-army image
+docker run --rm -it \
+  -v "$PWD:/workspace" \
+  ghcr.io/<owner>/tools:swiss-army black --version
+```
+
+#### Local/generated-only `docker run` examples
+
+Agent overlays and tool-pack overlays are still generated for transparency under `generated/docker/`, but they are not part of the curated public GHCR surface. Build them locally, then run them:
+
+```bash
+# Agent overlay
+docker build -t local/node-bun-claude generated/docker/agents/node-bun-claude
+docker run --rm -it \
+  -e ANTHROPIC_API_KEY=your-key \
+  -v "$PWD:/workspace" \
+  local/node-bun-claude claude --version
+
+# Tool-pack overlay
+docker build -t local/fullstack-polyglot-devtools generated/docker/tool-packs/fullstack-polyglot-devtools
+docker run --rm -it \
+  -v "$PWD:/workspace" \
+  local/fullstack-polyglot-devtools bash -lc "ruff --version && shellcheck --version"
+```
+
 ### Generated compose stacks
 
 | Stack | Scenario | Generated file |
@@ -86,6 +161,17 @@ The curated publish matrix is generator-owned. Floating major and minor aliases 
 | `solo-copilot` | Single Copilot container | `generated/compose/stacks/solo-copilot/docker-compose.yaml` |
 | `gateway-headroom` | OpenClaw + Headroom + Claude topology | `generated/compose/stacks/gateway-headroom/docker-compose.yaml` |
 | `polyglot-devtools` | Polyglot runtime with devtools overlay | `generated/compose/stacks/polyglot-devtools/docker-compose.yaml` |
+
+#### Compose demo commands
+
+```bash
+# Pull or build the single-agent examples
+docker compose -f generated/compose/stacks/solo-claude/docker-compose.yaml up
+docker compose -f generated/compose/stacks/solo-codex/docker-compose.yaml up
+
+# Full topology with sidecar
+docker compose -f generated/compose/stacks/gateway-headroom/docker-compose.yaml up
+```
 
 ## Quick start
 

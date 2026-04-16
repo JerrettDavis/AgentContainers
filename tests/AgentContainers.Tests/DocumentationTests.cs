@@ -36,6 +36,7 @@ public class DocumentationTests
         Assert.Contains("claude", content);
         Assert.Contains("headroom", content);
         Assert.Contains("solo-claude", content);
+        Assert.Contains("docker run", content);
     }
 
     [Fact]
@@ -86,8 +87,10 @@ public class DocumentationTests
         Assert.Contains("## Combo Dockerfiles", content);
         Assert.Contains("## Agent overlay Dockerfiles", content);
         Assert.Contains("## Tool-pack overlay Dockerfiles", content);
+        Assert.Contains("## Curated public image batches", content);
         Assert.Contains("## Compose matrix", content);
         Assert.Contains("node-bun-openclaw", content);
         Assert.Contains("fullstack-polyglot-devtools", content);
+        Assert.Contains("docker run", content);
     }
 }
