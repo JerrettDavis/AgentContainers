@@ -10,9 +10,12 @@ Agent CLIs all bring different runtime assumptions, auth models, shell expectati
 - **Combo images** combine multiple runtimes into one image family.
 - **Agent overlays** layer provider CLIs onto compatible bases and combos.
 - **Tool packs** add optional capabilities like developer utilities or sidecars.
+- **Tag policies** define the curated public images, convenience repository names, and floating tag aliases.
 - **Compose stacks** turn the image matrix into repeatable multi-container setups.
 
 ## Current image matrix
+
+The repo still generates the full internal runtime and overlay matrix under `generated/docker/`, but public publishing is now driven by curated manifests in `definitions/tag-policies/`. That keeps ingredient generation transparent while letting GHCR expose a smaller set of convenience-oriented names and tags.
 
 ### Base runtimes
 
@@ -45,6 +48,17 @@ Agent CLIs all bring different runtime assumptions, auth models, shell expectati
 |---|---|---|---|
 | `devtools` | Overlay image | `node-bun`, `node-py-dotnet`, `fullstack-polyglot` | `generated/docker/tool-packs/<runtime>-devtools/Dockerfile` |
 | `headroom` | Sidecar/service pack | Compose-driven | Sidecar wiring is generated through compose stacks |
+
+### Curated publish targets
+
+| Publish target | Runtime | Bundled loadout | Generated Dockerfile |
+|---|---|---|---|
+| `dotnet-claude` | `node-py-dotnet` | `claude` + `devtools` | `generated/docker/images/dotnet-claude/Dockerfile` |
+| `dotnet-codex` | `node-py-dotnet` | `codex` + `devtools` | `generated/docker/images/dotnet-codex/Dockerfile` |
+| `dotnet-copilot` | `node-py-dotnet` | `copilot` + `devtools` | `generated/docker/images/dotnet-copilot/Dockerfile` |
+| `openclaw-dotnet` | `node-py-dotnet` | `openclaw` + `devtools` | `generated/docker/images/openclaw-dotnet/Dockerfile` |
+| `polyglot-menagerie` | `fullstack-polyglot` | `claude`, `codex`, `copilot`, `openclaw`, `devtools` | `generated/docker/images/polyglot-menagerie/Dockerfile` |
+| `tools-swiss-army` | `fullstack-polyglot` | `devtools` | `generated/docker/images/tools-swiss-army/Dockerfile` |
 
 ### Generated compose stacks
 
@@ -79,8 +93,9 @@ dotnet tool run docfx docs/docfx.json --warningsAsErrors
 ## Dockerfile and compose conventions
 
 - Every generated Dockerfile is committed under `generated/docker/` for transparency and pull-based use.
-- Base, combo, agent, and tool-pack images all include OCI labels and deterministic build metadata.
+- Base, combo, agent, tool-pack, and curated publish-target images all include OCI labels and deterministic build metadata.
 - Overlay Dockerfiles accept a `BASE_IMAGE` build arg so local and published image flows use the same artifact.
+- Curated publish-target Dockerfiles also accept `BASE_IMAGE`, so one resolved loadout can be published under multiple repository/tag aliases without duplicating build logic.
 - Compose stacks use manifest-driven env wiring, health-gated dependencies, optional profiles, and sidecar-aware environment injection.
 
 ## Documentation
@@ -107,7 +122,7 @@ The repository is wired so docs and generated artifacts are treated like product
 - **CI** builds, tests, validates manifests, regenerates artifacts, checks drift, and builds the DocFX site.
 - **Docs workflow** builds the site on PRs and publishes it from `main`.
 - **E2E workflow** builds and validates generated images and a representative compose runtime path.
-- **Publish workflow** builds and publishes the image matrix to GHCR.
+- **Publish workflow** builds the base/combo ingredients and then publishes only the curated tag-policy image set to GHCR.
 - **Security workflow** runs Hadolint and Trivy against generated Dockerfiles and images.
 
 ## Local docs preview

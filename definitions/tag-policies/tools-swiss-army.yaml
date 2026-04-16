@@ -1,0 +1,21 @@
+id: tools-swiss-army
+display_name: Swiss-army developer toolbox
+version: v1
+description: Tool-centric image with the broadest runtime coverage and developer utilities but no bundled agent CLI
+
+runtime: fullstack-polyglot
+agents: []
+tool_packs:
+  - devtools
+
+release_version: 0.1.0
+
+publish:
+  - repository: tools
+    tags:
+      - swiss-army-{{version}}
+      - swiss-army
+  - repository: polyglot
+    tags:
+      - toolbox-{{version}}
+      - toolbox

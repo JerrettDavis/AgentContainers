@@ -39,6 +39,7 @@ public sealed class CatalogValidator
         ValidateAgentCompatibility(catalog, results);
         ValidateToolPackCompatibility(catalog, results);
         ValidateComposeReferences(catalog, results);
+        ValidateTagPolicies(catalog, results);
 
         return results;
     }
@@ -147,6 +148,127 @@ public sealed class CatalogValidator
                 {
                     results.Add(new("compose", stackId, ValidationSeverity.Warning,
                         $"Service '{svc.Id}' references base '{svc.Base}' not found in catalog."));
+                }
+            }
+        }
+    }
+
+    private static void ValidateTagPolicies(ManifestCatalog catalog, List<ValidationResult> results)
+    {
+        foreach (var (policyId, policy) in catalog.TagPolicies)
+        {
+            if (string.IsNullOrWhiteSpace(policy.Runtime))
+            {
+                results.Add(new("tag-policy", policyId, ValidationSeverity.Error,
+                    "Tag policy runtime is empty."));
+                continue;
+            }
+
+            List<string> runtimeProvides;
+            string runtimeLabel;
+
+            if (catalog.Bases.TryGetValue(policy.Runtime, out var baseRuntime))
+            {
+                runtimeProvides = baseRuntime.Provides;
+                runtimeLabel = baseRuntime.DisplayName;
+            }
+            else if (catalog.Combos.TryGetValue(policy.Runtime, out var comboRuntime))
+            {
+                runtimeProvides = comboRuntime.Provides;
+                runtimeLabel = comboRuntime.DisplayName;
+            }
+            else
+            {
+                results.Add(new("tag-policy", policyId, ValidationSeverity.Error,
+                    $"References runtime '{policy.Runtime}' which does not exist in catalog."));
+                continue;
+            }
+
+            if (string.IsNullOrWhiteSpace(policy.ReleaseVersion) ||
+                !System.Text.RegularExpressions.Regex.IsMatch(policy.ReleaseVersion, @"^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$"))
+            {
+                results.Add(new("tag-policy", policyId, ValidationSeverity.Error,
+                    $"ReleaseVersion '{policy.ReleaseVersion}' is not a supported semantic version."));
+            }
+
+            if (policy.Publish.Count == 0)
+            {
+                results.Add(new("tag-policy", policyId, ValidationSeverity.Error,
+                    "Tag policy must declare at least one publish target."));
+            }
+
+            foreach (var agentId in policy.Agents)
+            {
+                if (!catalog.Agents.TryGetValue(agentId, out var agent))
+                {
+                    results.Add(new("tag-policy", policyId, ValidationSeverity.Error,
+                        $"References agent '{agentId}' which does not exist in catalog."));
+                    continue;
+                }
+
+                if (!agent.Requires.All(req => CapabilitySatisfied(req, runtimeProvides)))
+                {
+                    results.Add(new("tag-policy", policyId, ValidationSeverity.Error,
+                        $"Agent '{agentId}' is not compatible with runtime '{policy.Runtime}' ({runtimeLabel})."));
+                }
+            }
+
+            foreach (var packId in policy.ToolPacks)
+            {
+                if (!catalog.ToolPacks.TryGetValue(packId, out var pack))
+                {
+                    results.Add(new("tag-policy", policyId, ValidationSeverity.Error,
+                        $"References tool pack '{packId}' which does not exist in catalog."));
+                    continue;
+                }
+
+                if (pack.Sidecar?.Enabled == true)
+                {
+                    results.Add(new("tag-policy", policyId, ValidationSeverity.Error,
+                        $"Tool pack '{packId}' is sidecar-only and cannot be baked into a published image."));
+                }
+
+                if (!pack.CompatibleWith.Bases.Contains(policy.Runtime))
+                {
+                    results.Add(new("tag-policy", policyId, ValidationSeverity.Error,
+                        $"Tool pack '{packId}' is not compatible with runtime '{policy.Runtime}'."));
+                }
+
+                var incompatibleAgents = policy.Agents
+                    .Where(agentId => pack.CompatibleWith.Agents.Count > 0 && !pack.CompatibleWith.Agents.Contains(agentId))
+                    .ToList();
+                if (incompatibleAgents.Count > 0)
+                {
+                    results.Add(new("tag-policy", policyId, ValidationSeverity.Error,
+                        $"Tool pack '{packId}' does not support agent(s): {string.Join(", ", incompatibleAgents)}."));
+                }
+            }
+
+            var seenTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var publication in policy.Publish)
+            {
+                if (string.IsNullOrWhiteSpace(publication.Repository))
+                {
+                    results.Add(new("tag-policy", policyId, ValidationSeverity.Error,
+                        "Publish target repository is empty."));
+                    continue;
+                }
+
+                if (publication.Tags.Count == 0)
+                {
+                    results.Add(new("tag-policy", policyId, ValidationSeverity.Error,
+                        $"Publish target '{publication.Repository}' must declare at least one tag template."));
+                    continue;
+                }
+
+                foreach (var tag in publication.Tags)
+                {
+                    var composite = $"{publication.Repository}:{tag}";
+                    if (!seenTags.Add(composite))
+                    {
+                        results.Add(new("tag-policy", policyId, ValidationSeverity.Error,
+                            $"Duplicate publish tag template '{composite}' in tag policy."));
+                    }
                 }
             }
         }

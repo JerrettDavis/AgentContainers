@@ -1,0 +1,24 @@
+id: openclaw-dotnet
+display_name: OpenClaw on .NET polyglot stack
+version: v1
+description: Curated OpenClaw image published from the agent-first and stack-first points of view
+
+runtime: node-py-dotnet
+agents:
+  - openclaw
+tool_packs:
+  - devtools
+
+release_version: 0.1.0
+
+publish:
+  - repository: dotnet
+    tags:
+      - openclaw-{{version}}
+      - openclaw-{{major}}.{{minor}}
+      - openclaw-{{major}}
+      - openclaw-latest
+  - repository: openclaw
+    tags:
+      - dotnet10-node24-devtools-{{version}}
+      - dotnet10-node24-devtools

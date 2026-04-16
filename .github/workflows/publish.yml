@@ -30,7 +30,7 @@ jobs:
     outputs:
       base-matrix: ${{ steps.matrix.outputs.base_matrix }}
       combo-matrix: ${{ steps.matrix.outputs.combo_matrix }}
-      overlay-matrix: ${{ steps.matrix.outputs.overlay_matrix }}
+      publish-target-matrix: ${{ steps.matrix.outputs.publish_target_matrix }}
     steps:
       - uses: actions/checkout@v4
 
@@ -59,7 +59,7 @@ jobs:
 
           base_matrix=$(echo "$raw" | jq '{ include: [ .include[] | select(.type == "base") ] }')
           combo_matrix=$(echo "$raw" | jq '{ include: [ .include[] | select(.type == "combo") ] }')
-          overlay_matrix=$(echo "$raw" | jq '{ include: [ .include[] | select(.type == "agent-image" or .type == "tool-pack-image") ] }')
+          publish_target_matrix=$(echo "$raw" | jq '{ include: [ .include[] | select(.type == "tag-policy-image") ] }')
 
           echo "base_matrix<<EOF" >> "$GITHUB_OUTPUT"
           echo "$base_matrix" >> "$GITHUB_OUTPUT"
@@ -67,8 +67,8 @@ jobs:
           echo "combo_matrix<<EOF" >> "$GITHUB_OUTPUT"
           echo "$combo_matrix" >> "$GITHUB_OUTPUT"
           echo "EOF" >> "$GITHUB_OUTPUT"
-          echo "overlay_matrix<<EOF" >> "$GITHUB_OUTPUT"
-          echo "$overlay_matrix" >> "$GITHUB_OUTPUT"
+          echo "publish_target_matrix<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$publish_target_matrix" >> "$GITHUB_OUTPUT"
           echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: Show matrix
@@ -77,8 +77,8 @@ jobs:
           echo '${{ steps.matrix.outputs.base_matrix }}' | jq .
           echo 'Combo matrix:'
           echo '${{ steps.matrix.outputs.combo_matrix }}' | jq .
-          echo 'Overlay matrix:'
-          echo '${{ steps.matrix.outputs.overlay_matrix }}' | jq .
+          echo 'Publish target matrix:'
+          echo '${{ steps.matrix.outputs.publish_target_matrix }}' | jq .
 
   # ─── Stage 2: Build + push base images ───
   build-bases:
@@ -244,17 +244,17 @@ jobs:
           path: sbom-${{ matrix.id }}.spdx.json
           retention-days: 90
 
-  # ─── Stage 4: Build + push overlays after combos ───
-  build-overlays:
+  # ─── Stage 4: Build + push curated publish targets after combos ───
+  build-publish-targets:
     needs:
       - generate-matrix
       - build-bases
       - build-combos
     runs-on: ubuntu-latest
-    if: ${{ always() && fromJSON(needs.generate-matrix.outputs.overlay-matrix).include[0] != null && (needs.build-bases.result == 'success' || needs.build-bases.result == 'skipped') && (needs.build-combos.result == 'success' || needs.build-combos.result == 'skipped') }}
+    if: ${{ always() && fromJSON(needs.generate-matrix.outputs.publish-target-matrix).include[0] != null && (needs.build-bases.result == 'success' || needs.build-bases.result == 'skipped') && (needs.build-combos.result == 'success' || needs.build-combos.result == 'skipped') }}
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.generate-matrix.outputs.overlay-matrix) }}
+      matrix: ${{ fromJSON(needs.generate-matrix.outputs.publish-target-matrix) }}
 
     steps:
       - uses: actions/checkout@v4
@@ -272,27 +272,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract image metadata (tags + labels)
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.id }}
-          tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=sha,prefix=sha-
-            type=raw,value=latest,enable=${{ github.ref_type == 'tag' }}
-            type=ref,event=branch
-
-      - name: Compute overlay base image arg
-        id: overlay_args
+      - name: Compute publish target base image arg
+        id: image_args
         shell: bash
         run: |
           owner="${GITHUB_REPOSITORY_OWNER,,}"
-          version="${{ steps.meta.outputs.version }}"
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            base_ref="${GITHUB_REF_NAME#v}"
+          else
+            base_ref="${GITHUB_REF_NAME}"
+          fi
           {
             echo "args<<EOF"
-            echo "BASE_IMAGE=ghcr.io/${owner}/${{ matrix.base_id }}:${version}"
+            echo "BASE_IMAGE=ghcr.io/${owner}/${{ matrix.base_id }}:${base_ref}"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
@@ -303,13 +295,12 @@ jobs:
           file: ${{ matrix.context }}/${{ matrix.dockerfile }}
           platforms: ${{ matrix.platforms }}
           push: ${{ github.event.inputs.dry_run != 'true' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ matrix.image_tags }}
           build-args: |
             BUILD_DATE=${{ github.event.repository.updated_at }}
             VCS_REF=${{ github.sha }}
-            IMAGE_VERSION=${{ steps.meta.outputs.version }}
-            ${{ steps.overlay_args.outputs.args }}
+            IMAGE_VERSION=${{ matrix.release_version }}
+            ${{ steps.image_args.outputs.args }}
           provenance: true
           sbom: true
           cache-from: type=gha,scope=${{ matrix.id }}
@@ -319,7 +310,7 @@ jobs:
         if: github.event.inputs.dry_run != 'true'
         uses: anchore/sbom-action@v0
         with:
-          image: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
+          image: ${{ matrix.primary_tag }}
           artifact-name: sbom-${{ matrix.id }}.spdx.json
           output-file: sbom-${{ matrix.id }}.spdx.json
           format: spdx-json
@@ -337,7 +328,7 @@ jobs:
     needs:
       - build-bases
       - build-combos
-      - build-overlays
+      - build-publish-targets
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -354,4 +345,4 @@ jobs:
           echo "| **Dry Run** | \`${{ github.event.inputs.dry_run || 'false' }}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| **Base Images** | \`${{ needs.build-bases.result }}\` |" >> "$GITHUB_STEP_SUMMARY"
           echo "| **Combo Images** | \`${{ needs.build-combos.result }}\` |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| **Overlay Images** | \`${{ needs.build-overlays.result }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Curated Publish Targets** | \`${{ needs.build-publish-targets.result }}\` |" >> "$GITHUB_STEP_SUMMARY"

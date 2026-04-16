@@ -22,7 +22,7 @@ public sealed class ManifestLoader
 
     /// <summary>
     /// Loads all manifests from the given definitions root directory.
-    /// Expected subdirectories: common-tools, bases, combos, agents, tool-packs, compose, profiles
+    /// Expected subdirectories: common-tools, bases, combos, agents, tool-packs, compose, profiles, tag-policies
     /// </summary>
     public ManifestCatalog LoadAll(string definitionsRoot)
     {
@@ -51,6 +51,9 @@ public sealed class ManifestLoader
 
         LoadManifests(catalog.Profiles, Path.Combine(definitionsRoot, "profiles"),
             yaml => Deserialize<ProfileManifest>(yaml));
+
+        LoadManifests(catalog.TagPolicies, Path.Combine(definitionsRoot, "tag-policies"),
+            yaml => Deserialize<TagPolicyManifest>(yaml));
 
         return catalog;
     }

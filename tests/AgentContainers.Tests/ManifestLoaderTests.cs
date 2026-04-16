@@ -79,6 +79,17 @@ public class ManifestLoaderTests
     }
 
     [Fact]
+    public void LoadAll_LoadsTagPolicies()
+    {
+        var loader = new ManifestLoader();
+        var catalog = loader.LoadAll(GetDefinitionsRoot());
+
+        Assert.True(catalog.TagPolicies.Count >= 3, "Should load curated publish targets.");
+        Assert.Contains("dotnet-claude", catalog.TagPolicies.Keys);
+        Assert.Contains("polyglot-menagerie", catalog.TagPolicies.Keys);
+    }
+
+    [Fact]
     public void LoadAll_ManifestsHaveRequiredFields()
     {
         var loader = new ManifestLoader();

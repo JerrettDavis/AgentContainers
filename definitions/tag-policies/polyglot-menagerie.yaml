@@ -1,0 +1,25 @@
+id: polyglot-menagerie
+display_name: Polyglot agent menagerie
+version: v1
+description: Full-stack image with multiple agent CLIs and developer tools, published through stack-first and bundle-first aliases
+
+runtime: fullstack-polyglot
+agents:
+  - claude
+  - codex
+  - copilot
+  - openclaw
+tool_packs:
+  - devtools
+
+release_version: 0.1.0
+
+publish:
+  - repository: polyglot
+    tags:
+      - menagerie-{{version}}
+      - menagerie
+  - repository: menagerie
+    tags:
+      - dotnet10-node24-python312-rust-{{version}}
+      - dotnet10-node24-python312-rust-latest

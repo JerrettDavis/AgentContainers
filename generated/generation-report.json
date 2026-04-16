@@ -1,5 +1,5 @@
 {
-  "manifest_hash": "ede3a1633f7370efd0aa0e559a5cae142c23163b45e8867b1c69d8dfae373372",
+  "manifest_hash": "a03b956176c449b75c5513f01eeb1f1ae640110bfee33973a1a17cb7c16697e6",
   "generator_version": "0.1.0",
   "artifacts": [
     {
@@ -129,6 +129,42 @@
       "content_hash": "f475423957b7f9a811858992ceb76c23ba0db14ff7a7252a11ba3a4c833e44dc"
     },
     {
+      "type": "dockerfile",
+      "id": "tag-policy-dotnet-claude",
+      "path": "docker/images/dotnet-claude/Dockerfile",
+      "content_hash": "0bd6a9be1b42b4d05aa7ddb0698c237107359df58480fc9a34ebbf010c05b286"
+    },
+    {
+      "type": "dockerfile",
+      "id": "tag-policy-dotnet-codex",
+      "path": "docker/images/dotnet-codex/Dockerfile",
+      "content_hash": "a8539072c119f7e5db0ef0f5679bddcd0004a9d28aef43994943cc3a397670d1"
+    },
+    {
+      "type": "dockerfile",
+      "id": "tag-policy-dotnet-copilot",
+      "path": "docker/images/dotnet-copilot/Dockerfile",
+      "content_hash": "1512984d0b9ae24396e4f08615b3cbbb26fe91f147729844919e423d879657eb"
+    },
+    {
+      "type": "dockerfile",
+      "id": "tag-policy-openclaw-dotnet",
+      "path": "docker/images/openclaw-dotnet/Dockerfile",
+      "content_hash": "fb32d934e3ee157d1971bbac914d1081b366621daf4722a755988fb65729af53"
+    },
+    {
+      "type": "dockerfile",
+      "id": "tag-policy-polyglot-menagerie",
+      "path": "docker/images/polyglot-menagerie/Dockerfile",
+      "content_hash": "f4b30682ab7b9883583b15d3cdb49a909aea3adeef4ceac2343f1be184681227"
+    },
+    {
+      "type": "dockerfile",
+      "id": "tag-policy-tools-swiss-army",
+      "path": "docker/images/tools-swiss-army/Dockerfile",
+      "content_hash": "751a22a4c27893fc46ee82db59033f4bde328ca1272522541fbd1ca81d35ab58"
+    },
+    {
       "type": "compose-fragment",
       "id": "agent-claude",
       "path": "compose/fragments/claude-service.yaml",
@@ -186,7 +222,7 @@
       "type": "catalog",
       "id": "image-catalog",
       "path": "image-catalog.json",
-      "content_hash": "e6653ea08f1933707b1443a1819e2f4b212dd7b5102d5c5df55154e7a0a04cc1"
+      "content_hash": "8595526d72acce56fa08171a77ce7f556ad1162ab72453b522bea1eafef864ba"
     }
   ]
 }

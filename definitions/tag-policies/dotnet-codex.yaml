@@ -1,0 +1,24 @@
+id: dotnet-codex
+display_name: .NET-first Codex image
+version: v1
+description: Curated Codex image published from the dotnet/tooling point of view
+
+runtime: node-py-dotnet
+agents:
+  - codex
+tool_packs:
+  - devtools
+
+release_version: 0.1.0
+
+publish:
+  - repository: dotnet
+    tags:
+      - codex-{{version}}
+      - codex-{{major}}.{{minor}}
+      - codex-{{major}}
+      - codex-latest
+  - repository: codex
+    tags:
+      - dotnet10-node24-{{version}}
+      - dotnet10-node24

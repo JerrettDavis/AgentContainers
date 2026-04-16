@@ -1,5 +1,5 @@
 {
-  "manifest_hash": "ede3a1633f7370efd0aa0e559a5cae142c23163b45e8867b1c69d8dfae373372",
+  "manifest_hash": "a03b956176c449b75c5513f01eeb1f1ae640110bfee33973a1a17cb7c16697e6",
   "generator_version": "0.1.0",
   "registry": "ghcr.io/agentcontainers",
   "images": [
@@ -309,6 +309,153 @@
       "tool_pack": "devtools",
       "base_id": "fullstack-polyglot",
       "registry": "ghcr.io/agentcontainers/fullstack-polyglot-devtools"
+    },
+    {
+      "type": "tag-policy-image",
+      "id": "dotnet-claude",
+      "display_name": ".NET-first Claude image",
+      "runtime": "node-py-dotnet",
+      "release_version": "0.1.0",
+      "agents": [
+        "claude"
+      ],
+      "tool_packs": [
+        "devtools"
+      ],
+      "platforms": [
+        "linux/amd64",
+        "linux/arm64"
+      ],
+      "tags": [
+        "ghcr.io/agentcontainers/dotnet:claude-0.1.0",
+        "ghcr.io/agentcontainers/dotnet:claude-0.1",
+        "ghcr.io/agentcontainers/dotnet:claude-0",
+        "ghcr.io/agentcontainers/dotnet:claude-latest",
+        "ghcr.io/agentcontainers/claude:dotnet10-node24-0.1.0",
+        "ghcr.io/agentcontainers/claude:dotnet10-node24"
+      ]
+    },
+    {
+      "type": "tag-policy-image",
+      "id": "dotnet-codex",
+      "display_name": ".NET-first Codex image",
+      "runtime": "node-py-dotnet",
+      "release_version": "0.1.0",
+      "agents": [
+        "codex"
+      ],
+      "tool_packs": [
+        "devtools"
+      ],
+      "platforms": [
+        "linux/amd64",
+        "linux/arm64"
+      ],
+      "tags": [
+        "ghcr.io/agentcontainers/dotnet:codex-0.1.0",
+        "ghcr.io/agentcontainers/dotnet:codex-0.1",
+        "ghcr.io/agentcontainers/dotnet:codex-0",
+        "ghcr.io/agentcontainers/dotnet:codex-latest",
+        "ghcr.io/agentcontainers/codex:dotnet10-node24-0.1.0",
+        "ghcr.io/agentcontainers/codex:dotnet10-node24"
+      ]
+    },
+    {
+      "type": "tag-policy-image",
+      "id": "dotnet-copilot",
+      "display_name": ".NET-first Copilot CLI image",
+      "runtime": "node-py-dotnet",
+      "release_version": "0.1.0",
+      "agents": [
+        "copilot"
+      ],
+      "tool_packs": [
+        "devtools"
+      ],
+      "platforms": [
+        "linux/amd64",
+        "linux/arm64"
+      ],
+      "tags": [
+        "ghcr.io/agentcontainers/dotnet:copilot-0.1.0",
+        "ghcr.io/agentcontainers/dotnet:copilot-0.1",
+        "ghcr.io/agentcontainers/dotnet:copilot-0",
+        "ghcr.io/agentcontainers/dotnet:copilot-latest",
+        "ghcr.io/agentcontainers/copilot:dotnet10-node24-0.1.0",
+        "ghcr.io/agentcontainers/copilot:dotnet10-node24"
+      ]
+    },
+    {
+      "type": "tag-policy-image",
+      "id": "openclaw-dotnet",
+      "display_name": "OpenClaw on .NET polyglot stack",
+      "runtime": "node-py-dotnet",
+      "release_version": "0.1.0",
+      "agents": [
+        "openclaw"
+      ],
+      "tool_packs": [
+        "devtools"
+      ],
+      "platforms": [
+        "linux/amd64",
+        "linux/arm64"
+      ],
+      "tags": [
+        "ghcr.io/agentcontainers/dotnet:openclaw-0.1.0",
+        "ghcr.io/agentcontainers/dotnet:openclaw-0.1",
+        "ghcr.io/agentcontainers/dotnet:openclaw-0",
+        "ghcr.io/agentcontainers/dotnet:openclaw-latest",
+        "ghcr.io/agentcontainers/openclaw:dotnet10-node24-devtools-0.1.0",
+        "ghcr.io/agentcontainers/openclaw:dotnet10-node24-devtools"
+      ]
+    },
+    {
+      "type": "tag-policy-image",
+      "id": "polyglot-menagerie",
+      "display_name": "Polyglot agent menagerie",
+      "runtime": "fullstack-polyglot",
+      "release_version": "0.1.0",
+      "agents": [
+        "claude",
+        "codex",
+        "copilot",
+        "openclaw"
+      ],
+      "tool_packs": [
+        "devtools"
+      ],
+      "platforms": [
+        "linux/amd64",
+        "linux/arm64"
+      ],
+      "tags": [
+        "ghcr.io/agentcontainers/polyglot:menagerie-0.1.0",
+        "ghcr.io/agentcontainers/polyglot:menagerie",
+        "ghcr.io/agentcontainers/menagerie:dotnet10-node24-python312-rust-0.1.0",
+        "ghcr.io/agentcontainers/menagerie:dotnet10-node24-python312-rust-latest"
+      ]
+    },
+    {
+      "type": "tag-policy-image",
+      "id": "tools-swiss-army",
+      "display_name": "Swiss-army developer toolbox",
+      "runtime": "fullstack-polyglot",
+      "release_version": "0.1.0",
+      "agents": [],
+      "tool_packs": [
+        "devtools"
+      ],
+      "platforms": [
+        "linux/amd64",
+        "linux/arm64"
+      ],
+      "tags": [
+        "ghcr.io/agentcontainers/tools:swiss-army-0.1.0",
+        "ghcr.io/agentcontainers/tools:swiss-army",
+        "ghcr.io/agentcontainers/polyglot:toolbox-0.1.0",
+        "ghcr.io/agentcontainers/polyglot:toolbox"
+      ]
     }
   ]
 }

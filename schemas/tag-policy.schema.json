@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agentcontainers.dev/schemas/tag-policy.schema.json",
+  "title": "Curated Publish Target Manifest",
+  "description": "Schema for contributor-authored publish targets and convenience tags",
+  "type": "object",
+  "required": ["id", "display_name", "version", "runtime", "release_version", "publish"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "display_name": { "type": "string", "minLength": 1 },
+    "version": { "type": "string", "enum": ["v1"] },
+    "description": { "type": "string" },
+    "runtime": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "agents": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "tool_packs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "release_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?$"
+    },
+    "publish": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["repository", "tags"],
+        "properties": {
+          "repository": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
+          },
+          "tags": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "minLength": 1 }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

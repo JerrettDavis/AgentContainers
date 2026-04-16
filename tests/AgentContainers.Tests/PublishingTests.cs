@@ -138,26 +138,20 @@ public class PublishingTests
     }
 
     [Fact]
-    public void BuildPublishMatrix_CoversEveryGeneratedDockerfile()
+    public void BuildPublishMatrix_PublishesCuratedTargets()
     {
         var repoRoot = GetRepoRoot();
         var catalog = LoadCatalog();
         var manifestHash = AgentContainers.Core.Hashing.ContentHasher.ComputeManifestHash(
             Path.Combine(repoRoot, "definitions"));
         var matrix = Program.BuildPublishMatrix(catalog, manifestHash);
-        var generationReportPath = Path.Combine(repoRoot, "generated", "generation-report.json");
-        using var generationReport = JsonDocument.Parse(File.ReadAllText(generationReportPath));
-        var dockerfileCount = generationReport.RootElement
-            .GetProperty("artifacts")
-            .EnumerateArray()
-            .Count(artifact => artifact.GetProperty("type").GetString() == "dockerfile");
 
-        Assert.Equal(dockerfileCount, matrix.Include.Count);
+        Assert.Equal(catalog.Bases.Count + catalog.Combos.Count + catalog.TagPolicies.Count, matrix.Include.Count);
         Assert.Equal(matrix.Include.Count, matrix.Include.Select(entry => entry.Id).Distinct().Count());
     }
 
     [Fact]
-    public void BuildPublishMatrix_IncludesAgentAndToolPackImages()
+    public void BuildPublishMatrix_IncludesTagPolicyImages()
     {
         var repoRoot = GetRepoRoot();
         var catalog = LoadCatalog();
@@ -165,8 +159,24 @@ public class PublishingTests
             Path.Combine(repoRoot, "definitions"));
         var matrix = Program.BuildPublishMatrix(catalog, manifestHash);
 
-        Assert.Contains(matrix.Include, entry => entry.Id == "fullstack-polyglot-claude" && entry.Type == "agent-image");
-        Assert.Contains(matrix.Include, entry => entry.Id == "fullstack-polyglot-devtools" && entry.Type == "tool-pack-image");
-        Assert.DoesNotContain(matrix.Include, entry => entry.Id == "fullstack-polyglot-headroom");
+        Assert.Contains(matrix.Include, entry => entry.Id == "dotnet-claude" && entry.Type == "tag-policy-image");
+        Assert.Contains(matrix.Include, entry => entry.Id == "polyglot-menagerie" && entry.Type == "tag-policy-image");
+        Assert.DoesNotContain(matrix.Include, entry => entry.Id == "fullstack-polyglot-claude");
+        Assert.DoesNotContain(matrix.Include, entry => entry.Id == "fullstack-polyglot-devtools");
+    }
+
+    [Fact]
+    public void BuildPublishMatrix_ResolvesConvenienceTags()
+    {
+        var repoRoot = GetRepoRoot();
+        var catalog = LoadCatalog();
+        var manifestHash = AgentContainers.Core.Hashing.ContentHasher.ComputeManifestHash(
+            Path.Combine(repoRoot, "definitions"));
+        var matrix = Program.BuildPublishMatrix(catalog, manifestHash);
+        var dotnetClaude = Assert.Single(matrix.Include.Where(entry => entry.Id == "dotnet-claude"));
+
+        Assert.Contains("ghcr.io/${{ github.repository_owner }}/dotnet:claude-0.1.0", dotnetClaude.ImageTags);
+        Assert.Contains("ghcr.io/${{ github.repository_owner }}/dotnet:claude-latest", dotnetClaude.ImageTags);
+        Assert.Contains("ghcr.io/${{ github.repository_owner }}/claude:dotnet10-node24", dotnetClaude.ImageTags);
     }
 }

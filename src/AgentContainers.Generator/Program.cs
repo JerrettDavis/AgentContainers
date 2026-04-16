@@ -207,6 +207,7 @@ public static class Program
         string manifestHash)
     {
         var include = new List<PublishMatrixEntry>();
+        var publishedImages = BuildResolvedPublishedImages(catalog, "${{ github.repository_owner }}");
 
         foreach (var (id, b) in catalog.Bases.OrderBy(entry => entry.Key))
         {
@@ -240,50 +241,23 @@ public static class Program
             });
         }
 
-        foreach (var (agentId, agent) in catalog.Agents.OrderBy(entry => entry.Key))
+        foreach (var publishedImage in publishedImages.OrderBy(entry => entry.Id))
         {
-            foreach (var (runtimeId, runtimeDisplayName) in GetCompatibleRuntimeTargets(catalog, agent))
+            include.Add(new PublishMatrixEntry
             {
-                include.Add(new PublishMatrixEntry
-                {
-                    Id = $"{runtimeId}-{agentId}",
-                    Type = "agent-image",
-                    DisplayName = $"{agent.DisplayName} on {runtimeDisplayName}",
-                    Context = $"generated/docker/agents/{runtimeId}-{agentId}",
-                    Dockerfile = "Dockerfile",
-                    ImageName = $"ghcr.io/${{{{ github.repository_owner }}}}/{runtimeId}-{agentId}",
-                    Platforms = string.Join(",", GetRuntimePlatforms(catalog, runtimeId)),
-                    BaseId = runtimeId,
-                    AgentId = agentId,
-                    ManifestHash = manifestHash
-                });
-            }
-        }
-
-        foreach (var (toolPackId, toolPack) in catalog.ToolPacks.OrderBy(entry => entry.Key))
-        {
-            if (toolPack.Sidecar?.Enabled == true)
-                continue;
-
-            foreach (var runtimeId in toolPack.CompatibleWith.Bases.OrderBy(id => id))
-            {
-                if (!TryGetRuntimeDisplayName(catalog, runtimeId, out var runtimeDisplayName))
-                    continue;
-
-                include.Add(new PublishMatrixEntry
-                {
-                    Id = $"{runtimeId}-{toolPackId}",
-                    Type = "tool-pack-image",
-                    DisplayName = $"{toolPack.DisplayName} on {runtimeDisplayName}",
-                    Context = $"generated/docker/tool-packs/{runtimeId}-{toolPackId}",
-                    Dockerfile = "Dockerfile",
-                    ImageName = $"ghcr.io/${{{{ github.repository_owner }}}}/{runtimeId}-{toolPackId}",
-                    Platforms = string.Join(",", GetRuntimePlatforms(catalog, runtimeId)),
-                    BaseId = runtimeId,
-                    ToolPackId = toolPackId,
-                    ManifestHash = manifestHash
-                });
-            }
+                Id = publishedImage.Id,
+                Type = "tag-policy-image",
+                DisplayName = publishedImage.DisplayName,
+                Context = $"generated/docker/images/{publishedImage.Id}",
+                Dockerfile = "Dockerfile",
+                ImageName = publishedImage.PrimaryTag,
+                ImageTags = string.Join('\n', publishedImage.Tags),
+                PrimaryTag = publishedImage.PrimaryTag,
+                Platforms = string.Join(",", publishedImage.Platforms),
+                BaseId = publishedImage.RuntimeId,
+                ReleaseVersion = publishedImage.ReleaseVersion,
+                ManifestHash = manifestHash
+            });
         }
 
         return new PublishMatrix
@@ -425,6 +399,23 @@ public static class Program
                 });
                 Console.WriteLine($"  [dockerfile] tool-packs/{imageId}/Dockerfile");
             }
+        }
+
+        foreach (var (policyId, policy) in catalog.TagPolicies.OrderBy(entry => entry.Key))
+        {
+            var dir = Path.Combine(dockerRoot, "images", policyId);
+            Directory.CreateDirectory(dir);
+            var dockerfilePath = Path.Combine(dir, "Dockerfile");
+            var content = GenerateTagPolicyDockerfile(policy, catalog);
+            File.WriteAllText(dockerfilePath, content);
+            report.Artifacts.Add(new ArtifactEntry
+            {
+                Type = "dockerfile",
+                Id = $"tag-policy-{policyId}",
+                Path = ContentHasher.NormalizePath(Path.GetRelativePath(generatedRoot, dockerfilePath)),
+                ContentHash = ContentHasher.ComputeContentHash(content)
+            });
+            Console.WriteLine($"  [dockerfile] images/{policyId}/Dockerfile");
         }
 
         // Generate compose fragments
@@ -777,6 +768,7 @@ public static class Program
     private static object BuildImageCatalog(AgentContainers.Core.Models.ManifestCatalog catalog, string manifestHash)
     {
         var entries = new List<object>();
+        var publishedImages = BuildResolvedPublishedImages(catalog, "agentcontainers");
 
         foreach (var (id, b) in catalog.Bases)
         {
@@ -879,6 +871,22 @@ public static class Program
             }
         }
 
+        foreach (var publishedImage in publishedImages.OrderBy(entry => entry.Id))
+        {
+            entries.Add(new
+            {
+                type = "tag-policy-image",
+                id = publishedImage.Id,
+                display_name = publishedImage.DisplayName,
+                runtime = publishedImage.RuntimeId,
+                release_version = publishedImage.ReleaseVersion,
+                agents = publishedImage.Agents,
+                tool_packs = publishedImage.ToolPacks,
+                platforms = publishedImage.Platforms,
+                tags = publishedImage.Tags
+            });
+        }
+
         return new
         {
             manifest_hash = manifestHash,
@@ -897,6 +905,7 @@ public static class Program
         Console.WriteLine($"  Tool Packs:   {catalog.ToolPacks.Count} ({string.Join(", ", catalog.ToolPacks.Keys)})");
         Console.WriteLine($"  Compose:      {catalog.ComposeStacks.Count} ({string.Join(", ", catalog.ComposeStacks.Keys)})");
         Console.WriteLine($"  Profiles:     {catalog.Profiles.Count} ({string.Join(", ", catalog.Profiles.Keys)})");
+        Console.WriteLine($"  Tag Policies: {catalog.TagPolicies.Count} ({string.Join(", ", catalog.TagPolicies.Keys)})");
         Console.WriteLine($"  Total:        {catalog.TotalCount}");
     }
 
@@ -1278,6 +1287,110 @@ public static class Program
         return sb.ToString();
     }
 
+    private static string GenerateTagPolicyDockerfile(
+        AgentContainers.Core.Models.TagPolicyManifest policy,
+        AgentContainers.Core.Models.ManifestCatalog catalog)
+    {
+        if (!TryGetRuntimeDisplayName(catalog, policy.Runtime, out var runtimeDisplayName))
+            throw new InvalidOperationException($"Tag policy '{policy.Id}' references unknown runtime '{policy.Runtime}'.");
+
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("# AUTO-GENERATED — do not edit by hand.");
+        sb.AppendLine($"# Curated publish target: {policy.Id}");
+        sb.AppendLine("# Generated by AgentContainers.Generator v0.1.0");
+        sb.AppendLine();
+        sb.AppendLine($"ARG BASE_IMAGE=agentcontainers/{policy.Runtime}:latest");
+        sb.AppendLine("FROM ${BASE_IMAGE}");
+        sb.AppendLine();
+        sb.AppendLine("USER root");
+        sb.AppendLine();
+
+        foreach (var agentId in policy.Agents)
+        {
+            if (!catalog.Agents.TryGetValue(agentId, out var agent))
+                throw new InvalidOperationException($"Tag policy '{policy.Id}' references unknown agent '{agentId}'.");
+
+            var installCommand = GetAgentInstallCommand(agent)
+                ?? throw new InvalidOperationException($"Agent '{agentId}' uses unsupported install method '{agent.Install.Method}'.");
+
+            sb.AppendLine($"# Install {agent.DisplayName}");
+            sb.AppendLine($"RUN {installCommand}");
+            foreach (var step in agent.Install.PostInstall)
+            {
+                sb.AppendLine($"# {step.Description}");
+                sb.AppendLine($"RUN {step.Command}");
+            }
+
+            sb.AppendLine();
+        }
+
+        foreach (var toolPackId in policy.ToolPacks)
+        {
+            if (!catalog.ToolPacks.TryGetValue(toolPackId, out var toolPack))
+                throw new InvalidOperationException($"Tag policy '{policy.Id}' references unknown tool pack '{toolPackId}'.");
+
+            var installCommand = GetToolPackInstallCommand(toolPack);
+            if (!string.IsNullOrWhiteSpace(installCommand))
+            {
+                sb.AppendLine($"# Install {toolPack.DisplayName}");
+                sb.AppendLine($"RUN {installCommand}");
+            }
+
+            foreach (var step in toolPack.Install.PostInstall)
+            {
+                sb.AppendLine($"# {step.Description}");
+                sb.AppendLine($"RUN {step.Command.Trim()}");
+            }
+
+            sb.AppendLine();
+        }
+
+        var envDefaults = policy.Agents
+            .SelectMany(agentId => catalog.Agents[agentId].Env)
+            .Concat(policy.ToolPacks.SelectMany(toolPackId => catalog.ToolPacks[toolPackId].Env))
+            .Where(env => !env.Sensitive && !string.IsNullOrWhiteSpace(env.Default))
+            .GroupBy(env => env.Name, StringComparer.Ordinal)
+            .Select(group => group.First())
+            .ToList();
+        AppendEnvironmentDefaults(sb, envDefaults);
+
+        sb.AppendLine("USER dev");
+        sb.AppendLine();
+
+        var healthcheckAgent = policy.Agents
+            .Select(agentId => catalog.Agents[agentId])
+            .FirstOrDefault(agent => agent.Healthcheck.Test.Count > 0);
+        if (healthcheckAgent != null)
+            AppendHealthcheck(sb, healthcheckAgent.Healthcheck);
+        else
+            AppendValidationHealthcheck(
+                sb,
+                policy.Agents.SelectMany(agentId => catalog.Agents[agentId].Validation.Commands)
+                    .Concat(policy.ToolPacks.SelectMany(toolPackId => catalog.ToolPacks[toolPackId].Validation.Commands)));
+
+        sb.AppendLine("# OCI Image Labels");
+        sb.AppendLine("ARG BUILD_DATE=unknown");
+        sb.AppendLine("ARG VCS_REF=unknown");
+        sb.AppendLine($"ARG IMAGE_VERSION={policy.ReleaseVersion}");
+        sb.AppendLine();
+        sb.AppendLine($"LABEL org.opencontainers.image.title=\"{policy.DisplayName}\"");
+        sb.AppendLine($"LABEL org.opencontainers.image.description=\"{policy.Description}\"");
+        sb.AppendLine("LABEL org.opencontainers.image.source=\"https://github.com/agentcontainers/AgentContainers\"");
+        sb.AppendLine("LABEL org.opencontainers.image.vendor=\"AgentContainers\"");
+        sb.AppendLine("LABEL org.opencontainers.image.licenses=\"MIT\"");
+        sb.AppendLine("LABEL org.opencontainers.image.version=\"${IMAGE_VERSION}\"");
+        sb.AppendLine("LABEL org.opencontainers.image.created=\"${BUILD_DATE}\"");
+        sb.AppendLine("LABEL org.opencontainers.image.revision=\"${VCS_REF}\"");
+        sb.AppendLine("LABEL dev.agentcontainers.image-type=\"tag-policy\"");
+        sb.AppendLine($"LABEL dev.agentcontainers.runtime=\"{policy.Runtime}\"");
+        sb.AppendLine($"LABEL dev.agentcontainers.agents=\"{string.Join(",", policy.Agents)}\"");
+        sb.AppendLine($"LABEL dev.agentcontainers.tool-packs=\"{string.Join(",", policy.ToolPacks)}\"");
+        sb.AppendLine($"LABEL dev.agentcontainers.release-version=\"{policy.ReleaseVersion}\"");
+        sb.AppendLine($"LABEL dev.agentcontainers.runtime-display-name=\"{runtimeDisplayName}\"");
+
+        return sb.ToString();
+    }
+
     private static string? GetAgentInstallCommand(AgentContainers.Core.Models.AgentManifest agent)
     {
         var pkg = agent.Install.Package;
@@ -1291,6 +1404,44 @@ public static class Program
             "apt" => FormatAptInstall([pkg]),
             _ => null
         };
+    }
+
+    private static string? GetToolPackInstallCommand(AgentContainers.Core.Models.ToolPackManifest toolPack)
+    {
+        if (string.IsNullOrWhiteSpace(toolPack.Install.Package))
+            return null;
+
+        var pkg = toolPack.Install.Package;
+        var version = toolPack.Install.Version;
+        var versionSuffix = string.IsNullOrEmpty(version) || version == "latest" ? "" : $"@{version}";
+
+        return toolPack.Install.Method switch
+        {
+            "npm_global" => $"npm install -g {pkg}{versionSuffix}",
+            "pip" => $"pip install --no-cache-dir {pkg}{versionSuffix}",
+            "apt" => FormatAptInstall([pkg]),
+            _ => null
+        };
+    }
+
+    private static void AppendEnvironmentDefaults(
+        System.Text.StringBuilder sb,
+        IEnumerable<AgentContainers.Core.Models.EnvVar> envVars)
+    {
+        var defaults = envVars
+            .Where(env => !string.IsNullOrWhiteSpace(env.Default))
+            .ToList();
+        if (defaults.Count == 0)
+            return;
+
+        sb.AppendLine("# Environment defaults");
+        foreach (var env in defaults)
+        {
+            sb.AppendLine($"ARG {env.Name}={env.Default}");
+            sb.AppendLine($"ENV {env.Name}=${{{env.Name}}}");
+        }
+
+        sb.AppendLine();
     }
 
     private static string? FindRepoRoot()
@@ -1367,6 +1518,97 @@ public static class Program
         return false;
     }
 
+    private static IReadOnlyList<ResolvedPublishedImage> BuildResolvedPublishedImages(
+        AgentContainers.Core.Models.ManifestCatalog catalog,
+        string registryOwner)
+    {
+        var selectedTags = new Dictionary<string, ResolvedTagCandidate>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var (policyId, policy) in catalog.TagPolicies.OrderBy(entry => entry.Key))
+        {
+            var version = ReleaseVersion.Parse(policy.ReleaseVersion);
+
+            foreach (var publication in policy.Publish)
+            {
+                foreach (var tagTemplate in publication.Tags)
+                {
+                    var renderedTag = RenderPublicationTag(tagTemplate, version);
+                    var fullTag = $"ghcr.io/{registryOwner}/{publication.Repository}:{renderedTag}";
+                    var candidate = new ResolvedTagCandidate(policyId, version, fullTag);
+
+                    if (!selectedTags.TryGetValue(fullTag, out var existing))
+                    {
+                        selectedTags[fullTag] = candidate;
+                        continue;
+                    }
+
+                    var comparison = candidate.Version.CompareTo(existing.Version);
+                    if (comparison > 0)
+                    {
+                        selectedTags[fullTag] = candidate;
+                        continue;
+                    }
+
+                    if (comparison == 0 && !string.Equals(existing.PolicyId, candidate.PolicyId, StringComparison.Ordinal))
+                    {
+                        throw new InvalidOperationException(
+                            $"Publish tag collision: '{fullTag}' is generated by both '{existing.PolicyId}' and '{candidate.PolicyId}'.");
+                    }
+                }
+            }
+        }
+
+        var tagsByPolicy = selectedTags.Values
+            .GroupBy(candidate => candidate.PolicyId, StringComparer.Ordinal)
+            .ToDictionary(
+                group => group.Key,
+                group => group.Select(candidate => candidate.Tag).OrderBy(tag => tag, StringComparer.Ordinal).ToList(),
+                StringComparer.Ordinal);
+
+        var publishedImages = new List<ResolvedPublishedImage>();
+        foreach (var (policyId, policy) in catalog.TagPolicies.OrderBy(entry => entry.Key))
+        {
+            if (!tagsByPolicy.TryGetValue(policyId, out var policyTags) || policyTags.Count == 0)
+                continue;
+
+            var orderedTags = new List<string>();
+            foreach (var publication in policy.Publish)
+            {
+                foreach (var tagTemplate in publication.Tags)
+                {
+                    var renderedTag = RenderPublicationTag(tagTemplate, ReleaseVersion.Parse(policy.ReleaseVersion));
+                    var fullTag = $"ghcr.io/{registryOwner}/{publication.Repository}:{renderedTag}";
+                    if (policyTags.Contains(fullTag))
+                        orderedTags.Add(fullTag);
+                }
+            }
+
+            publishedImages.Add(new ResolvedPublishedImage
+            {
+                Id = policyId,
+                DisplayName = policy.DisplayName,
+                RuntimeId = policy.Runtime,
+                ReleaseVersion = policy.ReleaseVersion,
+                Platforms = GetRuntimePlatforms(catalog, policy.Runtime).ToList(),
+                Tags = orderedTags,
+                PrimaryTag = orderedTags[0],
+                Agents = policy.Agents.ToList(),
+                ToolPacks = policy.ToolPacks.ToList()
+            });
+        }
+
+        return publishedImages;
+    }
+
+    private static string RenderPublicationTag(string template, ReleaseVersion version)
+    {
+        return template
+            .Replace("{{version}}", version.ToString(), StringComparison.Ordinal)
+            .Replace("{{major}}", version.Major.ToString(), StringComparison.Ordinal)
+            .Replace("{{minor}}", version.Minor.ToString(), StringComparison.Ordinal)
+            .Replace("{{patch}}", version.Patch.ToString(), StringComparison.Ordinal);
+    }
+
     internal sealed class PublishMatrix
     {
         public List<PublishMatrixEntry> Include { get; init; } = [];
@@ -1380,11 +1622,14 @@ public static class Program
         public required string Context { get; init; }
         public required string Dockerfile { get; init; }
         public required string ImageName { get; init; }
+        public string? ImageTags { get; init; }
+        public string? PrimaryTag { get; init; }
         public required string Platforms { get; init; }
         public string? Family { get; init; }
         public string? BaseId { get; init; }
         public string? AgentId { get; init; }
         public string? ToolPackId { get; init; }
+        public string? ReleaseVersion { get; init; }
         public required string ManifestHash { get; init; }
     }
 
@@ -1401,6 +1646,65 @@ public static class Program
         Console.WriteLine();
         return 1;
     }
+}
+
+internal sealed class ResolvedPublishedImage
+{
+    public required string Id { get; init; }
+    public required string DisplayName { get; init; }
+    public required string RuntimeId { get; init; }
+    public required string ReleaseVersion { get; init; }
+    public required List<string> Platforms { get; init; }
+    public required List<string> Tags { get; init; }
+    public required string PrimaryTag { get; init; }
+    public required List<string> Agents { get; init; }
+    public required List<string> ToolPacks { get; init; }
+}
+
+internal sealed record ResolvedTagCandidate(string PolicyId, ReleaseVersion Version, string Tag);
+
+internal readonly record struct ReleaseVersion(int Major, int Minor, int Patch, string? PreRelease) : IComparable<ReleaseVersion>
+{
+    public static ReleaseVersion Parse(string value)
+    {
+        var match = System.Text.RegularExpressions.Regex.Match(
+            value,
+            @"^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)(?:-(?<pre>[0-9A-Za-z.-]+))?$");
+        if (!match.Success)
+            throw new InvalidOperationException($"'{value}' is not a supported semantic version.");
+
+        return new ReleaseVersion(
+            int.Parse(match.Groups["major"].Value),
+            int.Parse(match.Groups["minor"].Value),
+            int.Parse(match.Groups["patch"].Value),
+            match.Groups["pre"].Success ? match.Groups["pre"].Value : null);
+    }
+
+    public int CompareTo(ReleaseVersion other)
+    {
+        var major = Major.CompareTo(other.Major);
+        if (major != 0) return major;
+
+        var minor = Minor.CompareTo(other.Minor);
+        if (minor != 0) return minor;
+
+        var patch = Patch.CompareTo(other.Patch);
+        if (patch != 0) return patch;
+
+        if (string.IsNullOrEmpty(PreRelease) && string.IsNullOrEmpty(other.PreRelease))
+            return 0;
+        if (string.IsNullOrEmpty(PreRelease))
+            return 1;
+        if (string.IsNullOrEmpty(other.PreRelease))
+            return -1;
+
+        return string.CompareOrdinal(PreRelease, other.PreRelease);
+    }
+
+    public override string ToString()
+        => string.IsNullOrEmpty(PreRelease)
+            ? $"{Major}.{Minor}.{Patch}"
+            : $"{Major}.{Minor}.{Patch}-{PreRelease}";
 }
 
 internal sealed class GenerationReport

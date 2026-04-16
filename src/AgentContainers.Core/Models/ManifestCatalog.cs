@@ -26,11 +26,14 @@ public sealed class ManifestCatalog
     /// <summary>Profile manifests keyed by ID.</summary>
     public Dictionary<string, ProfileManifest> Profiles { get; } = [];
 
+    /// <summary>Curated publish target manifests keyed by ID.</summary>
+    public Dictionary<string, TagPolicyManifest> TagPolicies { get; } = [];
+
     /// <summary>Total number of loaded manifests across all categories.</summary>
     public int TotalCount =>
         CommonTools.Count + Bases.Count + Combos.Count +
         Agents.Count + ToolPacks.Count + ComposeStacks.Count +
-        Profiles.Count;
+        Profiles.Count + TagPolicies.Count;
 
     /// <summary>
     /// Enumerates all manifests as a normalized sequence of <c>(type, id, manifest)</c> tuples.
@@ -44,5 +47,6 @@ public sealed class ManifestCatalog
         foreach (var kv in ToolPacks) yield return ("tool-pack", kv.Key, kv.Value);
         foreach (var kv in ComposeStacks) yield return ("compose", kv.Key, kv.Value);
         foreach (var kv in Profiles) yield return ("profile", kv.Key, kv.Value);
+        foreach (var kv in TagPolicies) yield return ("tag-policy", kv.Key, kv.Value);
     }
 }
