@@ -23,7 +23,7 @@ install:
   steps:
     - description: "Install pipx for isolated tool installs"
       run: |
-        pip install --no-cache-dir pipx
+        pip install --no-cache-dir --upgrade pip==26.0.1 pipx
         pipx ensurepath
 
 env:

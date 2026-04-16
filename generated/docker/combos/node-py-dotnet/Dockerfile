@@ -24,7 +24,7 @@ COPY --from=python_stage /usr/local /usr/local
 
 # --- Python runtime setup ---
 # Install pipx for isolated tool installs
-RUN pip install --no-cache-dir pipx && \
+RUN pip install --no-cache-dir --upgrade pip==26.0.1 pipx && \
     pipx ensurepath
 
 # --- Import runtime from .NET SDK base ---

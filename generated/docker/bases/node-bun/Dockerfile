@@ -38,11 +38,13 @@ RUN ln -sf /usr/bin/rg /usr/local/bin/rg || true
 # Layer 2: Node.js + Bun Runtime
 # Update npm, patch npm's bundled dependencies, and install Bun
 RUN npm install -g npm@11.12.1 && \
-    cd /usr/local/lib/node_modules/npm/node_modules/tinyglobby && \
-    npm install picomatch@4.0.4 && \
-    cd /usr/local/lib/node_modules/npm/node_modules/node-gyp && \
-    npm prune --omit=dev && \
-    cd / && \
+    tmpdir=$(mktemp -d) && \
+    npm install --prefix "$tmpdir" brace-expansion@5.0.5 && \
+    rm -rf /usr/local/lib/node_modules/npm/node_modules/brace-expansion && \
+    cp -R "$tmpdir/node_modules/brace-expansion" /usr/local/lib/node_modules/npm/node_modules/brace-expansion && \
+    rm -rf "$tmpdir" && \
+    npm install --prefix /usr/local/lib/node_modules/npm/node_modules/tinyglobby picomatch@4.0.4 && \
+    npm prune --omit=dev --prefix /usr/local/lib/node_modules/npm/node_modules/node-gyp && \
     export BUN_INSTALL=/usr/local/bun && \
     mkdir -p "$BUN_INSTALL" && \
     curl -fsSL https://bun.sh/install | bash && \

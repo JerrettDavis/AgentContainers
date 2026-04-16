@@ -37,7 +37,7 @@ RUN ln -sf /usr/bin/rg /usr/local/bin/rg || true
 
 # Layer 2: Python Runtime
 # Install pipx for isolated tool installs
-RUN pip install --no-cache-dir pipx && \
+RUN pip install --no-cache-dir --upgrade pip==26.0.1 pipx && \
     pipx ensurepath
 
 # Environment defaults (override at build time with --build-arg)

@@ -1,5 +1,5 @@
 {
-  "manifest_hash": "59f966805eba325f7442441e1a87d8bd17bec6b9d5d6b5d66205a8661d3c29b4",
+  "manifest_hash": "ede3a1633f7370efd0aa0e559a5cae142c23163b45e8867b1c69d8dfae373372",
   "generator_version": "0.1.0",
   "artifacts": [
     {
@@ -12,13 +12,13 @@
       "type": "dockerfile",
       "id": "base-node-bun",
       "path": "docker/bases/node-bun/Dockerfile",
-      "content_hash": "6dada4d1c9781961512a81593f98005caa04500d51fc9cb1bc353e34225c432b"
+      "content_hash": "89a2017db98f3f08032baeaff6ae3637113bcf2921ce4e74b60d332cfaedd804"
     },
     {
       "type": "dockerfile",
       "id": "base-python",
       "path": "docker/bases/python/Dockerfile",
-      "content_hash": "a7174b3e3e1cf5ebc85846aceb6051e435392eb7a2ae67b99be0963060e1f805"
+      "content_hash": "e151179bfd518651a3626ae19536675a7e4d0b2f01f1ab6fab5c56d7dc793593"
     },
     {
       "type": "dockerfile",
@@ -30,13 +30,13 @@
       "type": "dockerfile",
       "id": "combo-fullstack-polyglot",
       "path": "docker/combos/fullstack-polyglot/Dockerfile",
-      "content_hash": "fb43b99ae0d53eab3e46cac776cfd12a27d25bebf92a9b3f53b25e0c440f3711"
+      "content_hash": "b1073b052eebf78479a0ab53b5e8c179f8cea9acf8f8a19764f21e43dff824e0"
     },
     {
       "type": "dockerfile",
       "id": "combo-node-py-dotnet",
       "path": "docker/combos/node-py-dotnet/Dockerfile",
-      "content_hash": "9b07fa4e923b950b0c95719294a716496cfc748fcba7b8f384e36c5127edb606"
+      "content_hash": "ab0c0485b24a54144e6b2d64e65c080e99107211af7c65ed7bd10fc13bd4cbe3"
     },
     {
       "type": "dockerfile",
@@ -186,7 +186,7 @@
       "type": "catalog",
       "id": "image-catalog",
       "path": "image-catalog.json",
-      "content_hash": "75d254ad923c0cc339fef76489509d2e30b15ed4841d5a29a07bd9e566bd6cd2"
+      "content_hash": "e6653ea08f1933707b1443a1819e2f4b212dd7b5102d5c5df55154e7a0a04cc1"
     }
   ]
 }
