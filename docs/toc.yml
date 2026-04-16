@@ -1,12 +1,41 @@
 - name: Home
   href: index.md
 - name: Guides
-  href: articles/toc.yml
+  href: articles/
+  homepage: articles/getting-started.md
+  items:
+    - name: Getting started
+      href: articles/getting-started.md
+    - name: User guide
+      href: articles/user-guide.md
+    - name: Generator CLI
+      href: articles/generator-cli.md
+    - name: Dockerfiles and generated artifacts
+      href: articles/dockerfiles.md
+    - name: Dockerfile matrix
+      href: articles/dockerfile-matrix.md
+    - name: Examples
+      href: articles/examples.md
+    - name: Extending the matrix
+      href: articles/extending-the-matrix.md
 - name: Environment Contract
   href: ENV-CONTRACT.md
 - name: E2E Validation
   href: e2e-testing.md
 - name: Planning
-  href: plans/toc.yml
+  href: plans/
+  homepage: plans/README.md
+  items:
+    - name: Planning overview
+      href: plans/README.md
+    - name: Architecture
+      href: plans/ARCHITECTURE.md
+    - name: Implementation plan
+      href: plans/IMPLEMENTATION-PLAN.md
+    - name: Manifest model
+      href: plans/MANIFEST-MODEL.md
+    - name: Compose strategy
+      href: plans/COMPOSE-STRATEGY.md
 - name: API Reference
-  href: api/toc.yml
+  href: api/
+  homepage: api/toc.yml
