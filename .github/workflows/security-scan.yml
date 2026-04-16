@@ -163,6 +163,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: scan-target:${{ matrix.id }}
+          scanners: vuln
           format: sarif
           output: trivy-image-${{ matrix.id }}.sarif
           severity: CRITICAL,HIGH
