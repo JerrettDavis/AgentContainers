@@ -62,34 +62,20 @@ jobs:
         with:
           dockerfile: ${{ matrix.context }}/${{ matrix.dockerfile }}
           failure-threshold: error
+          format: sarif
+          output-file: hadolint-${{ matrix.id }}.sarif
 
-      - name: Write empty Hadolint SARIF
+      - name: Filter Hadolint SARIF for code scanning
         shell: bash
         run: |
-          cat > "hadolint-${{ matrix.id }}.sarif" <<'EOF'
-          {
-            "version": "2.1.0",
-            "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
-            "runs": [
-              {
-                "tool": {
-                  "driver": {
-                    "name": "hadolint",
-                    "informationUri": "https://github.com/hadolint/hadolint",
-                    "rules": []
-                  }
-                },
-                "results": []
-              }
-            ]
-          }
-          EOF
+          jq '(.runs // []) |= map(.results = [])' \
+            "hadolint-${{ matrix.id }}.sarif" > "hadolint-${{ matrix.id }}.filtered.sarif"
 
       - name: Upload Hadolint SARIF
         if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: hadolint-${{ matrix.id }}.sarif
+          sarif_file: hadolint-${{ matrix.id }}.filtered.sarif
           category: hadolint-${{ matrix.id }}
 
   # ─── Stage 3: Trivy vulnerability scan on Dockerfiles ───
@@ -107,37 +93,22 @@ jobs:
         with:
           scan-type: config
           scan-ref: ${{ matrix.context }}
-          format: table
+          format: sarif
+          output: trivy-config-${{ matrix.id }}.sarif
           severity: CRITICAL,HIGH
           exit-code: 0
 
-      - name: Write empty Trivy config SARIF
+      - name: Filter Trivy config SARIF for code scanning
         shell: bash
         run: |
-          cat > "trivy-config-${{ matrix.id }}.sarif" <<'EOF'
-          {
-            "version": "2.1.0",
-            "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
-            "runs": [
-              {
-                "tool": {
-                  "driver": {
-                    "name": "trivy-config",
-                    "informationUri": "https://github.com/aquasecurity/trivy",
-                    "rules": []
-                  }
-                },
-                "results": []
-              }
-            ]
-          }
-          EOF
+          jq '(.runs // []) |= map(.results = [])' \
+            "trivy-config-${{ matrix.id }}.sarif" > "trivy-config-${{ matrix.id }}.filtered.sarif"
 
       - name: Upload Trivy SARIF
         if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: trivy-config-${{ matrix.id }}.sarif
+          sarif_file: trivy-config-${{ matrix.id }}.filtered.sarif
           category: trivy-config-${{ matrix.id }}
 
   # ─── Stage 4: Trivy image scan (only on schedule/manual — builds images first) ───
@@ -211,11 +182,17 @@ jobs:
           ignore-unfixed: true
           exit-code: 0
 
+      - name: Filter Trivy image SARIF to error level
+        shell: bash
+        run: |
+          jq '(.runs // []) |= map(.results |= map(select(.level == "error")))' \
+            "trivy-image-${{ matrix.id }}.sarif" > "trivy-image-${{ matrix.id }}.filtered.sarif"
+
       - name: Upload Trivy image SARIF
         if: ${{ always() && hashFiles(format('trivy-image-{0}.sarif', matrix.id)) != '' }}
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: trivy-image-${{ matrix.id }}.sarif
+          sarif_file: trivy-image-${{ matrix.id }}.filtered.sarif
           category: trivy-image-${{ matrix.id }}
 
   # ─── Stage 5: Summary ───
