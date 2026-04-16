@@ -1,12 +1,12 @@
 {
-  "manifest_hash": "40beaa84c496d625f18545602b8f8d709a9be01509b555e4f79a657017950f24",
+  "manifest_hash": "21e8411b11b187d1248836ba898a488bc406b914b5008c266d0b3c0da35983fd",
   "generator_version": "0.1.0",
   "artifacts": [
     {
       "type": "dockerfile",
       "id": "base-dotnet",
       "path": "docker/bases/dotnet/Dockerfile",
-      "content_hash": "2e8fe6d5d8ba20a421df598dba940a493aed92aa73b8ab2dc8b78ae19dc8aefc"
+      "content_hash": "11afc061ca6f23856dee3cdfef5e6eb598a4371033d6fbb9051b168a0e8a3252"
     },
     {
       "type": "dockerfile",
@@ -30,13 +30,13 @@
       "type": "dockerfile",
       "id": "combo-fullstack-polyglot",
       "path": "docker/combos/fullstack-polyglot/Dockerfile",
-      "content_hash": "8e07c07b11bb827529e1ce39348ee5da925ea9e4861ef24bdc071bbebbd02fbd"
+      "content_hash": "fb43b99ae0d53eab3e46cac776cfd12a27d25bebf92a9b3f53b25e0c440f3711"
     },
     {
       "type": "dockerfile",
       "id": "combo-node-py-dotnet",
       "path": "docker/combos/node-py-dotnet/Dockerfile",
-      "content_hash": "e43ac8b08fb6dc99a7077731b90048460804ae86b444ddd93a07292b868962e3"
+      "content_hash": "9b07fa4e923b950b0c95719294a716496cfc748fcba7b8f384e36c5127edb606"
     },
     {
       "type": "dockerfile",
@@ -186,7 +186,7 @@
       "type": "catalog",
       "id": "image-catalog",
       "path": "image-catalog.json",
-      "content_hash": "c287739f61701a1ba44e9d825f4ecc842cd2e445ec2e10d7db34372e43d07904"
+      "content_hash": "658f19672bf34f47cb39e561c9a938cfebe70c4719b8f634be66f1901863eacb"
     }
   ]
 }

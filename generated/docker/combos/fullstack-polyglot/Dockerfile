@@ -51,6 +51,9 @@ RUN ln -sf /usr/share/dotnet/dotnet /usr/bin/dotnet
 # --- .NET SDK runtime setup ---
 # Configure dotnet CLI telemetry opt-out
 RUN echo 'export DOTNET_CLI_TELEMETRY_OPTOUT=1' >> /etc/profile.d/dotnet.sh
+# Remove inherited PowerShell runtime
+RUN rm -f /usr/bin/pwsh && \
+    rm -rf /usr/share/powershell
 
 # Re-apply common tool path helpers
 # Alias fd-find to fd

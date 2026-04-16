@@ -38,6 +38,9 @@ RUN ln -sf /usr/bin/rg /usr/local/bin/rg || true
 # Layer 2: .NET SDK Runtime
 # Configure dotnet CLI telemetry opt-out
 RUN echo 'export DOTNET_CLI_TELEMETRY_OPTOUT=1' >> /etc/profile.d/dotnet.sh
+# Remove inherited PowerShell runtime
+RUN rm -f /usr/bin/pwsh && \
+    rm -rf /usr/share/powershell
 
 # Environment defaults (override at build time with --build-arg)
 ARG DOTNET_CLI_TELEMETRY_OPTOUT=1

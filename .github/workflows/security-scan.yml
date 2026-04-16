@@ -111,17 +111,50 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Prebuild local combo dependencies
-        if: matrix.type == 'combo'
+      - name: Prebuild local image dependencies
         shell: bash
         run: |
           set -euo pipefail
-          docker build -t agentcontainers/node-bun:latest generated/docker/bases/node-bun
-          docker build -t agentcontainers/python:latest generated/docker/bases/python
-          docker build -t agentcontainers/dotnet:latest generated/docker/bases/dotnet
-          if grep -q 'agentcontainers/rust:latest' "${{ matrix.context }}/${{ matrix.dockerfile }}"; then
-            docker build -t agentcontainers/rust:latest generated/docker/bases/rust
-          fi
+          declare -A built=()
+
+          build_image() {
+            local image_id="$1"
+            local context=""
+            local dockerfile=""
+
+            if [[ -n "${built[$image_id]:-}" ]]; then
+              return
+            fi
+
+            if [[ -d "generated/docker/bases/$image_id" ]]; then
+              context="generated/docker/bases/$image_id"
+            elif [[ -d "generated/docker/combos/$image_id" ]]; then
+              context="generated/docker/combos/$image_id"
+            else
+              echo "No local dependency context found for agentcontainers/$image_id:latest" >&2
+              return 1
+            fi
+
+            dockerfile="$context/Dockerfile"
+            if [[ -f "$dockerfile" ]]; then
+              while IFS= read -r dependency; do
+                dependency="${dependency#agentcontainers/}"
+                dependency="${dependency%:latest}"
+                [[ "$dependency" == "$image_id" ]] && continue
+                build_image "$dependency"
+              done < <(grep -Eo 'agentcontainers/[[:alnum:]-]+:latest' "$dockerfile" | sort -u)
+            fi
+
+            docker build -t "agentcontainers/$image_id:latest" "$context"
+            built[$image_id]=1
+          }
+
+          target_dockerfile="${{ matrix.context }}/${{ matrix.dockerfile }}"
+          while IFS= read -r dependency; do
+            dependency="${dependency#agentcontainers/}"
+            dependency="${dependency%:latest}"
+            build_image "$dependency"
+          done < <(grep -Eo 'agentcontainers/[[:alnum:]-]+:latest' "$target_dockerfile" | sort -u)
 
       - name: Build image locally
         run: docker build --tag scan-target:${{ matrix.id }} --file ${{ matrix.context }}/${{ matrix.dockerfile }} ${{ matrix.context }}
@@ -138,7 +171,7 @@ jobs:
           exit-code: 0
 
       - name: Upload Trivy image SARIF
-        if: always()
+        if: ${{ always() && hashFiles(format('trivy-image-{0}.sarif', matrix.id)) != '' }}
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: trivy-image-${{ matrix.id }}.sarif

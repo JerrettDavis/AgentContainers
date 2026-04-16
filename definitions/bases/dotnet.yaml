@@ -24,6 +24,10 @@ install:
     - description: "Configure dotnet CLI telemetry opt-out"
       run: |
         echo 'export DOTNET_CLI_TELEMETRY_OPTOUT=1' >> /etc/profile.d/dotnet.sh
+    - description: "Remove inherited PowerShell runtime"
+      run: |
+        rm -f /usr/bin/pwsh
+        rm -rf /usr/share/powershell
 
 env:
   - name: DOTNET_CLI_TELEMETRY_OPTOUT
