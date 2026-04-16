@@ -288,6 +288,25 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
+      - name: Resolve publish tags
+        id: publish_tags
+        shell: bash
+        env:
+          RAW_TAGS: ${{ matrix.image_tags }}
+          RAW_PRIMARY_TAG: ${{ matrix.primary_tag }}
+        run: |
+          owner="${GITHUB_REPOSITORY_OWNER,,}"
+          placeholder='$'
+          placeholder+='{{ github.repository_owner }}'
+          tags="${RAW_TAGS//$placeholder/$owner}"
+          primary_tag="${RAW_PRIMARY_TAG//$placeholder/$owner}"
+          {
+            echo "tags<<EOF"
+            printf '%s\n' "$tags"
+            echo "EOF"
+            echo "primary_tag=$primary_tag"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
@@ -295,7 +314,7 @@ jobs:
           file: ${{ matrix.context }}/${{ matrix.dockerfile }}
           platforms: ${{ matrix.platforms }}
           push: ${{ github.event.inputs.dry_run != 'true' }}
-          tags: ${{ matrix.image_tags }}
+          tags: ${{ steps.publish_tags.outputs.tags }}
           build-args: |
             BUILD_DATE=${{ github.event.repository.updated_at }}
             VCS_REF=${{ github.sha }}
@@ -310,7 +329,7 @@ jobs:
         if: github.event.inputs.dry_run != 'true'
         uses: anchore/sbom-action@v0
         with:
-          image: ${{ matrix.primary_tag }}
+          image: ${{ steps.publish_tags.outputs.primary_tag }}
           artifact-name: sbom-${{ matrix.id }}.spdx.json
           output-file: sbom-${{ matrix.id }}.spdx.json
           format: spdx-json

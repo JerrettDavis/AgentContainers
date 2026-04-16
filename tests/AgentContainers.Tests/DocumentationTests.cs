@@ -66,10 +66,13 @@ public class DocumentationTests
         var tocPath = Path.Combine(GetRepoRoot(), "docs", "toc.yml");
         var content = File.ReadAllText(tocPath);
 
-        Assert.Contains("articles/toc.yml", content);
-        Assert.Contains("plans/toc.yml", content);
+        Assert.Contains("href: articles/", content);
+        Assert.Contains("homepage: articles/getting-started.md", content);
+        Assert.Contains("href: plans/", content);
+        Assert.Contains("homepage: plans/README.md", content);
         Assert.Contains("ENV-CONTRACT.md", content);
         Assert.Contains("e2e-testing.md", content);
+        Assert.Contains("api/", content);
         Assert.Contains("api/toc.yml", content);
     }
 
