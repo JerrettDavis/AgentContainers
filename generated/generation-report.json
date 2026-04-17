@@ -1,5 +1,5 @@
 {
-  "manifest_hash": "a03b956176c449b75c5513f01eeb1f1ae640110bfee33973a1a17cb7c16697e6",
+  "manifest_hash": "9a8fdeb6a2d193a0368f71b50df7ea05ac47b2f2873f6756ff0d4233960c6700",
   "generator_version": "0.1.0",
   "artifacts": [
     {
@@ -30,199 +30,199 @@
       "type": "dockerfile",
       "id": "combo-fullstack-polyglot",
       "path": "docker/combos/fullstack-polyglot/Dockerfile",
-      "content_hash": "b1073b052eebf78479a0ab53b5e8c179f8cea9acf8f8a19764f21e43dff824e0"
+      "content_hash": "4e025d252945c43ad2844ae5f9505c9d6807688545e1e8cf094a7bfbb057bc41"
     },
     {
       "type": "dockerfile",
       "id": "combo-node-py-dotnet",
       "path": "docker/combos/node-py-dotnet/Dockerfile",
-      "content_hash": "ab0c0485b24a54144e6b2d64e65c080e99107211af7c65ed7bd10fc13bd4cbe3"
+      "content_hash": "854d16b2d61325185ca7a98579e63d4b9ea8b63defa8055c7c5526f78f4b6407"
     },
     {
       "type": "dockerfile",
       "id": "agent-node-bun-claude",
       "path": "docker/agents/node-bun-claude/Dockerfile",
-      "content_hash": "bd2c506850665a69936d772f393926d509e8474bf42a65f58387223bf1707d8b"
+      "content_hash": "e3f93ecd6be8f8d9c25a81d175a43899c7fc560cc59e91cc4158a418083f674b"
     },
     {
       "type": "dockerfile",
       "id": "agent-fullstack-polyglot-claude",
       "path": "docker/agents/fullstack-polyglot-claude/Dockerfile",
-      "content_hash": "7c1257c8837a41ba29693fecb844256abb4e21f294ed17fcb9b1caae5039cbaa"
+      "content_hash": "2c75325b1dd3fd0c9f2d603c601b98aef24efa21aaa16cbdc62262998c276b23"
     },
     {
       "type": "dockerfile",
       "id": "agent-node-py-dotnet-claude",
       "path": "docker/agents/node-py-dotnet-claude/Dockerfile",
-      "content_hash": "18818fcdab1cdd6660ea7ac66d567dee9688c562e602e13ef3766e7869159957"
+      "content_hash": "de947f89ad977b1601630d7f9b033f46f406a79f46b8e247cfaa26a9a9068f2a"
     },
     {
       "type": "dockerfile",
       "id": "agent-node-bun-codex",
       "path": "docker/agents/node-bun-codex/Dockerfile",
-      "content_hash": "11d20cd2df9850cd0be65f7a10893d1d92b4c76ea8f5361e2206c0e1dc47a3ad"
+      "content_hash": "2b92fa37918d345907a443b4b9145efb30fe5dbe1175e41953bb72299f065921"
     },
     {
       "type": "dockerfile",
       "id": "agent-fullstack-polyglot-codex",
       "path": "docker/agents/fullstack-polyglot-codex/Dockerfile",
-      "content_hash": "3f318a64814b69225e8cd58854b4b6bd3d9ff02d52031b1d39ea191608658c58"
+      "content_hash": "0f3faf854c49d3245d99d3805aeff86add37410def89cae250ef4636242477ea"
     },
     {
       "type": "dockerfile",
       "id": "agent-node-py-dotnet-codex",
       "path": "docker/agents/node-py-dotnet-codex/Dockerfile",
-      "content_hash": "c4782ea39ebd96d96db0527e6fd4a6896a34ea9840a9919f477f8535eb1f4519"
+      "content_hash": "7bd98e3bc8b8999457dd4872dd2b71359efb1ba84eed276c150b43f7c0aab574"
     },
     {
       "type": "dockerfile",
       "id": "agent-node-bun-copilot",
       "path": "docker/agents/node-bun-copilot/Dockerfile",
-      "content_hash": "72203604ad9f8332c5c6614020ba4dceffa4a870e664c23cb0c40e5dc05cc122"
+      "content_hash": "63a471a9d7dcc7a4b8105e76c13f5428b1b60c1f24e80792ca5580a2fd804148"
     },
     {
       "type": "dockerfile",
       "id": "agent-fullstack-polyglot-copilot",
       "path": "docker/agents/fullstack-polyglot-copilot/Dockerfile",
-      "content_hash": "ecc740637068aae7e5f9e0d86ca5e9166f9317f2cb071c38cc0a3ccf11a83196"
+      "content_hash": "e0e24af463d27a52a55e9e8400e717b06f732399f4ff6fd29dc1ba0426d58e35"
     },
     {
       "type": "dockerfile",
       "id": "agent-node-py-dotnet-copilot",
       "path": "docker/agents/node-py-dotnet-copilot/Dockerfile",
-      "content_hash": "89ec4a6c668bdae2993279962f5acbe58bf512f09cccf968867c741a12e3e9a6"
+      "content_hash": "71c19fca50387705e8e47e5983af1f2e29e5af921ca96e2ee35fb9abfe8fa1d2"
     },
     {
       "type": "dockerfile",
       "id": "agent-node-bun-openclaw",
       "path": "docker/agents/node-bun-openclaw/Dockerfile",
-      "content_hash": "f0e75dfa57b4a48c170a500190a1fd474c86b7e568270a834b6eb14f5121660c"
+      "content_hash": "bd1a9d9b429d95a8ef6122869c812f7bc3d2727521ebe1948ee307a19a82036b"
     },
     {
       "type": "dockerfile",
       "id": "agent-fullstack-polyglot-openclaw",
       "path": "docker/agents/fullstack-polyglot-openclaw/Dockerfile",
-      "content_hash": "fe9b4d4e269f092925f7e3c62d12e81c255a1e904c23cc7572ac7b890c18b474"
+      "content_hash": "8d37b80f2c2e18494cf80e5614ae9507be1091a707bf28acc0678bdc8f66819e"
     },
     {
       "type": "dockerfile",
       "id": "agent-node-py-dotnet-openclaw",
       "path": "docker/agents/node-py-dotnet-openclaw/Dockerfile",
-      "content_hash": "a2f766eceac7125e979cb1e90b6ab709ccef17e2cd318ef6eef67e2c849d0f73"
+      "content_hash": "2e4d4cb7a09f43a27e87d069b19ec436e3143ed715d78a22c84271b002b75e27"
     },
     {
       "type": "dockerfile",
       "id": "tool-pack-node-bun-devtools",
       "path": "docker/tool-packs/node-bun-devtools/Dockerfile",
-      "content_hash": "f00259f80ba0ad49aa9b5636810f9a6d85a5c9b69a02565ba0df8e0e14ac2dcf"
+      "content_hash": "f86ae79df9bf30bd6f9b44551cc087131677042d0674b41ab187bfd8e5d0313b"
     },
     {
       "type": "dockerfile",
       "id": "tool-pack-node-py-dotnet-devtools",
       "path": "docker/tool-packs/node-py-dotnet-devtools/Dockerfile",
-      "content_hash": "52d8261c497797cb6e6ebac9fd84a468e7880e3569e23f63a659066a4919587b"
+      "content_hash": "38fbbd231bf48b2c1cf4c42f2711ae2805ca9a7bbb7c30b432f6f48650c162a5"
     },
     {
       "type": "dockerfile",
       "id": "tool-pack-fullstack-polyglot-devtools",
       "path": "docker/tool-packs/fullstack-polyglot-devtools/Dockerfile",
-      "content_hash": "f475423957b7f9a811858992ceb76c23ba0db14ff7a7252a11ba3a4c833e44dc"
+      "content_hash": "5518f48cab251907a7fa4b3b109dc50192f88d2182c3285b91644eb3d5ba85a6"
     },
     {
       "type": "dockerfile",
       "id": "tag-policy-dotnet-claude",
       "path": "docker/images/dotnet-claude/Dockerfile",
-      "content_hash": "0bd6a9be1b42b4d05aa7ddb0698c237107359df58480fc9a34ebbf010c05b286"
+      "content_hash": "f718d583edfc9239ea829d02672fe6911138fc699312c74c0a8d25ea32966bfe"
     },
     {
       "type": "dockerfile",
       "id": "tag-policy-dotnet-codex",
       "path": "docker/images/dotnet-codex/Dockerfile",
-      "content_hash": "a8539072c119f7e5db0ef0f5679bddcd0004a9d28aef43994943cc3a397670d1"
+      "content_hash": "7204ce00164cf99f9e04a97bd61e2dec1114ba3bf77362b2d70409549adb637c"
     },
     {
       "type": "dockerfile",
       "id": "tag-policy-dotnet-copilot",
       "path": "docker/images/dotnet-copilot/Dockerfile",
-      "content_hash": "1512984d0b9ae24396e4f08615b3cbbb26fe91f147729844919e423d879657eb"
+      "content_hash": "d7e5a991b896998e0c0890f28109eb5b4c63df86d45727da06707ef903eb5c9f"
     },
     {
       "type": "dockerfile",
       "id": "tag-policy-openclaw-dotnet",
       "path": "docker/images/openclaw-dotnet/Dockerfile",
-      "content_hash": "fb32d934e3ee157d1971bbac914d1081b366621daf4722a755988fb65729af53"
+      "content_hash": "f89bc8def3ff189b4994b56166f028d14170b42372917fcdf7d588a9bcd54223"
     },
     {
       "type": "dockerfile",
       "id": "tag-policy-polyglot-menagerie",
       "path": "docker/images/polyglot-menagerie/Dockerfile",
-      "content_hash": "f4b30682ab7b9883583b15d3cdb49a909aea3adeef4ceac2343f1be184681227"
+      "content_hash": "01670460e421381aed8ff03abdb63ef6d6dd4c7301b75b3703a9821553f19561"
     },
     {
       "type": "dockerfile",
       "id": "tag-policy-tools-swiss-army",
       "path": "docker/images/tools-swiss-army/Dockerfile",
-      "content_hash": "751a22a4c27893fc46ee82db59033f4bde328ca1272522541fbd1ca81d35ab58"
+      "content_hash": "3a6cad70d48a669eea2c7b6b82ac03bb3c5ad4c1420eeb480ea5e3708d4f0003"
     },
     {
       "type": "compose-fragment",
       "id": "agent-claude",
       "path": "compose/fragments/claude-service.yaml",
-      "content_hash": "66190a9ff8caa4018e140979ff84bb26ef99f910fd6b94c3177738df7aac39d8"
+      "content_hash": "13cc770935c835b35d3eb603b02b0d4a89b953b9f82dac9afb612b565134c3c1"
     },
     {
       "type": "compose-fragment",
       "id": "agent-codex",
       "path": "compose/fragments/codex-service.yaml",
-      "content_hash": "a3f1eaee51abf4814c4fb6bfea1817d9724170f67316dd4a7eec0481d02d1be4"
+      "content_hash": "a5bf858308da8a60a8af8bbb04984978b51647201ebc2dd102f00a78787aa523"
     },
     {
       "type": "compose-fragment",
       "id": "agent-copilot",
       "path": "compose/fragments/copilot-service.yaml",
-      "content_hash": "d822dcd1b1104920fca58b4253d014f7f33d5dc952bf7285d676d75cbf13ff62"
+      "content_hash": "90ecc4fd30c461847f4af27c23b1ce0a3a2d6222576afc856bfb7a90b10f8595"
     },
     {
       "type": "compose-fragment",
       "id": "agent-openclaw",
       "path": "compose/fragments/openclaw-service.yaml",
-      "content_hash": "e1f9ea0432572bf81df4f072823bf304232b901858006efcd5a9eda40258d584"
+      "content_hash": "787d2a07719073072d88b976c18a78ef28baacfa4c446a1d866c54d2d61ce8de"
     },
     {
       "type": "compose-stack",
       "id": "stack-gateway-headroom",
       "path": "compose/stacks/gateway-headroom/docker-compose.yaml",
-      "content_hash": "3603112fb716368f2622e07eedd2a1c91ae349d1930fab57b8f2656f26f5d9b9"
+      "content_hash": "9a68752cea416c889af6e61ddf442e42673dcf12de23f082c852f419d7b6d952"
     },
     {
       "type": "compose-stack",
       "id": "stack-polyglot-devtools",
       "path": "compose/stacks/polyglot-devtools/docker-compose.yaml",
-      "content_hash": "04d78fdac462d8f7659ef182fd7a70641e07b19466692cbe4cacf8983a786d77"
+      "content_hash": "fb8518862836c5a128deecc9472c67ac7e8525f80c31d014011d7fde0b74c9f9"
     },
     {
       "type": "compose-stack",
       "id": "stack-solo-claude",
       "path": "compose/stacks/solo-claude/docker-compose.yaml",
-      "content_hash": "87edefff21e9791ab85b85fab1c899b7175c9b095d6914a5f704558c31322903"
+      "content_hash": "c42c8b1dc0ee78bc9419c17a591aa314704a534d14f41b47bd6080079e5f5a72"
     },
     {
       "type": "compose-stack",
       "id": "stack-solo-codex",
       "path": "compose/stacks/solo-codex/docker-compose.yaml",
-      "content_hash": "030745eaf2653f9d49e1bfcc08f7a3ce2c918d0e6b50b7dcc2edb1c4b07ed955"
+      "content_hash": "0632f1fb757583755ea4f80d7d2e36099acc5f65fda6ef320a4740b28f86dd95"
     },
     {
       "type": "compose-stack",
       "id": "stack-solo-copilot",
       "path": "compose/stacks/solo-copilot/docker-compose.yaml",
-      "content_hash": "b636b0a2de1e84f4cb555ede33ce75980ce0dadc91ef1c566c3ea32930d74743"
+      "content_hash": "ffd89a76dfd817b9397d75b562b3ffadd2c013b7b625fe300f24cc5d65def609"
     },
     {
       "type": "catalog",
       "id": "image-catalog",
       "path": "image-catalog.json",
-      "content_hash": "8595526d72acce56fa08171a77ce7f556ad1162ab72453b522bea1eafef864ba"
+      "content_hash": "da715471273f7f913b96025a5e3e0c83a7ad5edc399611ce32d9ea637f340b28"
     }
   ]
 }

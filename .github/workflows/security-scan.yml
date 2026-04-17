@@ -130,6 +130,7 @@ jobs:
 
           build_image() {
             local image_id="$1"
+            local source_id="${image_id#ac-}"
             local context=""
             local dockerfile=""
 
@@ -137,10 +138,10 @@ jobs:
               return
             fi
 
-            if [[ -d "generated/docker/bases/$image_id" ]]; then
-              context="generated/docker/bases/$image_id"
-            elif [[ -d "generated/docker/combos/$image_id" ]]; then
-              context="generated/docker/combos/$image_id"
+            if [[ -d "generated/docker/bases/$source_id" ]]; then
+              context="generated/docker/bases/$source_id"
+            elif [[ -d "generated/docker/combos/$source_id" ]]; then
+              context="generated/docker/combos/$source_id"
             else
               echo "No local dependency context found for agentcontainers/$image_id:latest" >&2
               return 1

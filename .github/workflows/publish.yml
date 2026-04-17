@@ -109,7 +109,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.id }}
+          images: ${{ matrix.image_name }}
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
@@ -200,10 +200,10 @@ jobs:
           IFS='+' read -ra bases <<< "${{ matrix.family }}"
           {
             echo "args<<EOF"
-            echo "PRIMARY_BASE_IMAGE=ghcr.io/${owner}/${bases[0]}:${version}"
+            echo "PRIMARY_BASE_IMAGE=ghcr.io/${owner}/ac-${bases[0]}:${version}"
             for base in "${bases[@]:1}"; do
               key="$(echo "$base" | tr '[:lower:]-' '[:upper:]_')_STAGE_IMAGE"
-              echo "${key}=ghcr.io/${owner}/${base}:${version}"
+              echo "${key}=ghcr.io/${owner}/ac-${base}:${version}"
             done
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
@@ -284,7 +284,7 @@ jobs:
           fi
           {
             echo "args<<EOF"
-            echo "BASE_IMAGE=ghcr.io/${owner}/${{ matrix.base_id }}:${base_ref}"
+            echo "BASE_IMAGE=ghcr.io/${owner}/ac-${{ matrix.base_id }}:${base_ref}"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 

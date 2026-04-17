@@ -1,5 +1,5 @@
 {
-  "manifest_hash": "a03b956176c449b75c5513f01eeb1f1ae640110bfee33973a1a17cb7c16697e6",
+  "manifest_hash": "9a8fdeb6a2d193a0368f71b50df7ea05ac47b2f2873f6756ff0d4233960c6700",
   "generator_version": "0.1.0",
   "registry": "ghcr.io/agentcontainers",
   "images": [
@@ -19,7 +19,7 @@
         "linux/amd64",
         "linux/arm64"
       ],
-      "registry": "ghcr.io/agentcontainers/dotnet"
+      "registry": "ghcr.io/agentcontainers/ac-dotnet"
     },
     {
       "type": "base",
@@ -39,7 +39,7 @@
         "linux/amd64",
         "linux/arm64"
       ],
-      "registry": "ghcr.io/agentcontainers/node-bun"
+      "registry": "ghcr.io/agentcontainers/ac-node-bun"
     },
     {
       "type": "base",
@@ -57,7 +57,7 @@
         "linux/amd64",
         "linux/arm64"
       ],
-      "registry": "ghcr.io/agentcontainers/python"
+      "registry": "ghcr.io/agentcontainers/ac-python"
     },
     {
       "type": "base",
@@ -75,7 +75,7 @@
         "linux/amd64",
         "linux/arm64"
       ],
-      "registry": "ghcr.io/agentcontainers/rust"
+      "registry": "ghcr.io/agentcontainers/ac-rust"
     },
     {
       "type": "combo",
@@ -111,7 +111,7 @@
         "linux/amd64",
         "linux/arm64"
       ],
-      "registry": "ghcr.io/agentcontainers/fullstack-polyglot"
+      "registry": "ghcr.io/agentcontainers/ac-fullstack-polyglot"
     },
     {
       "type": "combo",
@@ -140,7 +140,7 @@
         "linux/amd64",
         "linux/arm64"
       ],
-      "registry": "ghcr.io/agentcontainers/node-py-dotnet"
+      "registry": "ghcr.io/agentcontainers/ac-node-py-dotnet"
     },
     {
       "type": "agent",
@@ -292,7 +292,7 @@
       "display_name": "Developer Power Tools on node-bun",
       "tool_pack": "devtools",
       "base_id": "node-bun",
-      "registry": "ghcr.io/agentcontainers/node-bun-devtools"
+      "registry": "ghcr.io/agentcontainers/ac-node-bun-devtools"
     },
     {
       "type": "tool-pack-image",
@@ -300,7 +300,7 @@
       "display_name": "Developer Power Tools on node-py-dotnet",
       "tool_pack": "devtools",
       "base_id": "node-py-dotnet",
-      "registry": "ghcr.io/agentcontainers/node-py-dotnet-devtools"
+      "registry": "ghcr.io/agentcontainers/ac-node-py-dotnet-devtools"
     },
     {
       "type": "tool-pack-image",
@@ -308,7 +308,7 @@
       "display_name": "Developer Power Tools on fullstack-polyglot",
       "tool_pack": "devtools",
       "base_id": "fullstack-polyglot",
-      "registry": "ghcr.io/agentcontainers/fullstack-polyglot-devtools"
+      "registry": "ghcr.io/agentcontainers/ac-fullstack-polyglot-devtools"
     },
     {
       "type": "tag-policy-image",
@@ -327,12 +327,12 @@
         "linux/arm64"
       ],
       "tags": [
-        "ghcr.io/agentcontainers/dotnet:claude-0.1.0",
-        "ghcr.io/agentcontainers/dotnet:claude-0.1",
-        "ghcr.io/agentcontainers/dotnet:claude-0",
-        "ghcr.io/agentcontainers/dotnet:claude-latest",
-        "ghcr.io/agentcontainers/claude:dotnet10-node24-0.1.0",
-        "ghcr.io/agentcontainers/claude:dotnet10-node24"
+        "ghcr.io/agentcontainers/ac-dotnet:claude-0.1.0",
+        "ghcr.io/agentcontainers/ac-dotnet:claude-0.1",
+        "ghcr.io/agentcontainers/ac-dotnet:claude-0",
+        "ghcr.io/agentcontainers/ac-dotnet:claude-latest",
+        "ghcr.io/agentcontainers/ac-claude:dotnet10-node24-0.1.0",
+        "ghcr.io/agentcontainers/ac-claude:dotnet10-node24"
       ]
     },
     {
@@ -352,12 +352,12 @@
         "linux/arm64"
       ],
       "tags": [
-        "ghcr.io/agentcontainers/dotnet:codex-0.1.0",
-        "ghcr.io/agentcontainers/dotnet:codex-0.1",
-        "ghcr.io/agentcontainers/dotnet:codex-0",
-        "ghcr.io/agentcontainers/dotnet:codex-latest",
-        "ghcr.io/agentcontainers/codex:dotnet10-node24-0.1.0",
-        "ghcr.io/agentcontainers/codex:dotnet10-node24"
+        "ghcr.io/agentcontainers/ac-dotnet:codex-0.1.0",
+        "ghcr.io/agentcontainers/ac-dotnet:codex-0.1",
+        "ghcr.io/agentcontainers/ac-dotnet:codex-0",
+        "ghcr.io/agentcontainers/ac-dotnet:codex-latest",
+        "ghcr.io/agentcontainers/ac-codex:dotnet10-node24-0.1.0",
+        "ghcr.io/agentcontainers/ac-codex:dotnet10-node24"
       ]
     },
     {
@@ -377,12 +377,12 @@
         "linux/arm64"
       ],
       "tags": [
-        "ghcr.io/agentcontainers/dotnet:copilot-0.1.0",
-        "ghcr.io/agentcontainers/dotnet:copilot-0.1",
-        "ghcr.io/agentcontainers/dotnet:copilot-0",
-        "ghcr.io/agentcontainers/dotnet:copilot-latest",
-        "ghcr.io/agentcontainers/copilot:dotnet10-node24-0.1.0",
-        "ghcr.io/agentcontainers/copilot:dotnet10-node24"
+        "ghcr.io/agentcontainers/ac-dotnet:copilot-0.1.0",
+        "ghcr.io/agentcontainers/ac-dotnet:copilot-0.1",
+        "ghcr.io/agentcontainers/ac-dotnet:copilot-0",
+        "ghcr.io/agentcontainers/ac-dotnet:copilot-latest",
+        "ghcr.io/agentcontainers/ac-copilot:dotnet10-node24-0.1.0",
+        "ghcr.io/agentcontainers/ac-copilot:dotnet10-node24"
       ]
     },
     {
@@ -402,12 +402,12 @@
         "linux/arm64"
       ],
       "tags": [
-        "ghcr.io/agentcontainers/dotnet:openclaw-0.1.0",
-        "ghcr.io/agentcontainers/dotnet:openclaw-0.1",
-        "ghcr.io/agentcontainers/dotnet:openclaw-0",
-        "ghcr.io/agentcontainers/dotnet:openclaw-latest",
-        "ghcr.io/agentcontainers/openclaw:dotnet10-node24-devtools-0.1.0",
-        "ghcr.io/agentcontainers/openclaw:dotnet10-node24-devtools"
+        "ghcr.io/agentcontainers/ac-dotnet:openclaw-0.1.0",
+        "ghcr.io/agentcontainers/ac-dotnet:openclaw-0.1",
+        "ghcr.io/agentcontainers/ac-dotnet:openclaw-0",
+        "ghcr.io/agentcontainers/ac-dotnet:openclaw-latest",
+        "ghcr.io/agentcontainers/ac-openclaw:dotnet10-node24-devtools-0.1.0",
+        "ghcr.io/agentcontainers/ac-openclaw:dotnet10-node24-devtools"
       ]
     },
     {
@@ -430,10 +430,10 @@
         "linux/arm64"
       ],
       "tags": [
-        "ghcr.io/agentcontainers/polyglot:menagerie-0.1.0",
-        "ghcr.io/agentcontainers/polyglot:menagerie",
-        "ghcr.io/agentcontainers/menagerie:dotnet10-node24-python312-rust-0.1.0",
-        "ghcr.io/agentcontainers/menagerie:dotnet10-node24-python312-rust-latest"
+        "ghcr.io/agentcontainers/ac-polyglot:menagerie-0.1.0",
+        "ghcr.io/agentcontainers/ac-polyglot:menagerie",
+        "ghcr.io/agentcontainers/ac-menagerie:dotnet10-node24-python312-rust-0.1.0",
+        "ghcr.io/agentcontainers/ac-menagerie:dotnet10-node24-python312-rust-latest"
       ]
     },
     {
@@ -451,10 +451,10 @@
         "linux/arm64"
       ],
       "tags": [
-        "ghcr.io/agentcontainers/tools:swiss-army-0.1.0",
-        "ghcr.io/agentcontainers/tools:swiss-army",
-        "ghcr.io/agentcontainers/polyglot:toolbox-0.1.0",
-        "ghcr.io/agentcontainers/polyglot:toolbox"
+        "ghcr.io/agentcontainers/ac-tools:swiss-army-0.1.0",
+        "ghcr.io/agentcontainers/ac-tools:swiss-army",
+        "ghcr.io/agentcontainers/ac-polyglot:toolbox-0.1.0",
+        "ghcr.io/agentcontainers/ac-polyglot:toolbox"
       ]
     }
   ]

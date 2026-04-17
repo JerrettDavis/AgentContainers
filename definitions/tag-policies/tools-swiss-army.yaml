@@ -11,11 +11,11 @@ tool_packs:
 release_version: 0.1.0
 
 publish:
-  - repository: tools
+  - repository: ac-tools
     tags:
       - swiss-army-{{version}}
       - swiss-army
-  - repository: polyglot
+  - repository: ac-polyglot
     tags:
       - toolbox-{{version}}
       - toolbox

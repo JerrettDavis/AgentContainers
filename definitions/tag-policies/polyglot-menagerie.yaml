@@ -15,11 +15,11 @@ tool_packs:
 release_version: 0.1.0
 
 publish:
-  - repository: polyglot
+  - repository: ac-polyglot
     tags:
       - menagerie-{{version}}
       - menagerie
-  - repository: menagerie
+  - repository: ac-menagerie
     tags:
       - dotnet10-node24-python312-rust-{{version}}
       - dotnet10-node24-python312-rust-latest

@@ -3,7 +3,7 @@
 
 services:
   copilot:
-    image: ghcr.io/agentcontainers/node-bun-copilot:latest
+    image: ghcr.io/agentcontainers/ac-node-bun-copilot:latest
     environment:
       - GITHUB_TOKEN=${GITHUB_TOKEN:?GITHUB_TOKEN is required}
       - COPILOT_CONFIG_DIR=/home/dev/.config/github-copilot

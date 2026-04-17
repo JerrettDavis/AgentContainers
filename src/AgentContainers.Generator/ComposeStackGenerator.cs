@@ -83,7 +83,7 @@ internal static class ComposeStackGenerator
         ResolvedService rs, ComposeService svc, AgentManifest agent, ManifestCatalog catalog)
     {
         var baseName = svc.Base ?? "node-bun";
-        rs.Image = $"ghcr.io/agentcontainers/{baseName}-{agent.Id}:latest";
+        rs.Image = $"ghcr.io/agentcontainers/ac-{baseName}-{agent.Id}:latest";
 
         foreach (var env in agent.Env)
         {
@@ -130,7 +130,7 @@ internal static class ComposeStackGenerator
 
     private static void ResolveSidecarService(ResolvedService rs, ComposeService svc, ManifestCatalog catalog)
     {
-        rs.Image = svc.Image ?? $"ghcr.io/agentcontainers/{svc.Id}:latest";
+        rs.Image = svc.Image ?? $"ghcr.io/agentcontainers/ac-{svc.Id}:latest";
         rs.Ports.AddRange(svc.Ports);
         rs.Networks.Add("agent-net");
 

@@ -3,7 +3,7 @@
 
 services:
   claude:
-    image: ghcr.io/agentcontainers/node-bun-claude:latest
+    image: ghcr.io/agentcontainers/ac-node-bun-claude:latest
     environment:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:?ANTHROPIC_API_KEY is required}
       - CLAUDE_CONFIG_DIR=/home/dev/.config/claude

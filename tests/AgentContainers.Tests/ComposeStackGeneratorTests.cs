@@ -53,7 +53,7 @@ public class ComposeStackGeneratorTests
         var stack = catalog.ComposeStacks["solo-claude"];
         var services = ComposeStackGenerator.ResolveServices(stack, catalog);
 
-        Assert.Equal("ghcr.io/agentcontainers/node-bun-claude:latest", services[0].Image);
+        Assert.Equal("ghcr.io/agentcontainers/ac-node-bun-claude:latest", services[0].Image);
     }
 
     [Fact]
@@ -160,7 +160,7 @@ public class ComposeStackGeneratorTests
 
         Assert.Contains("services:", output);
         Assert.Contains("claude:", output);
-        Assert.Contains("image: ghcr.io/agentcontainers/node-bun-claude:latest", output);
+        Assert.Contains("image: ghcr.io/agentcontainers/ac-node-bun-claude:latest", output);
         Assert.Contains("networks:", output);
         Assert.Contains("volumes:", output);
     }

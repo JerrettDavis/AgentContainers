@@ -12,13 +12,13 @@ tool_packs:
 release_version: 0.1.0
 
 publish:
-  - repository: dotnet
+  - repository: ac-dotnet
     tags:
       - codex-{{version}}
       - codex-{{major}}.{{minor}}
       - codex-{{major}}
       - codex-latest
-  - repository: codex
+  - repository: ac-codex
     tags:
       - dotnet10-node24-{{version}}
       - dotnet10-node24

@@ -3,7 +3,7 @@
 
 services:
   openclaw:
-    image: ghcr.io/agentcontainers/node-bun-openclaw:latest
+    image: ghcr.io/agentcontainers/ac-node-bun-openclaw:latest
     environment:
       - OPENCLAW_API_KEY=${OPENCLAW_API_KEY:?OPENCLAW_API_KEY is required}
       - OPENCLAW_PORT=3000

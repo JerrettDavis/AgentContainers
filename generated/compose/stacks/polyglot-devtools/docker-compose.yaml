@@ -3,7 +3,7 @@
 
 services:
   claude-polyglot:
-    image: ghcr.io/agentcontainers/fullstack-polyglot-claude:latest
+    image: ghcr.io/agentcontainers/ac-fullstack-polyglot-claude:latest
     environment:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:?ANTHROPIC_API_KEY is required}
       - CLAUDE_CONFIG_DIR=/home/dev/.config/claude
@@ -60,7 +60,7 @@ services:
       start_period: 15s
     restart: unless-stopped
   codex-polyglot:
-    image: ghcr.io/agentcontainers/fullstack-polyglot-codex:latest
+    image: ghcr.io/agentcontainers/ac-fullstack-polyglot-codex:latest
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY:?OPENAI_API_KEY is required}
       - CODEX_HOME=/home/dev/.config/codex

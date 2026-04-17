@@ -12,13 +12,13 @@ tool_packs:
 release_version: 0.1.0
 
 publish:
-  - repository: dotnet
+  - repository: ac-dotnet
     tags:
       - copilot-{{version}}
       - copilot-{{major}}.{{minor}}
       - copilot-{{major}}
       - copilot-latest
-  - repository: copilot
+  - repository: ac-copilot
     tags:
       - dotnet10-node24-{{version}}
       - dotnet10-node24

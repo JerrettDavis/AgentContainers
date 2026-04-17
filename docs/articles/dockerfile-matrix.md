@@ -14,10 +14,10 @@ This page is the operator-facing index of the checked-in Dockerfile and compose 
 ### Base image `docker run` batch
 
 ```bash
-docker run --rm -it ghcr.io/<owner>/dotnet:0.1.0 dotnet --info
-docker run --rm -it ghcr.io/<owner>/node-bun:0.1 node --version
-docker run --rm -it ghcr.io/<owner>/python:latest python3 --version
-docker run --rm -it ghcr.io/<owner>/rust:main rustc --version
+docker run --rm -it ghcr.io/JerrettDavis/ac-dotnet:0.1.0 dotnet --info
+docker run --rm -it ghcr.io/JerrettDavis/ac-node-bun:0.1 node --version
+docker run --rm -it ghcr.io/JerrettDavis/ac-python:latest python3 --version
+docker run --rm -it ghcr.io/JerrettDavis/ac-rust:main rustc --version
 ```
 
 ## Combo Dockerfiles
@@ -30,8 +30,8 @@ docker run --rm -it ghcr.io/<owner>/rust:main rustc --version
 ### Combo image `docker run` batch
 
 ```bash
-docker run --rm -it ghcr.io/<owner>/node-py-dotnet:latest bash -lc "node --version && python3 --version && dotnet --version"
-docker run --rm -it ghcr.io/<owner>/fullstack-polyglot:main bash -lc "node --version && rustc --version && python3 --version && dotnet --version"
+docker run --rm -it ghcr.io/JerrettDavis/ac-node-py-dotnet:latest bash -lc "node --version && python3 --version && dotnet --version"
+docker run --rm -it ghcr.io/JerrettDavis/ac-fullstack-polyglot:main bash -lc "node --version && rustc --version && python3 --version && dotnet --version"
 ```
 
 ## Agent overlay Dockerfiles
@@ -79,22 +79,22 @@ docker run --rm -it -v "$PWD:/workspace" local/fullstack-polyglot-devtools bash 
 
 | Publish target | Primary public tag | Alternate public tags |
 |---|---|---|
-| `dotnet-claude` | `ghcr.io/<owner>/dotnet:claude-0.1.0` | `ghcr.io/<owner>/dotnet:claude-0.1`, `ghcr.io/<owner>/dotnet:claude-0`, `ghcr.io/<owner>/dotnet:claude-latest`, `ghcr.io/<owner>/claude:dotnet10-node24` |
-| `dotnet-codex` | `ghcr.io/<owner>/dotnet:codex-0.1.0` | `ghcr.io/<owner>/dotnet:codex-0.1`, `ghcr.io/<owner>/dotnet:codex-0`, `ghcr.io/<owner>/dotnet:codex-latest`, `ghcr.io/<owner>/codex:dotnet10-node24` |
-| `dotnet-copilot` | `ghcr.io/<owner>/dotnet:copilot-0.1.0` | `ghcr.io/<owner>/dotnet:copilot-0.1`, `ghcr.io/<owner>/dotnet:copilot-0`, `ghcr.io/<owner>/dotnet:copilot-latest`, `ghcr.io/<owner>/copilot:dotnet10-node24` |
-| `openclaw-dotnet` | `ghcr.io/<owner>/dotnet:openclaw-0.1.0` | `ghcr.io/<owner>/dotnet:openclaw-0.1`, `ghcr.io/<owner>/dotnet:openclaw-0`, `ghcr.io/<owner>/dotnet:openclaw-latest`, `ghcr.io/<owner>/openclaw:dotnet10-node24-devtools` |
-| `polyglot-menagerie` | `ghcr.io/<owner>/polyglot:menagerie-0.1.0` | `ghcr.io/<owner>/polyglot:menagerie`, `ghcr.io/<owner>/menagerie:dotnet10-node24-python312-rust-latest` |
-| `tools-swiss-army` | `ghcr.io/<owner>/tools:swiss-army-0.1.0` | `ghcr.io/<owner>/tools:swiss-army`, `ghcr.io/<owner>/polyglot:toolbox` |
+| `dotnet-claude` | `ghcr.io/JerrettDavis/ac-dotnet:claude-0.1.0` | `ghcr.io/JerrettDavis/ac-dotnet:claude-0.1`, `ghcr.io/JerrettDavis/ac-dotnet:claude-0`, `ghcr.io/JerrettDavis/ac-dotnet:claude-latest`, `ghcr.io/JerrettDavis/ac-claude:dotnet10-node24` |
+| `dotnet-codex` | `ghcr.io/JerrettDavis/ac-dotnet:codex-0.1.0` | `ghcr.io/JerrettDavis/ac-dotnet:codex-0.1`, `ghcr.io/JerrettDavis/ac-dotnet:codex-0`, `ghcr.io/JerrettDavis/ac-dotnet:codex-latest`, `ghcr.io/JerrettDavis/ac-codex:dotnet10-node24` |
+| `dotnet-copilot` | `ghcr.io/JerrettDavis/ac-dotnet:copilot-0.1.0` | `ghcr.io/JerrettDavis/ac-dotnet:copilot-0.1`, `ghcr.io/JerrettDavis/ac-dotnet:copilot-0`, `ghcr.io/JerrettDavis/ac-dotnet:copilot-latest`, `ghcr.io/JerrettDavis/ac-copilot:dotnet10-node24` |
+| `openclaw-dotnet` | `ghcr.io/JerrettDavis/ac-dotnet:openclaw-0.1.0` | `ghcr.io/JerrettDavis/ac-dotnet:openclaw-0.1`, `ghcr.io/JerrettDavis/ac-dotnet:openclaw-0`, `ghcr.io/JerrettDavis/ac-dotnet:openclaw-latest`, `ghcr.io/JerrettDavis/ac-openclaw:dotnet10-node24-devtools` |
+| `polyglot-menagerie` | `ghcr.io/JerrettDavis/ac-polyglot:menagerie-0.1.0` | `ghcr.io/JerrettDavis/ac-polyglot:menagerie`, `ghcr.io/JerrettDavis/ac-menagerie:dotnet10-node24-python312-rust-latest` |
+| `tools-swiss-army` | `ghcr.io/JerrettDavis/ac-tools:swiss-army-0.1.0` | `ghcr.io/JerrettDavis/ac-tools:swiss-army`, `ghcr.io/JerrettDavis/ac-polyglot:toolbox` |
 
 ### Curated public `docker run` batch
 
 ```bash
-docker run --rm -it -e ANTHROPIC_API_KEY=your-key -v "$PWD:/workspace" ghcr.io/<owner>/dotnet:claude-0.1.0 claude --version
-docker run --rm -it -e OPENAI_API_KEY=your-key -v "$PWD:/workspace" ghcr.io/<owner>/codex:dotnet10-node24 codex --version
-docker run --rm -it -e GITHUB_TOKEN=your-token -v "$PWD:/workspace" ghcr.io/<owner>/dotnet:copilot-latest github-copilot-cli --version
-docker run --rm -it -e OPENCLAW_API_KEY=your-key -p 3000:3000 ghcr.io/<owner>/openclaw:dotnet10-node24-devtools
-docker run --rm -it -v "$PWD:/workspace" ghcr.io/<owner>/polyglot:menagerie bash -lc "claude --version && codex --version && github-copilot-cli --version && openclaw --version"
-docker run --rm -it -v "$PWD:/workspace" ghcr.io/<owner>/tools:swiss-army black --version
+docker run --rm -it -e ANTHROPIC_API_KEY=your-key -v "$PWD:/workspace" ghcr.io/JerrettDavis/ac-dotnet:claude-0.1.0 claude --version
+docker run --rm -it -e OPENAI_API_KEY=your-key -v "$PWD:/workspace" ghcr.io/JerrettDavis/ac-codex:dotnet10-node24 codex --version
+docker run --rm -it -e GITHUB_TOKEN=your-token -v "$PWD:/workspace" ghcr.io/JerrettDavis/ac-dotnet:copilot-latest github-copilot-cli --version
+docker run --rm -it -e OPENCLAW_API_KEY=your-key -p 3000:3000 ghcr.io/JerrettDavis/ac-openclaw:dotnet10-node24-devtools
+docker run --rm -it -v "$PWD:/workspace" ghcr.io/JerrettDavis/ac-polyglot:menagerie bash -lc "claude --version && codex --version && github-copilot-cli --version && openclaw --version"
+docker run --rm -it -v "$PWD:/workspace" ghcr.io/JerrettDavis/ac-tools:swiss-army black --version
 ```
 
 ## Compose matrix

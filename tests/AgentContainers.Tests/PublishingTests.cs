@@ -175,8 +175,8 @@ public class PublishingTests
         var matrix = Program.BuildPublishMatrix(catalog, manifestHash);
         var dotnetClaude = Assert.Single(matrix.Include.Where(entry => entry.Id == "dotnet-claude"));
 
-        Assert.Contains("ghcr.io/${{ github.repository_owner }}/dotnet:claude-0.1.0", dotnetClaude.ImageTags);
-        Assert.Contains("ghcr.io/${{ github.repository_owner }}/dotnet:claude-latest", dotnetClaude.ImageTags);
-        Assert.Contains("ghcr.io/${{ github.repository_owner }}/claude:dotnet10-node24", dotnetClaude.ImageTags);
+        Assert.Contains("ghcr.io/${{ github.repository_owner }}/ac-dotnet:claude-0.1.0", dotnetClaude.ImageTags);
+        Assert.Contains("ghcr.io/${{ github.repository_owner }}/ac-dotnet:claude-latest", dotnetClaude.ImageTags);
+        Assert.Contains("ghcr.io/${{ github.repository_owner }}/ac-claude:dotnet10-node24", dotnetClaude.ImageTags);
     }
 }

@@ -218,7 +218,7 @@ public static class Program
                 DisplayName = b.DisplayName,
                 Context = $"generated/docker/bases/{id}",
                 Dockerfile = "Dockerfile",
-                ImageName = $"ghcr.io/${{{{ github.repository_owner }}}}/{id}",
+                ImageName = $"ghcr.io/${{{{ github.repository_owner }}}}/{GetPublishedRepositoryName(id)}",
                 Platforms = string.Join(",", GetRuntimePlatforms(catalog, id)),
                 Family = b.Family,
                 ManifestHash = manifestHash
@@ -234,7 +234,7 @@ public static class Program
                 DisplayName = c.DisplayName,
                 Context = $"generated/docker/combos/{id}",
                 Dockerfile = "Dockerfile",
-                ImageName = $"ghcr.io/${{{{ github.repository_owner }}}}/{id}",
+                ImageName = $"ghcr.io/${{{{ github.repository_owner }}}}/{GetPublishedRepositoryName(id)}",
                 Platforms = string.Join(",", GetRuntimePlatforms(catalog, id)),
                 Family = string.Join("+", c.Bases.OrderBy(b => b.Order).Select(b => b.Id)),
                 ManifestHash = manifestHash
@@ -594,12 +594,12 @@ public static class Program
         var primaryBase = combo.Bases.OrderBy(b => b.Order).FirstOrDefault();
         if (primaryBase != null && catalog.Bases.TryGetValue(primaryBase.Id, out var primary))
         {
-            sb.AppendLine($"ARG PRIMARY_BASE_IMAGE=agentcontainers/{primaryBase.Id}:latest");
+            sb.AppendLine($"ARG PRIMARY_BASE_IMAGE=agentcontainers/{GetPublishedRepositoryName(primaryBase.Id)}:latest");
             foreach (var baseRef in combo.Bases.OrderBy(b => b.Order).Skip(1))
             {
                 if (catalog.Bases.TryGetValue(baseRef.Id, out var stageBase))
                 {
-                    sb.AppendLine($"ARG {stageBase.Id.ToUpperInvariant().Replace('-', '_')}_STAGE_IMAGE=agentcontainers/{stageBase.Id}:latest");
+                    sb.AppendLine($"ARG {stageBase.Id.ToUpperInvariant().Replace('-', '_')}_STAGE_IMAGE=agentcontainers/{GetPublishedRepositoryName(stageBase.Id)}:latest");
                 }
             }
             sb.AppendLine();
@@ -731,7 +731,7 @@ public static class Program
         sb.AppendLine();
         sb.AppendLine("services:");
         sb.AppendLine($"  {agent.ComposeCapabilities.ServiceNameDefault}:");
-        sb.AppendLine($"    image: ghcr.io/agentcontainers/node-bun-{agent.Id}:latest");
+        sb.AppendLine($"    image: ghcr.io/agentcontainers/{GetPublishedRepositoryName($"node-bun-{agent.Id}")}:latest");
         sb.AppendLine("    environment:");
         foreach (var env in agent.Env)
         {
@@ -781,7 +781,7 @@ public static class Program
                 from_image = b.From.Image,
                 provides = b.Provides,
                 platforms = b.Platforms,
-                registry = $"ghcr.io/agentcontainers/{id}"
+                registry = $"ghcr.io/agentcontainers/{GetPublishedRepositoryName(id)}"
             });
         }
 
@@ -801,7 +801,7 @@ public static class Program
                 bases = c.Bases.OrderBy(b => b.Order).Select(b => b.Id).ToList(),
                 provides = c.Provides,
                 platforms,
-                registry = $"ghcr.io/agentcontainers/{id}"
+                registry = $"ghcr.io/agentcontainers/{GetPublishedRepositoryName(id)}"
             });
         }
 
@@ -866,7 +866,7 @@ public static class Program
                     display_name = $"{tp.DisplayName} on {compatBaseId}",
                     tool_pack = id,
                     base_id = compatBaseId,
-                    registry = $"ghcr.io/agentcontainers/{imageId}"
+                    registry = $"ghcr.io/agentcontainers/{GetPublishedRepositoryName(imageId)}"
                 });
             }
         }
@@ -1025,7 +1025,7 @@ public static class Program
                 Id = id,
                 DisplayName = b.DisplayName,
                 BuildContext = $"generated/docker/bases/{id}",
-                Tag = $"agentcontainers/{id}:latest",
+                Tag = $"agentcontainers/{GetPublishedRepositoryName(id)}:latest",
                 ValidationCommands = b.Validation.Commands,
                 CommonToolValidations = commonValidations,
                 SizeClass = b.ResourceHints.ImageSizeClass
@@ -1040,7 +1040,7 @@ public static class Program
                 Id = id,
                 DisplayName = c.DisplayName,
                 BuildContext = $"generated/docker/combos/{id}",
-                Tag = $"agentcontainers/{id}:latest",
+                Tag = $"agentcontainers/{GetPublishedRepositoryName(id)}:latest",
                 ValidationCommands = c.Validation.Commands,
                 CommonToolValidations = [],
                 SizeClass = c.ResourceHints.ImageSizeClass
@@ -1063,8 +1063,8 @@ public static class Program
                     BaseId = baseId,
                     DisplayName = $"{agent.DisplayName} on {baseManifest.DisplayName}",
                     BuildContext = $"generated/docker/agents/{imageId}",
-                    Tag = $"agentcontainers/{imageId}:latest",
-                    BaseTag = $"agentcontainers/{baseId}:latest",
+                    Tag = $"agentcontainers/{GetPublishedRepositoryName(imageId)}:latest",
+                    BaseTag = $"agentcontainers/{GetPublishedRepositoryName(baseId)}:latest",
                     ValidationCommands = agent.Validation.Commands,
                     SizeClass = baseManifest.ResourceHints.ImageSizeClass
                 });
@@ -1083,8 +1083,8 @@ public static class Program
                     BaseId = comboId,
                     DisplayName = $"{agent.DisplayName} on {combo.DisplayName}",
                     BuildContext = $"generated/docker/agents/{imageId}",
-                    Tag = $"agentcontainers/{imageId}:latest",
-                    BaseTag = $"agentcontainers/{comboId}:latest",
+                    Tag = $"agentcontainers/{GetPublishedRepositoryName(imageId)}:latest",
+                    BaseTag = $"agentcontainers/{GetPublishedRepositoryName(comboId)}:latest",
                     ValidationCommands = agent.Validation.Commands,
                     SizeClass = combo.ResourceHints.ImageSizeClass
                 });
@@ -1112,8 +1112,8 @@ public static class Program
                     BaseId = compatBaseId,
                     DisplayName = $"{pack.DisplayName} on {compatBaseId}",
                     BuildContext = $"generated/docker/tool-packs/{imageId}",
-                    Tag = $"agentcontainers/{imageId}:latest",
-                    BaseTag = $"agentcontainers/{compatBaseId}:latest",
+                    Tag = $"agentcontainers/{GetPublishedRepositoryName(imageId)}:latest",
+                    BaseTag = $"agentcontainers/{GetPublishedRepositoryName(compatBaseId)}:latest",
                     ValidationCommands = pack.Validation.Commands,
                     SizeClass = sizeClass
                 });
@@ -1129,7 +1129,7 @@ public static class Program
                 if (svc.Agent != null)
                 {
                     var baseName = svc.Base ?? "node-bun";
-                    requiredImages.Add($"agentcontainers/{baseName}-{svc.Agent}:latest");
+                    requiredImages.Add($"agentcontainers/{GetPublishedRepositoryName($"{baseName}-{svc.Agent}")}:latest");
                 }
             }
 
@@ -1157,7 +1157,7 @@ public static class Program
         sb.AppendLine($"# Agent overlay: {agent.Id} on {baseId}");
         sb.AppendLine($"# Generated by AgentContainers.Generator v0.1.0");
         sb.AppendLine();
-        sb.AppendLine($"ARG BASE_IMAGE=agentcontainers/{baseId}:latest");
+        sb.AppendLine($"ARG BASE_IMAGE=agentcontainers/{GetPublishedRepositoryName(baseId)}:latest");
         sb.AppendLine($"FROM ${{BASE_IMAGE}}");
         sb.AppendLine();
         sb.AppendLine("USER root");
@@ -1213,7 +1213,7 @@ public static class Program
         sb.AppendLine($"# Tool pack overlay: {toolPack.Id} on {baseId}");
         sb.AppendLine($"# Generated by AgentContainers.Generator v0.1.0");
         sb.AppendLine();
-        sb.AppendLine($"ARG BASE_IMAGE=agentcontainers/{baseId}:latest");
+        sb.AppendLine($"ARG BASE_IMAGE=agentcontainers/{GetPublishedRepositoryName(baseId)}:latest");
         sb.AppendLine($"FROM ${{BASE_IMAGE}}");
         sb.AppendLine();
         sb.AppendLine("USER root");
@@ -1299,7 +1299,7 @@ public static class Program
         sb.AppendLine($"# Curated publish target: {policy.Id}");
         sb.AppendLine("# Generated by AgentContainers.Generator v0.1.0");
         sb.AppendLine();
-        sb.AppendLine($"ARG BASE_IMAGE=agentcontainers/{policy.Runtime}:latest");
+        sb.AppendLine($"ARG BASE_IMAGE=agentcontainers/{GetPublishedRepositoryName(policy.Runtime)}:latest");
         sb.AppendLine("FROM ${BASE_IMAGE}");
         sb.AppendLine();
         sb.AppendLine("USER root");
@@ -1608,6 +1608,9 @@ public static class Program
             .Replace("{{minor}}", version.Minor.ToString(), StringComparison.Ordinal)
             .Replace("{{patch}}", version.Patch.ToString(), StringComparison.Ordinal);
     }
+
+    private static string GetPublishedRepositoryName(string id)
+        => id.StartsWith("ac-", StringComparison.Ordinal) ? id : $"ac-{id}";
 
     internal sealed class PublishMatrix
     {
