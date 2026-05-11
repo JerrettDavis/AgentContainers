@@ -207,7 +207,7 @@ public static class Program
         string manifestHash)
     {
         var include = new List<PublishMatrixEntry>();
-        var publishedImages = BuildResolvedPublishedImages(catalog, "${{ github.repository_owner }}");
+        var publishedImages = BuildResolvedPublishedImages(catalog, "agentcontainers");
 
         foreach (var (id, b) in catalog.Bases.OrderBy(entry => entry.Key))
         {
