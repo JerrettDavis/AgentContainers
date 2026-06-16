@@ -1,0 +1,87 @@
+# Keep dependency PRs grouped and delayed for at least 48 hours so newly published packages age before adoption.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "America/Chicago"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "ci"
+    commit-message:
+      prefix: "chore(deps)"
+    cooldown:
+      default-days: 2
+    groups:
+      github-actions-dependencies:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "America/Chicago"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "chore(deps)"
+    cooldown:
+      default-days: 2
+    groups:
+      nuget-dependencies:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "docker"
+    directories:
+      - "/generated/docker/agents/fullstack-polyglot-claude"
+      - "/generated/docker/agents/fullstack-polyglot-codex"
+      - "/generated/docker/agents/fullstack-polyglot-copilot"
+      - "/generated/docker/agents/fullstack-polyglot-openclaw"
+      - "/generated/docker/agents/node-bun-claude"
+      - "/generated/docker/agents/node-bun-codex"
+      - "/generated/docker/agents/node-bun-copilot"
+      - "/generated/docker/agents/node-bun-openclaw"
+      - "/generated/docker/agents/node-py-dotnet-claude"
+      - "/generated/docker/agents/node-py-dotnet-codex"
+      - "/generated/docker/agents/node-py-dotnet-copilot"
+      - "/generated/docker/agents/node-py-dotnet-openclaw"
+      - "/generated/docker/bases/dotnet"
+      - "/generated/docker/bases/node-bun"
+      - "/generated/docker/bases/python"
+      - "/generated/docker/bases/rust"
+      - "/generated/docker/combos/fullstack-polyglot"
+      - "/generated/docker/combos/node-py-dotnet"
+      - "/generated/docker/images/dotnet-claude"
+      - "/generated/docker/images/dotnet-codex"
+      - "/generated/docker/images/dotnet-copilot"
+      - "/generated/docker/images/openclaw-dotnet"
+      - "/generated/docker/images/polyglot-menagerie"
+      - "/generated/docker/images/tools-swiss-army"
+      - "/generated/docker/tool-packs/fullstack-polyglot-devtools"
+      - "/generated/docker/tool-packs/node-bun-devtools"
+      - "/generated/docker/tool-packs/node-py-dotnet-devtools"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "America/Chicago"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "chore(deps)"
+    cooldown:
+      default-days: 2
+    groups:
+      docker-dependencies:
+        patterns:
+          - "*"
