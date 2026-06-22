@@ -32,7 +32,7 @@ jobs:
       combo-matrix: ${{ steps.matrix.outputs.combo_matrix }}
       publish-target-matrix: ${{ steps.matrix.outputs.publish_target_matrix }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v5
@@ -90,7 +90,7 @@ jobs:
       matrix: ${{ fromJSON(needs.generate-matrix.outputs.base-matrix) }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up QEMU (multi-arch)
         uses: docker/setup-qemu-action@v4
@@ -164,7 +164,7 @@ jobs:
       matrix: ${{ fromJSON(needs.generate-matrix.outputs.combo-matrix) }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up QEMU (multi-arch)
         uses: docker/setup-qemu-action@v4
@@ -257,7 +257,7 @@ jobs:
       matrix: ${{ fromJSON(needs.generate-matrix.outputs.publish-target-matrix) }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up QEMU (multi-arch)
         uses: docker/setup-qemu-action@v4
