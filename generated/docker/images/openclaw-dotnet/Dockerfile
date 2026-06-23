@@ -9,10 +9,10 @@ USER root
 
 # Install OpenClaw
 RUN npm install -g openclaw
-# Patch vulnerable axios dependency
-RUN npm install --omit=dev --prefix /usr/local/lib/node_modules/openclaw/dist/extensions/feishu axios@1.15.0
-# Patch nested feishu axios dependency
-RUN npm install --omit=dev --prefix /usr/local/lib/node_modules/openclaw/dist/extensions/feishu/node_modules/@larksuiteoapi/node-sdk axios@1.15.0
+# Patch vulnerable axios dependency (CVE-2026-44496/44495/44494/44492/44488/44487/44486/42264/42043/42035/42033)
+RUN npm install --omit=dev --prefix /usr/local/lib/node_modules/openclaw/dist/extensions/feishu axios@1.16.0
+# Patch nested feishu axios dependency (CVE-2026-44496/44495/44494/44492/44488/44487/44486/42264/42043/42035/42033)
+RUN npm install --omit=dev --prefix /usr/local/lib/node_modules/openclaw/dist/extensions/feishu/node_modules/@larksuiteoapi/node-sdk axios@1.16.0
 # Patch vulnerable tar dependency
 RUN npm install --omit=dev --prefix /usr/local/lib/node_modules/openclaw/dist/extensions/discord tar@7.5.11
 # Patch nested discord tar dependency

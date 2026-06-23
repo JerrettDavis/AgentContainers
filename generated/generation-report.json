@@ -1,5 +1,5 @@
 {
-  "manifest_hash": "9a8fdeb6a2d193a0368f71b50df7ea05ac47b2f2873f6756ff0d4233960c6700",
+  "manifest_hash": "57b7abfc22d202f3116980bbbc3b75943480030626d1bc031dae3763602b2cb5",
   "generator_version": "0.1.0",
   "artifacts": [
     {
@@ -96,19 +96,19 @@
       "type": "dockerfile",
       "id": "agent-node-bun-openclaw",
       "path": "docker/agents/node-bun-openclaw/Dockerfile",
-      "content_hash": "bd1a9d9b429d95a8ef6122869c812f7bc3d2727521ebe1948ee307a19a82036b"
+      "content_hash": "8cd574a590700001ee88fab17c1af4c3384df01b6836d80b9b64275cefaf6129"
     },
     {
       "type": "dockerfile",
       "id": "agent-fullstack-polyglot-openclaw",
       "path": "docker/agents/fullstack-polyglot-openclaw/Dockerfile",
-      "content_hash": "8d37b80f2c2e18494cf80e5614ae9507be1091a707bf28acc0678bdc8f66819e"
+      "content_hash": "96b2e0aa88440461d54c4fa8ad3e6d60e3e1a511a404c890d1e75fb1e23896c3"
     },
     {
       "type": "dockerfile",
       "id": "agent-node-py-dotnet-openclaw",
       "path": "docker/agents/node-py-dotnet-openclaw/Dockerfile",
-      "content_hash": "2e4d4cb7a09f43a27e87d069b19ec436e3143ed715d78a22c84271b002b75e27"
+      "content_hash": "ab1371d361ed9ce9807e1aa5db1b1e1faab0d7402a2ec57807331e8c191ee46a"
     },
     {
       "type": "dockerfile",
@@ -150,13 +150,13 @@
       "type": "dockerfile",
       "id": "tag-policy-openclaw-dotnet",
       "path": "docker/images/openclaw-dotnet/Dockerfile",
-      "content_hash": "f89bc8def3ff189b4994b56166f028d14170b42372917fcdf7d588a9bcd54223"
+      "content_hash": "156c0edc9b78bc015e2e1fa74d7926bfbbb3d5dcf171f7748d2272f2a2cde945"
     },
     {
       "type": "dockerfile",
       "id": "tag-policy-polyglot-menagerie",
       "path": "docker/images/polyglot-menagerie/Dockerfile",
-      "content_hash": "01670460e421381aed8ff03abdb63ef6d6dd4c7301b75b3703a9821553f19561"
+      "content_hash": "7b063e35d9d0bea699893bcff7619fadba024d03b90dd3cd1927e7b8e5c2503a"
     },
     {
       "type": "dockerfile",
@@ -222,7 +222,7 @@
       "type": "catalog",
       "id": "image-catalog",
       "path": "image-catalog.json",
-      "content_hash": "da715471273f7f913b96025a5e3e0c83a7ad5edc399611ce32d9ea637f340b28"
+      "content_hash": "a7b1eb946f49fcf2687065e35f4d021adf7413f7c4f5da159b7930a5de23c888"
     }
   ]
 }
