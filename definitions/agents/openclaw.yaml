@@ -13,10 +13,10 @@ install:
   package: "openclaw"
   version: latest
   post_install:
-    - command: "npm install --omit=dev --prefix /usr/local/lib/node_modules/openclaw/dist/extensions/feishu axios@1.15.0"
-      description: "Patch vulnerable axios dependency"
-    - command: "npm install --omit=dev --prefix /usr/local/lib/node_modules/openclaw/dist/extensions/feishu/node_modules/@larksuiteoapi/node-sdk axios@1.15.0"
-      description: "Patch nested feishu axios dependency"
+    - command: "npm install --omit=dev --prefix /usr/local/lib/node_modules/openclaw/dist/extensions/feishu axios@1.16.0"
+      description: "Patch vulnerable axios dependency (CVE-2026-44496/44495/44494/44492/44488/44487/44486/42264/42043/42035/42033)"
+    - command: "npm install --omit=dev --prefix /usr/local/lib/node_modules/openclaw/dist/extensions/feishu/node_modules/@larksuiteoapi/node-sdk axios@1.16.0"
+      description: "Patch nested feishu axios dependency (CVE-2026-44496/44495/44494/44492/44488/44487/44486/42264/42043/42035/42033)"
     - command: "npm install --omit=dev --prefix /usr/local/lib/node_modules/openclaw/dist/extensions/discord tar@7.5.11"
       description: "Patch vulnerable tar dependency"
     - command: "npm install --omit=dev --prefix /usr/local/lib/node_modules/openclaw/dist/extensions/discord/node_modules/@discordjs/node-pre-gyp tar@7.5.11"
