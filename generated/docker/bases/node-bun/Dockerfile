@@ -76,7 +76,7 @@ ARG VCS_REF=unknown
 ARG IMAGE_VERSION=v1
 
 LABEL org.opencontainers.image.title="Node.js + Bun"
-LABEL org.opencontainers.image.description="Node.js 24 LTS with Bun runtime"
+LABEL org.opencontainers.image.description="Node.js 26 LTS with Bun runtime"
 LABEL org.opencontainers.image.source="https://github.com/agentcontainers/AgentContainers"
 LABEL org.opencontainers.image.url="https://github.com/agentcontainers/AgentContainers"
 LABEL org.opencontainers.image.vendor="AgentContainers"

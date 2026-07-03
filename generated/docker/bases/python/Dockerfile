@@ -63,7 +63,7 @@ ARG VCS_REF=unknown
 ARG IMAGE_VERSION=v1
 
 LABEL org.opencontainers.image.title="Python"
-LABEL org.opencontainers.image.description="Python 3.12 with pip and venv"
+LABEL org.opencontainers.image.description="Python 3.14 with pip and venv"
 LABEL org.opencontainers.image.source="https://github.com/agentcontainers/AgentContainers"
 LABEL org.opencontainers.image.url="https://github.com/agentcontainers/AgentContainers"
 LABEL org.opencontainers.image.vendor="AgentContainers"
