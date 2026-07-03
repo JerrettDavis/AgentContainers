@@ -1,5 +1,5 @@
 {
-  "manifest_hash": "57b7abfc22d202f3116980bbbc3b75943480030626d1bc031dae3763602b2cb5",
+  "manifest_hash": "582db26be82fc180428e99d4f0bb255af35e082d0c0bb296fab1e05185b33c8a",
   "generator_version": "0.1.0",
   "registry": "ghcr.io/agentcontainers",
   "images": [
@@ -26,10 +26,10 @@
       "id": "node-bun",
       "display_name": "Node.js \u002B Bun",
       "family": "javascript",
-      "from_image": "node:24-bookworm-slim",
+      "from_image": "node:26-bookworm-slim",
       "provides": [
         "node",
-        "node\u003E=24",
+        "node\u003E=26",
         "npm",
         "bun",
         "bun\u003E=1.0",
@@ -46,10 +46,10 @@
       "id": "python",
       "display_name": "Python",
       "family": "python",
-      "from_image": "python:3.12-slim-bookworm",
+      "from_image": "python:3.14-slim-bookworm",
       "provides": [
         "python",
-        "python\u003E=3.12",
+        "python\u003E=3.14",
         "pip",
         "venv"
       ],

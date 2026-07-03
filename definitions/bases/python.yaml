@@ -1,17 +1,17 @@
 id: python
 display_name: Python
 version: v1
-description: Python 3.12 with pip and venv
+description: Python 3.14 with pip and venv
 family: python
 
 from:
-  image: "python:3.12-slim-bookworm"
+  image: "python:3.14-slim-bookworm"
 
 common_tools: default
 
 provides:
   - python
-  - "python>=3.12"
+  - "python>=3.14"
   - pip
   - venv
 

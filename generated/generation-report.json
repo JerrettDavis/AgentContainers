@@ -1,5 +1,5 @@
 {
-  "manifest_hash": "57b7abfc22d202f3116980bbbc3b75943480030626d1bc031dae3763602b2cb5",
+  "manifest_hash": "582db26be82fc180428e99d4f0bb255af35e082d0c0bb296fab1e05185b33c8a",
   "generator_version": "0.1.0",
   "artifacts": [
     {
@@ -12,13 +12,13 @@
       "type": "dockerfile",
       "id": "base-node-bun",
       "path": "docker/bases/node-bun/Dockerfile",
-      "content_hash": "89a2017db98f3f08032baeaff6ae3637113bcf2921ce4e74b60d332cfaedd804"
+      "content_hash": "ac64004fc48bbaa0a0332c921f86cff936e638bb8ccc9ab2a5370af89a0bef37"
     },
     {
       "type": "dockerfile",
       "id": "base-python",
       "path": "docker/bases/python/Dockerfile",
-      "content_hash": "e151179bfd518651a3626ae19536675a7e4d0b2f01f1ab6fab5c56d7dc793593"
+      "content_hash": "a34f9948a34e096f10cf5977340f5e2ad5763aea4c5f3d58851eb1451ba08e22"
     },
     {
       "type": "dockerfile",
@@ -222,7 +222,7 @@
       "type": "catalog",
       "id": "image-catalog",
       "path": "image-catalog.json",
-      "content_hash": "a7b1eb946f49fcf2687065e35f4d021adf7413f7c4f5da159b7930a5de23c888"
+      "content_hash": "78eb3bd600b217d67122fcae6bf04ebfbf0c02b310873c8749b511514dd4d39d"
     }
   ]
 }

@@ -1,17 +1,17 @@
 id: node-bun
 display_name: Node.js + Bun
 version: v1
-description: Node.js 24 LTS with Bun runtime
+description: Node.js 26 LTS with Bun runtime
 family: javascript
 
 from:
-  image: "node:24-bookworm-slim"
+  image: "node:26-bookworm-slim"
 
 common_tools: default
 
 provides:
   - node
-  - "node>=24"
+  - "node>=26"
   - npm
   - bun
   - "bun>=1.0"
