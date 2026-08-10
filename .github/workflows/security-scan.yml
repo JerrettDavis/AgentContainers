@@ -73,7 +73,7 @@ jobs:
 
       - name: Upload Hadolint SARIF
         if: always()
-        uses: github/codeql-action/upload-sarif@v4.37.4
+        uses: github/codeql-action/upload-sarif@v4.37.6
         with:
           sarif_file: hadolint-${{ matrix.id }}.filtered.sarif
           category: hadolint-${{ matrix.id }}
@@ -106,7 +106,7 @@ jobs:
 
       - name: Upload Trivy SARIF
         if: always()
-        uses: github/codeql-action/upload-sarif@v4.37.4
+        uses: github/codeql-action/upload-sarif@v4.37.6
         with:
           sarif_file: trivy-config-${{ matrix.id }}.filtered.sarif
           category: trivy-config-${{ matrix.id }}
@@ -191,7 +191,7 @@ jobs:
 
       - name: Upload Trivy image SARIF
         if: ${{ always() && hashFiles(format('trivy-image-{0}.sarif', matrix.id)) != '' }}
-        uses: github/codeql-action/upload-sarif@v4.37.4
+        uses: github/codeql-action/upload-sarif@v4.37.6
         with:
           sarif_file: trivy-image-${{ matrix.id }}.filtered.sarif
           category: trivy-image-${{ matrix.id }}
