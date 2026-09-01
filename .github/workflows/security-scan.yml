@@ -58,7 +58,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Run Hadolint
-        uses: hadolint/hadolint-action@v3.4.0
+        uses: hadolint/hadolint-action@v3.5.0
         with:
           dockerfile: ${{ matrix.context }}/${{ matrix.dockerfile }}
           failure-threshold: error
@@ -73,7 +73,7 @@ jobs:
 
       - name: Upload Hadolint SARIF
         if: always()
-        uses: github/codeql-action/upload-sarif@v4.37.6
+        uses: github/codeql-action/upload-sarif@v4.37.9
         with:
           sarif_file: hadolint-${{ matrix.id }}.filtered.sarif
           category: hadolint-${{ matrix.id }}
@@ -106,7 +106,7 @@ jobs:
 
       - name: Upload Trivy SARIF
         if: always()
-        uses: github/codeql-action/upload-sarif@v4.37.6
+        uses: github/codeql-action/upload-sarif@v4.37.9
         with:
           sarif_file: trivy-config-${{ matrix.id }}.filtered.sarif
           category: trivy-config-${{ matrix.id }}
@@ -191,7 +191,7 @@ jobs:
 
       - name: Upload Trivy image SARIF
         if: ${{ always() && hashFiles(format('trivy-image-{0}.sarif', matrix.id)) != '' }}
-        uses: github/codeql-action/upload-sarif@v4.37.6
+        uses: github/codeql-action/upload-sarif@v4.37.9
         with:
           sarif_file: trivy-image-${{ matrix.id }}.filtered.sarif
           category: trivy-image-${{ matrix.id }}
