@@ -1,5 +1,5 @@
 {
-  "manifest_hash": "582db26be82fc180428e99d4f0bb255af35e082d0c0bb296fab1e05185b33c8a",
+  "manifest_hash": "4dcb66caedf29d7cf76bf5327d6152152fd5a87d769784adc45b3a8a49f7ed9d",
   "generator_version": "0.1.0",
   "artifacts": [
     {
@@ -18,7 +18,7 @@
       "type": "dockerfile",
       "id": "base-python",
       "path": "docker/bases/python/Dockerfile",
-      "content_hash": "a34f9948a34e096f10cf5977340f5e2ad5763aea4c5f3d58851eb1451ba08e22"
+      "content_hash": "cc66a661b6aa5822fc98deecc8b9507c0938e0bd1a0e6b6ff0029ac88c2ffa38"
     },
     {
       "type": "dockerfile",
@@ -222,7 +222,7 @@
       "type": "catalog",
       "id": "image-catalog",
       "path": "image-catalog.json",
-      "content_hash": "78eb3bd600b217d67122fcae6bf04ebfbf0c02b310873c8749b511514dd4d39d"
+      "content_hash": "26a786ae3a255ae02bd70c00c456a649c6a6d44a82e8656e1bbefefdca4ec101"
     }
   ]
 }
