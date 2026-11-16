@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Scriban" Version="7.5.3" />
+    <PackageReference Include="Scriban" Version="7.6.1" />
   </ItemGroup>
 
   <ItemGroup>
